@@ -1,0 +1,7 @@
+db_name = rmx_contr
+db_host = localhost
+db_user = root
+db_pass = root
+redis_pass = passwd
+redis_host =localhost
+redis_port = 6379 

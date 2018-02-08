@@ -1,0 +1,1 @@
+/usr/bin/c++    -std=c++11   CMakeFiles/custom_header.dir/custom_header.cc.o  -o custom_header -rdynamic ../src/libnet_static.a -lpthread 

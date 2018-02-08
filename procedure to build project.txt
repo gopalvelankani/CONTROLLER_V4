@@ -1,0 +1,28 @@
+Building project
+http://pistache.io/quickstart
+
+I. Libraries need to install
+	1. sudo apt-get install apache2
+	2. sudo apt-get install mysql-server-5.6
+	3. sudo apt-get install  php5-mysql
+	4. sudo apt-get install phpmyadmin
+	5. sudo apt-get install libjsoncpp-dev 	--> For JSON
+	6. sudo apt-get install libmysqlclient-dev --> For MYSQL
+	7. sudo apt-get install libhiredis-dev.
+	8. sudo apt-get install redis-server.
+
+II. edit apache config file.
+
+	add fallowing line to /etc/apache2/apache2.conf at the end of 		the file. 
+	Include /etc/phpmyadmin/apache.conf
+
+III. Linking library.
+
+	step1: Open the file  /pistache-master/examples/CMakeLists.txt 
+	step2: Add  target_link_libraries(rest_server mysqlclient) And
+		    target_link_libraries(rest_server jsoncpp)
+		    target_link_libraries(rest_server hiredis)
+	 	    target_link_libraries(rest_server pthread)
+
+IV. Configure database.
+	

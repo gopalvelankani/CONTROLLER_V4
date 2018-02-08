@@ -1,0 +1,257 @@
+Start testing: Mar 30 15:15 IST
+----------------------------------------------------------
+1/7 Testing: mime_test
+1/7 Test: mime_test
+Command: "/home/mahesh/rmx_controller/pistache-master/build/tests/run_mime_test"
+Directory: /home/mahesh/rmx_controller/pistache-master/build/tests
+"mime_test" start time: Mar 30 15:15 IST
+Output:
+----------------------------------------------------------
+Running main() from gtest_main.cc
+[==========] Running 3 tests from 1 test case.
+[----------] Global test environment set-up.
+[----------] 3 tests from mime_test
+[ RUN      ] mime_test.basic_test
+[       OK ] mime_test.basic_test (0 ms)
+[ RUN      ] mime_test.valid_parsing_test
+[       OK ] mime_test.valid_parsing_test (0 ms)
+[ RUN      ] mime_test.invalid_parsing
+[       OK ] mime_test.invalid_parsing (0 ms)
+[----------] 3 tests from mime_test (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test case ran. (0 ms total)
+[  PASSED  ] 3 tests.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"mime_test" end time: Mar 30 15:15 IST
+"mime_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/7 Testing: headers_test
+2/7 Test: headers_test
+Command: "/home/mahesh/rmx_controller/pistache-master/build/tests/run_headers_test"
+Directory: /home/mahesh/rmx_controller/pistache-master/build/tests
+"headers_test" start time: Mar 30 15:15 IST
+Output:
+----------------------------------------------------------
+Running main() from gtest_main.cc
+[==========] Running 10 tests from 1 test case.
+[----------] Global test environment set-up.
+[----------] 10 tests from headers_test
+[ RUN      ] headers_test.accept
+[       OK ] headers_test.accept (0 ms)
+[ RUN      ] headers_test.allow
+[       OK ] headers_test.allow (0 ms)
+[ RUN      ] headers_test.cache_control
+[       OK ] headers_test.cache_control (0 ms)
+[ RUN      ] headers_test.content_length
+[       OK ] headers_test.content_length (0 ms)
+[ RUN      ] headers_test.connection
+[       OK ] headers_test.connection (0 ms)
+[ RUN      ] headers_test.date_test
+[       OK ] headers_test.date_test (0 ms)
+[ RUN      ] headers_test.host
+[       OK ] headers_test.host (0 ms)
+[ RUN      ] headers_test.user_agent
+[       OK ] headers_test.user_agent (0 ms)
+[ RUN      ] headers_test.content_encoding
+[       OK ] headers_test.content_encoding (0 ms)
+[ RUN      ] headers_test.content_type
+[       OK ] headers_test.content_type (0 ms)
+[----------] 10 tests from headers_test (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 10 tests from 1 test case ran. (0 ms total)
+[  PASSED  ] 10 tests.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"headers_test" end time: Mar 30 15:15 IST
+"headers_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/7 Testing: async_test
+3/7 Test: async_test
+Command: "/home/mahesh/rmx_controller/pistache-master/build/tests/run_async_test"
+Directory: /home/mahesh/rmx_controller/pistache-master/build/tests
+"async_test" start time: Mar 30 15:15 IST
+Output:
+----------------------------------------------------------
+Running main() from gtest_main.cc
+[==========] Running 8 tests from 1 test case.
+[----------] Global test environment set-up.
+[----------] 8 tests from async_test
+[ RUN      ] async_test.basic_test
+[       OK ] async_test.basic_test (2000 ms)
+[ RUN      ] async_test.error_test
+[       OK ] async_test.error_test (0 ms)
+[ RUN      ] async_test.void_promise
+[       OK ] async_test.void_promise (0 ms)
+[ RUN      ] async_test.chain_test
+Result = 20
+Result = 22.901
+[       OK ] async_test.chain_test (2000 ms)
+[ RUN      ] async_test.when_all
+[       OK ] async_test.when_all (3000 ms)
+[ RUN      ] async_test.when_any
+[       OK ] async_test.when_any (3000 ms)
+[ RUN      ] async_test.rethrow_test
+[       OK ] async_test.rethrow_test (0 ms)
+[ RUN      ] async_test.stress_multithreaded_test
+Starting stress testing promises, hang on, this test might take some time to complete
+=================================================
+Parameters for the test: 
+Workers      -> 6
+OpsPerThread -> 100000
+Total Ops    -> 600000
+=================================================
+
+
+599999 promises resolved
+600000 promises resolved
+Stopping worker
+[       OK ] async_test.stress_multithreaded_test (1742 ms)
+[----------] 8 tests from async_test (11742 ms total)
+
+[----------] Global test environment tear-down
+[==========] 8 tests from 1 test case ran. (11743 ms total)
+[  PASSED  ] 8 tests.
+<end of output>
+Test time =  11.75 sec
+----------------------------------------------------------
+Test Passed.
+"async_test" end time: Mar 30 15:16 IST
+"async_test" time elapsed: 00:00:11
+----------------------------------------------------------
+
+4/7 Testing: typeid_test
+4/7 Test: typeid_test
+Command: "/home/mahesh/rmx_controller/pistache-master/build/tests/run_typeid_test"
+Directory: /home/mahesh/rmx_controller/pistache-master/build/tests
+"typeid_test" start time: Mar 30 15:16 IST
+Output:
+----------------------------------------------------------
+Running main() from gtest_main.cc
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from type_id_test
+[ RUN      ] type_id_test.basic_test
+[       OK ] type_id_test.basic_test (0 ms)
+[----------] 1 test from type_id_test (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"typeid_test" end time: Mar 30 15:16 IST
+"typeid_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/7 Testing: router_test
+5/7 Test: router_test
+Command: "/home/mahesh/rmx_controller/pistache-master/build/tests/run_router_test"
+Directory: /home/mahesh/rmx_controller/pistache-master/build/tests
+"router_test" start time: Mar 30 15:16 IST
+Output:
+----------------------------------------------------------
+Running main() from gtest_main.cc
+[==========] Running 4 tests from 1 test case.
+[----------] Global test environment set-up.
+[----------] 4 tests from router_test
+[ RUN      ] router_test.test_fixed_routes
+[       OK ] router_test.test_fixed_routes (0 ms)
+[ RUN      ] router_test.test_parameters
+[       OK ] router_test.test_parameters (0 ms)
+[ RUN      ] router_test.test_optional
+[       OK ] router_test.test_optional (0 ms)
+[ RUN      ] router_test.test_splat
+[       OK ] router_test.test_splat (0 ms)
+[----------] 4 tests from router_test (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test case ran. (1 ms total)
+[  PASSED  ] 4 tests.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"router_test" end time: Mar 30 15:16 IST
+"router_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/7 Testing: cookie_test
+6/7 Test: cookie_test
+Command: "/home/mahesh/rmx_controller/pistache-master/build/tests/run_cookie_test"
+Directory: /home/mahesh/rmx_controller/pistache-master/build/tests
+"cookie_test" start time: Mar 30 15:16 IST
+Output:
+----------------------------------------------------------
+Running main() from gtest_main.cc
+[==========] Running 6 tests from 1 test case.
+[----------] Global test environment set-up.
+[----------] 6 tests from cookie_test
+[ RUN      ] cookie_test.basic_test
+[       OK ] cookie_test.basic_test (0 ms)
+[ RUN      ] cookie_test.attributes_test
+[       OK ] cookie_test.attributes_test (0 ms)
+[ RUN      ] cookie_test.bool_test
+[       OK ] cookie_test.bool_test (0 ms)
+[ RUN      ] cookie_test.ext_test
+[       OK ] cookie_test.ext_test (0 ms)
+[ RUN      ] cookie_test.write_test
+[       OK ] cookie_test.write_test (0 ms)
+[ RUN      ] cookie_test.invalid_test
+[       OK ] cookie_test.invalid_test (0 ms)
+[----------] 6 tests from cookie_test (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 6 tests from 1 test case ran. (0 ms total)
+[  PASSED  ] 6 tests.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"cookie_test" end time: Mar 30 15:16 IST
+"cookie_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/7 Testing: view_test
+7/7 Test: view_test
+Command: "/home/mahesh/rmx_controller/pistache-master/build/tests/run_view_test"
+Directory: /home/mahesh/rmx_controller/pistache-master/build/tests
+"view_test" start time: Mar 30 15:16 IST
+Output:
+----------------------------------------------------------
+Running main() from gtest_main.cc
+[==========] Running 4 tests from 1 test case.
+[----------] Global test environment set-up.
+[----------] 4 tests from view_test
+[ RUN      ] view_test.test_vector
+[       OK ] view_test.test_vector (1 ms)
+[ RUN      ] view_test.test_array
+[       OK ] view_test.test_array (0 ms)
+[ RUN      ] view_test.string_test
+[       OK ] view_test.string_test (0 ms)
+[ RUN      ] view_test.null_test
+[       OK ] view_test.null_test (0 ms)
+[----------] 4 tests from view_test (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test case ran. (1 ms total)
+[  PASSED  ] 4 tests.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"view_test" end time: Mar 30 15:16 IST
+"view_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Mar 30 15:16 IST
