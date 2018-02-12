@@ -7749,14 +7749,14 @@ private:
 	                json["tuner_ch"] = tuner_ch;
 	                json["target"] = target;
 	                json["control_fpga"] = control_fpga;
-	                json["channel_no"] = read32bI2C(6,4);
-	                json["ip"] = (read32bI2C(6,8))&0xFFFFFFFF;
-	                json["port"] = read32bI2C(6,12);
-	                json["channel"] = read32bI2C(6,16);
-	                usleep(1000);
-	                json["igmpip"] = (read32bI2C(2,28))&0xFFFFFFFF;
-	                json["igmpch"] = read32bI2C(2,32);
-	                json["input"] = read32bI2C(4,0);
+	                // json["channel_no"] = read32bI2C(6,4);
+	                // json["ip"] = (read32bI2C(6,8))&0xFFFFFFFF;
+	                // json["port"] = read32bI2C(6,12);
+	                // json["channel"] = read32bI2C(6,16);
+	                // usleep(1000);
+	                // json["igmpip"] = (read32bI2C(2,28))&0xFFFFFFFF;
+	                // json["igmpch"] = read32bI2C(2,32);
+	                // json["input"] = read32bI2C(4,0);
 	            }else{
 	        		json["error"]= true;
             		json["message"]= "Error while connection!";    	
@@ -7854,7 +7854,7 @@ private:
 	                json["message"]= "successfully assigned IP OUT!";
 	                int controller_of_rmx = (rmx_no % 2 == 0)?1:0;
         			int ch_no = ((controller_of_rmx)*8)+std::stoi(channel_no);
-
+        			usleep(1000);
 	                if(write32bI2C(6, 4,ch_no) == -1){
 			        	json["error"]= true;
 			        	json["message"]= "Fail to set channel_no!";
@@ -7944,14 +7944,18 @@ private:
 	                	json["error"]= true;
 	                	json["message"]= "Failed IGMP Channel Number!";
 	                }
-				   	// IGMP multicast ip
+			        // IGMP multicast ip
 				   	if(write32bI2C(2,28,0) == -1){
 	                	json["error"]= true;
 	                	json["message"]= "Failed IGMP multicast ip!";
 	                }
+				   	
 	            }else{
 	        		json["error"]= true;
             		json["message"]= "Error while connection!";    	
+	            }
+	            if(json["error"] == false){
+	            	db->removeIPInputChannels(rmx_no,std::stoi(channel_no));
 	            }
             }
         }else{
@@ -10880,46 +10884,35 @@ private:
         Json::Value json,NewService_names,NewService_ids,network_details,lcn_json,high_prior_ser,pmt_alarm_json,active_progs,locked_progs,freeca_progs,input_mode_json,fifo_flags,table_ver_json,table_timeout_json,dvb_output_json,psisi_interval,serv_provider_json,nit_mode;
         printf("\n\n Downloding Mxl 1 \n");
         downloadMxlFW(1,0);
-        // usleep(1000000);
-        // printf("\n\n Downloding Mxl 2 \n");
-        // downloadMxlFW(2,0);
-        // // usleep(1000000);
-        // printf("\n\n Downloding Mxl 3 \n");
-        // downloadMxlFW(3,0);
-        // //usleep(1000000);
-        // printf("\n\n Downloding Mxl 4 \n");
-        // downloadMxlFW(4,0);
-        // //usleep(1000000);
-        // printf("\n\n Downloding Mxl 5 \n");
-        // downloadMxlFW(5,0);
-        // //usleep(1000000);
-        // printf("\n\n Downloding Mxl 6 \n");
-        // downloadMxlFW(6,0);
-        // printf("\n\n MXL Downlod Completed! \n\n");
         usleep(1000000);
+        printf("\n\n Downloding Mxl 2 \n");
+        downloadMxlFW(2,0);
+        // usleep(1000000);
+        printf("\n\n Downloding Mxl 3 \n");
+        downloadMxlFW(3,0);
+        //usleep(1000000);
+        printf("\n\n Downloding Mxl 4 \n");
+        downloadMxlFW(4,0);
+        //usleep(1000000);
+        printf("\n\n Downloding Mxl 5 \n");
+        downloadMxlFW(5,0);
+        //usleep(1000000);
+        printf("\n\n Downloding Mxl 6 \n");
+        downloadMxlFW(6,0);
+        printf("\n\n MXL Downlod Completed! \n\n");
+        usleep(1000);
         Json::Value jsonAllegro = db->getConfAllegro();
         if(jsonAllegro["error"] == false){
         	for(int i=0;i<jsonAllegro["list"].size();i++ ){
         		int target =((0&0x3)<<8) | ((0&0x7)<<5) | ((((std::stoi(jsonAllegro["list"][i]["mxl_id"].asString()))+6)&0xF)<<1) | (0&0x1);
         		if(write32bCPU(0,0,target) != -1){
         			confAllegro8297(std::stoi(jsonAllegro["list"][i]["address"].asString()),std::stoi(jsonAllegro["list"][i]["enable1"].asString()),std::stoi(jsonAllegro["list"][i]["volt1"].asString()),std::stoi(jsonAllegro["list"][i]["enable2"].asString()),std::stoi(jsonAllegro["list"][i]["volt2"].asString()));
-        			usleep(1000000);
+        			usleep(1000);
         		}
         		
         	}	
         }
-        //Setting Input tuner type for each input channels (RF or IP IN)
-        for (int control_fpga = 1; control_fpga <= 3; ++control_fpga)
-        {
-        	int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
-    		if(write32bCPU(0,0,target) != -1){
-    			int tuner_ch = db->getTunerChannelType(control_fpga);
-				if(write32bI2C(4,0,tuner_ch) == -1){
-		        	std::cout<<"Failed to configure MUX IN!"<<std::endl;
-		        }
-		    }
-		    usleep(10000);
-        }
+        
         Json::Value jsonTuner = db->getRFTunerDetails();
         if(jsonTuner["error"] == false){
         	for(int i=0;i<jsonTuner["list"].size();i++ ){
@@ -10928,9 +10921,9 @@ private:
         		int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
 	            if(connectI2Clines(target)){
 	        		tuneMxl(std::stoi(jsonTuner["list"][i]["demod_id"].asString()),std::stoi(jsonTuner["list"][i]["lnb_id"].asString()),std::stoi(jsonTuner["list"][i]["dvb_standard"].asString()),std::stoi(jsonTuner["list"][i]["frequency"].asString()),std::stoi(jsonTuner["list"][i]["symbol_rate"].asString()),std::stoi(jsonTuner["list"][i]["modulation"].asString()),std::stoi(jsonTuner["list"][i]["fec"].asString()),std::stoi(jsonTuner["list"][i]["rolloff"].asString()),std::stoi(jsonTuner["list"][i]["pilots"].asString()),std::stoi(jsonTuner["list"][i]["spectrum"].asString()),std::stoi(jsonTuner["list"][i]["lo_frequency"].asString()),mxl_id,rmx_no,0);
-	        		usleep(1000000);
+	        		usleep(1000);
 	        		setMpegMode(std::stoi(jsonTuner["list"][i]["demod_id"].asString()),1,MXL_HYDRA_MPEG_CLK_CONTINUOUS,MXL_HYDRA_MPEG_CLK_IN_PHASE,50,MXL_HYDRA_MPEG_CLK_PHASE_SHIFT_0_DEG,1,1,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_MODE_SERIAL_3_WIRE,MXL_HYDRA_MPEG_ERR_INDICATION_DISABLED);
-	        		usleep(1000000);
+	        		usleep(1000);
 	        	}
         	}	
         }
@@ -10951,11 +10944,26 @@ private:
 	        		else
 	        			std::cout<<"--------------------IP Input FAILED-------------------------------- "<<std::endl;
 	        	}
-        		usleep(1000000);
+        		usleep(1000);
         	}	
         }
+        usleep(1000);
+        //Setting Input tuner type for each input channels (RF or IP IN)
+        for (int control_fpga = 1; control_fpga <= 3; ++control_fpga)
+        {
+        	int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
+    		if(write32bCPU(0,0,target) != -1){
+    			int tuner_ch = db->getTunerChannelType(control_fpga);
+				if(write32bI2C(4,0,tuner_ch) == -1){
+		        	std::cout<<"Failed to configure MUX IN!"<<std::endl;
+		        }else{
+		        	std::cout<<"-------------------Success MUX IN!--------------------------------------"<<std::endl;
+		        }
+		    }
+		    usleep(1000);
+        }
 
-        usleep(1000000);
+        usleep(1000);
         Json::Value jsonIPOUT = db->getIPOutputChannels();
         if(jsonIPOUT["error"] == false){
         	std::cout<<jsonIPOUT["list"].size()<<std::endl;
@@ -10980,7 +10988,7 @@ private:
 			}
 	    }
 
-	    usleep(1000000);
+	    usleep(1000);
         Json::Value jsonRfauth = db->getRFauthorizedRmx();
         int rmx_no =0;
         if(jsonRfauth["error"] == false){
@@ -10999,7 +11007,7 @@ private:
 		            std::cout<<"-----------Services has been restored from channel RMX "<<rmx<<">---------------->CH "<<input<<std::endl;
 		    }
 		}
-
+		usleep(1000);
         for (int i = 0; i <= RMX_COUNT; ++i)
         {
             for (int j = 0; j <= INPUT_COUNT; ++j)

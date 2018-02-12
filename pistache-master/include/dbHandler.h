@@ -118,6 +118,7 @@ public:
 	int getTunerChannelType(int contr_fpga);
 	int addTunerChannelType(int rmx_no,int channel_no,int type);
 	Json::Value getIPTunerDetails();
+	int removeIPInputChannels(int rmx_no, int input_channel);
 };
 // This is the content of the .h file, which is where the declarations go
 

@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master
+CMAKE_SOURCE_DIR = /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build
+CMAKE_BINARY_DIR = /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -135,14 +135,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/CMakeFiles /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/examples/CMakeFiles/progress.marks
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/CMakeFiles 0
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/examples/CMakeFiles/progress.marks
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/clean
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/clean
 .PHONY : clean
 
 # The main clean target
@@ -152,22 +152,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/preinstall
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/preinstall
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 examples/CMakeFiles/http_server.dir/rule:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/CMakeFiles/http_server.dir/rule
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/CMakeFiles/http_server.dir/rule
 .PHONY : examples/CMakeFiles/http_server.dir/rule
 
 # Convenience name for target.
@@ -177,12 +177,12 @@ http_server: examples/CMakeFiles/http_server.dir/rule
 
 # fast build rule for target.
 http_server/fast:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/http_server.dir/build.make examples/CMakeFiles/http_server.dir/build
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/http_server.dir/build.make examples/CMakeFiles/http_server.dir/build
 .PHONY : http_server/fast
 
 # Convenience name for target.
 examples/CMakeFiles/http_client.dir/rule:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/CMakeFiles/http_client.dir/rule
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/CMakeFiles/http_client.dir/rule
 .PHONY : examples/CMakeFiles/http_client.dir/rule
 
 # Convenience name for target.
@@ -192,12 +192,12 @@ http_client: examples/CMakeFiles/http_client.dir/rule
 
 # fast build rule for target.
 http_client/fast:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/http_client.dir/build.make examples/CMakeFiles/http_client.dir/build
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/http_client.dir/build.make examples/CMakeFiles/http_client.dir/build
 .PHONY : http_client/fast
 
 # Convenience name for target.
 examples/CMakeFiles/rest_server.dir/rule:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/CMakeFiles/rest_server.dir/rule
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/CMakeFiles/rest_server.dir/rule
 .PHONY : examples/CMakeFiles/rest_server.dir/rule
 
 # Convenience name for target.
@@ -207,12 +207,12 @@ rest_server: examples/CMakeFiles/rest_server.dir/rule
 
 # fast build rule for target.
 rest_server/fast:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/rest_server.dir/build.make examples/CMakeFiles/rest_server.dir/build
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/rest_server.dir/build.make examples/CMakeFiles/rest_server.dir/build
 .PHONY : rest_server/fast
 
 # Convenience name for target.
 examples/CMakeFiles/custom_header.dir/rule:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/CMakeFiles/custom_header.dir/rule
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/CMakeFiles/custom_header.dir/rule
 .PHONY : examples/CMakeFiles/custom_header.dir/rule
 
 # Convenience name for target.
@@ -222,12 +222,12 @@ custom_header: examples/CMakeFiles/custom_header.dir/rule
 
 # fast build rule for target.
 custom_header/fast:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/custom_header.dir/build.make examples/CMakeFiles/custom_header.dir/build
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/custom_header.dir/build.make examples/CMakeFiles/custom_header.dir/build
 .PHONY : custom_header/fast
 
 # Convenience name for target.
 examples/CMakeFiles/hello_server.dir/rule:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/CMakeFiles/hello_server.dir/rule
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/CMakeFiles/hello_server.dir/rule
 .PHONY : examples/CMakeFiles/hello_server.dir/rule
 
 # Convenience name for target.
@@ -237,7 +237,7 @@ hello_server: examples/CMakeFiles/hello_server.dir/rule
 
 # fast build rule for target.
 hello_server/fast:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/hello_server.dir/build.make examples/CMakeFiles/hello_server.dir/build
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/hello_server.dir/build.make examples/CMakeFiles/hello_server.dir/build
 .PHONY : hello_server/fast
 
 custom_header.o: custom_header.cc.o
@@ -246,7 +246,7 @@ custom_header.o: custom_header.cc.o
 
 # target to build an object file
 custom_header.cc.o:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/custom_header.dir/build.make examples/CMakeFiles/custom_header.dir/custom_header.cc.o
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/custom_header.dir/build.make examples/CMakeFiles/custom_header.dir/custom_header.cc.o
 .PHONY : custom_header.cc.o
 
 custom_header.i: custom_header.cc.i
@@ -255,7 +255,7 @@ custom_header.i: custom_header.cc.i
 
 # target to preprocess a source file
 custom_header.cc.i:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/custom_header.dir/build.make examples/CMakeFiles/custom_header.dir/custom_header.cc.i
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/custom_header.dir/build.make examples/CMakeFiles/custom_header.dir/custom_header.cc.i
 .PHONY : custom_header.cc.i
 
 custom_header.s: custom_header.cc.s
@@ -264,7 +264,7 @@ custom_header.s: custom_header.cc.s
 
 # target to generate assembly for a file
 custom_header.cc.s:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/custom_header.dir/build.make examples/CMakeFiles/custom_header.dir/custom_header.cc.s
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/custom_header.dir/build.make examples/CMakeFiles/custom_header.dir/custom_header.cc.s
 .PHONY : custom_header.cc.s
 
 hello_server.o: hello_server.cc.o
@@ -273,7 +273,7 @@ hello_server.o: hello_server.cc.o
 
 # target to build an object file
 hello_server.cc.o:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/hello_server.dir/build.make examples/CMakeFiles/hello_server.dir/hello_server.cc.o
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/hello_server.dir/build.make examples/CMakeFiles/hello_server.dir/hello_server.cc.o
 .PHONY : hello_server.cc.o
 
 hello_server.i: hello_server.cc.i
@@ -282,7 +282,7 @@ hello_server.i: hello_server.cc.i
 
 # target to preprocess a source file
 hello_server.cc.i:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/hello_server.dir/build.make examples/CMakeFiles/hello_server.dir/hello_server.cc.i
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/hello_server.dir/build.make examples/CMakeFiles/hello_server.dir/hello_server.cc.i
 .PHONY : hello_server.cc.i
 
 hello_server.s: hello_server.cc.s
@@ -291,7 +291,7 @@ hello_server.s: hello_server.cc.s
 
 # target to generate assembly for a file
 hello_server.cc.s:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/hello_server.dir/build.make examples/CMakeFiles/hello_server.dir/hello_server.cc.s
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/hello_server.dir/build.make examples/CMakeFiles/hello_server.dir/hello_server.cc.s
 .PHONY : hello_server.cc.s
 
 http_client.o: http_client.cc.o
@@ -300,7 +300,7 @@ http_client.o: http_client.cc.o
 
 # target to build an object file
 http_client.cc.o:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/http_client.dir/build.make examples/CMakeFiles/http_client.dir/http_client.cc.o
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/http_client.dir/build.make examples/CMakeFiles/http_client.dir/http_client.cc.o
 .PHONY : http_client.cc.o
 
 http_client.i: http_client.cc.i
@@ -309,7 +309,7 @@ http_client.i: http_client.cc.i
 
 # target to preprocess a source file
 http_client.cc.i:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/http_client.dir/build.make examples/CMakeFiles/http_client.dir/http_client.cc.i
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/http_client.dir/build.make examples/CMakeFiles/http_client.dir/http_client.cc.i
 .PHONY : http_client.cc.i
 
 http_client.s: http_client.cc.s
@@ -318,7 +318,7 @@ http_client.s: http_client.cc.s
 
 # target to generate assembly for a file
 http_client.cc.s:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/http_client.dir/build.make examples/CMakeFiles/http_client.dir/http_client.cc.s
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/http_client.dir/build.make examples/CMakeFiles/http_client.dir/http_client.cc.s
 .PHONY : http_client.cc.s
 
 http_server.o: http_server.cc.o
@@ -327,7 +327,7 @@ http_server.o: http_server.cc.o
 
 # target to build an object file
 http_server.cc.o:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/http_server.dir/build.make examples/CMakeFiles/http_server.dir/http_server.cc.o
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/http_server.dir/build.make examples/CMakeFiles/http_server.dir/http_server.cc.o
 .PHONY : http_server.cc.o
 
 http_server.i: http_server.cc.i
@@ -336,7 +336,7 @@ http_server.i: http_server.cc.i
 
 # target to preprocess a source file
 http_server.cc.i:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/http_server.dir/build.make examples/CMakeFiles/http_server.dir/http_server.cc.i
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/http_server.dir/build.make examples/CMakeFiles/http_server.dir/http_server.cc.i
 .PHONY : http_server.cc.i
 
 http_server.s: http_server.cc.s
@@ -345,7 +345,7 @@ http_server.s: http_server.cc.s
 
 # target to generate assembly for a file
 http_server.cc.s:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/http_server.dir/build.make examples/CMakeFiles/http_server.dir/http_server.cc.s
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/http_server.dir/build.make examples/CMakeFiles/http_server.dir/http_server.cc.s
 .PHONY : http_server.cc.s
 
 rest_server.o: rest_server.cc.o
@@ -354,7 +354,7 @@ rest_server.o: rest_server.cc.o
 
 # target to build an object file
 rest_server.cc.o:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/rest_server.dir/build.make examples/CMakeFiles/rest_server.dir/rest_server.cc.o
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/rest_server.dir/build.make examples/CMakeFiles/rest_server.dir/rest_server.cc.o
 .PHONY : rest_server.cc.o
 
 rest_server.i: rest_server.cc.i
@@ -363,7 +363,7 @@ rest_server.i: rest_server.cc.i
 
 # target to preprocess a source file
 rest_server.cc.i:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/rest_server.dir/build.make examples/CMakeFiles/rest_server.dir/rest_server.cc.i
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/rest_server.dir/build.make examples/CMakeFiles/rest_server.dir/rest_server.cc.i
 .PHONY : rest_server.cc.i
 
 rest_server.s: rest_server.cc.s
@@ -372,7 +372,7 @@ rest_server.s: rest_server.cc.s
 
 # target to generate assembly for a file
 rest_server.cc.s:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(MAKE) -f examples/CMakeFiles/rest_server.dir/build.make examples/CMakeFiles/rest_server.dir/rest_server.cc.s
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/rest_server.dir/build.make examples/CMakeFiles/rest_server.dir/rest_server.cc.s
 .PHONY : rest_server.cc.s
 
 # Help Target
@@ -419,6 +419,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

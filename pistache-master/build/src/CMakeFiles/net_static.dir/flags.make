@@ -7,11 +7,11 @@ C_FLAGS =
 
 C_DEFINES = 
 
-C_INCLUDES = -I/home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/include 
+C_INCLUDES = -I/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/include 
 
 CXX_FLAGS =  -std=c++11  
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/include 
+CXX_INCLUDES = -I/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/include 
 

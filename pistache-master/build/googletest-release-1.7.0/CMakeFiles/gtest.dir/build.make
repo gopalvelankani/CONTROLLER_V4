@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master
+CMAKE_SOURCE_DIR = /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build
+CMAKE_BINARY_DIR = /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build
 
 # Include any dependencies generated for this target.
 include googletest-release-1.7.0/CMakeFiles/gtest.dir/depend.make
@@ -59,16 +59,16 @@ include googletest-release-1.7.0/CMakeFiles/gtest.dir/flags.make
 
 googletest-release-1.7.0/CMakeFiles/gtest.dir/src/gtest-all.cc.o: googletest-release-1.7.0/CMakeFiles/gtest.dir/flags.make
 googletest-release-1.7.0/CMakeFiles/gtest.dir/src/gtest-all.cc.o: ../googletest-release-1.7.0/src/gtest-all.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object googletest-release-1.7.0/CMakeFiles/gtest.dir/src/gtest-all.cc.o"
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/googletest-release-1.7.0 && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/gtest.dir/src/gtest-all.cc.o -c /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/googletest-release-1.7.0/src/gtest-all.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object googletest-release-1.7.0/CMakeFiles/gtest.dir/src/gtest-all.cc.o"
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/googletest-release-1.7.0 && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/gtest.dir/src/gtest-all.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/googletest-release-1.7.0/src/gtest-all.cc
 
 googletest-release-1.7.0/CMakeFiles/gtest.dir/src/gtest-all.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/gtest.dir/src/gtest-all.cc.i"
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/googletest-release-1.7.0 && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/googletest-release-1.7.0/src/gtest-all.cc > CMakeFiles/gtest.dir/src/gtest-all.cc.i
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/googletest-release-1.7.0 && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/googletest-release-1.7.0/src/gtest-all.cc > CMakeFiles/gtest.dir/src/gtest-all.cc.i
 
 googletest-release-1.7.0/CMakeFiles/gtest.dir/src/gtest-all.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/gtest.dir/src/gtest-all.cc.s"
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/googletest-release-1.7.0 && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/googletest-release-1.7.0/src/gtest-all.cc -o CMakeFiles/gtest.dir/src/gtest-all.cc.s
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/googletest-release-1.7.0 && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/googletest-release-1.7.0/src/gtest-all.cc -o CMakeFiles/gtest.dir/src/gtest-all.cc.s
 
 googletest-release-1.7.0/CMakeFiles/gtest.dir/src/gtest-all.cc.o.requires:
 
@@ -91,9 +91,9 @@ gtest_EXTERNAL_OBJECTS =
 googletest-release-1.7.0/libgtest.a: googletest-release-1.7.0/CMakeFiles/gtest.dir/src/gtest-all.cc.o
 googletest-release-1.7.0/libgtest.a: googletest-release-1.7.0/CMakeFiles/gtest.dir/build.make
 googletest-release-1.7.0/libgtest.a: googletest-release-1.7.0/CMakeFiles/gtest.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX static library libgtest.a"
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/googletest-release-1.7.0 && $(CMAKE_COMMAND) -P CMakeFiles/gtest.dir/cmake_clean_target.cmake
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/googletest-release-1.7.0 && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/gtest.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX static library libgtest.a"
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/googletest-release-1.7.0 && $(CMAKE_COMMAND) -P CMakeFiles/gtest.dir/cmake_clean_target.cmake
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/googletest-release-1.7.0 && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/gtest.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 googletest-release-1.7.0/CMakeFiles/gtest.dir/build: googletest-release-1.7.0/libgtest.a
@@ -105,10 +105,10 @@ googletest-release-1.7.0/CMakeFiles/gtest.dir/requires: googletest-release-1.7.0
 .PHONY : googletest-release-1.7.0/CMakeFiles/gtest.dir/requires
 
 googletest-release-1.7.0/CMakeFiles/gtest.dir/clean:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/googletest-release-1.7.0 && $(CMAKE_COMMAND) -P CMakeFiles/gtest.dir/cmake_clean.cmake
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/googletest-release-1.7.0 && $(CMAKE_COMMAND) -P CMakeFiles/gtest.dir/cmake_clean.cmake
 .PHONY : googletest-release-1.7.0/CMakeFiles/gtest.dir/clean
 
 googletest-release-1.7.0/CMakeFiles/gtest.dir/depend:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/googletest-release-1.7.0 /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/googletest-release-1.7.0 /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/googletest-release-1.7.0/CMakeFiles/gtest.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/googletest-release-1.7.0 /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/googletest-release-1.7.0 /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/googletest-release-1.7.0/CMakeFiles/gtest.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : googletest-release-1.7.0/CMakeFiles/gtest.dir/depend
 

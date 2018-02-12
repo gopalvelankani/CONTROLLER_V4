@@ -100,18 +100,18 @@ int write32(unsigned char cCs, unsigned char addr, unsigned int *sData,int sData
         else
             byte = sData[i];
         data_out =  ((data_out << 8) + byte);
-          printf("\n data_out %d",data_out);
-          printf("\n %llu",data_out);
+          // printf("\n data_out %d",data_out);
+          // printf("\n %llu",data_out);
           if ( index_out == 3 ) {
              write32bCPU (I2C_CS,4,data_out);
-             printf("\n %d",data_out);
+             // printf("\n %d",data_out);
              index_out = 0;
           } else {
              index_out = index_out+1;
           }
 
        }
-       printf("\nindex_out %d",index_out);
+       // printf("\nindex_out %d",index_out);
        // print $index_out
         if (index_out == 1 ) {
          data_out = data_out<<24;
@@ -124,7 +124,7 @@ int write32(unsigned char cCs, unsigned char addr, unsigned int *sData,int sData
           write32bCPU(I2C_CS,4,data_out);
         }
         word0 = (1<<18)|word0;
-        printf("\n last word0 %d",word0);
+        // printf("\n last word0 %d",word0);
         write32bCPU(I2C_CS,8,word0);
 }
 int read32bI2C(unsigned char cCs, unsigned char addr){

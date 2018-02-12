@@ -1,4 +1,4 @@
-# Install script for directory: /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/tests
+# Install script for directory: /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/tests
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

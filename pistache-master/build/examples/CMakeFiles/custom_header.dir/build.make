@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master
+CMAKE_SOURCE_DIR = /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build
+CMAKE_BINARY_DIR = /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build
 
 # Include any dependencies generated for this target.
 include examples/CMakeFiles/custom_header.dir/depend.make
@@ -59,16 +59,16 @@ include examples/CMakeFiles/custom_header.dir/flags.make
 
 examples/CMakeFiles/custom_header.dir/custom_header.cc.o: examples/CMakeFiles/custom_header.dir/flags.make
 examples/CMakeFiles/custom_header.dir/custom_header.cc.o: ../examples/custom_header.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object examples/CMakeFiles/custom_header.dir/custom_header.cc.o"
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/examples && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/custom_header.dir/custom_header.cc.o -c /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/examples/custom_header.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object examples/CMakeFiles/custom_header.dir/custom_header.cc.o"
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/examples && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/custom_header.dir/custom_header.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/examples/custom_header.cc
 
 examples/CMakeFiles/custom_header.dir/custom_header.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/custom_header.dir/custom_header.cc.i"
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/examples && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/examples/custom_header.cc > CMakeFiles/custom_header.dir/custom_header.cc.i
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/examples && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/examples/custom_header.cc > CMakeFiles/custom_header.dir/custom_header.cc.i
 
 examples/CMakeFiles/custom_header.dir/custom_header.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/custom_header.dir/custom_header.cc.s"
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/examples && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/examples/custom_header.cc -o CMakeFiles/custom_header.dir/custom_header.cc.s
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/examples && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/examples/custom_header.cc -o CMakeFiles/custom_header.dir/custom_header.cc.s
 
 examples/CMakeFiles/custom_header.dir/custom_header.cc.o.requires:
 
@@ -92,8 +92,8 @@ examples/custom_header: examples/CMakeFiles/custom_header.dir/custom_header.cc.o
 examples/custom_header: examples/CMakeFiles/custom_header.dir/build.make
 examples/custom_header: src/libnet_static.a
 examples/custom_header: examples/CMakeFiles/custom_header.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable custom_header"
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/examples && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/custom_header.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable custom_header"
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/examples && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/custom_header.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 examples/CMakeFiles/custom_header.dir/build: examples/custom_header
@@ -105,10 +105,10 @@ examples/CMakeFiles/custom_header.dir/requires: examples/CMakeFiles/custom_heade
 .PHONY : examples/CMakeFiles/custom_header.dir/requires
 
 examples/CMakeFiles/custom_header.dir/clean:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/examples && $(CMAKE_COMMAND) -P CMakeFiles/custom_header.dir/cmake_clean.cmake
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/examples && $(CMAKE_COMMAND) -P CMakeFiles/custom_header.dir/cmake_clean.cmake
 .PHONY : examples/CMakeFiles/custom_header.dir/clean
 
 examples/CMakeFiles/custom_header.dir/depend:
-	cd /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/examples /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/examples /home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/build/examples/CMakeFiles/custom_header.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/examples /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/examples /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/examples/CMakeFiles/custom_header.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : examples/CMakeFiles/custom_header.dir/depend
 

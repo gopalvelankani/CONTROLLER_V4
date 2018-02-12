@@ -268,7 +268,7 @@ using namespace std;
 	}
 	int dbHandler ::addIPInputChannels(int rmx_no, int input_channel, std::string ip_address,int port,int type){
 		string query = "UPDATE tuner_details SET is_enable = 0 WHERE rmx_no = '"+std::to_string(rmx_no)+"' AND demod_id = '"+std::to_string(input_channel-1)+"';";  
-		std::cout<<query<<std::endl;
+		// std::cout<<query<<std::endl;
 		mysql_query (connect,query.c_str());
 
 		query = "Insert into ip_input_channels (rmx_no,input_channel,ip_address,port,type) VALUES ('"+std::to_string(rmx_no)+"','"+std::to_string(input_channel)+"','"+ip_address+"','"+std::to_string(port)+"','"+std::to_string(type)+"') ON DUPLICATE KEY UPDATE ip_address = '"+ip_address+"',port = '"+std::to_string(port)+"' ,type = '"+std::to_string(type)+"',is_enable = 1;";  
@@ -278,7 +278,7 @@ using namespace std;
 	 
 	int dbHandler :: addTunerChannelType(int rmx_no,int channel_no,int type){
 		string query = "UPDATE input SET tuner_type = '"+std::to_string(type)+"' WHERE rmx_id = '"+std::to_string(rmx_no)+"' AND input_channel = '"+std::to_string(channel_no)+"';";  
-		std::cout<<query<<std::endl;
+		// std::cout<<query<<std::endl;
 		mysql_query (connect,query.c_str());
 		return mysql_affected_rows(connect);		
 	}
@@ -287,8 +287,11 @@ using namespace std;
 		mysql_query (connect,query.c_str());
 		return mysql_affected_rows(connect);		
 	}
-
-
+	int dbHandler :: removeIPInputChannels(int rmx_no, int input_channel){
+		string query = "UPDATE ip_input_channels SET is_enable = 0 WHERE rmx_no = '"+std::to_string(rmx_no)+"' AND input_channel = '"+std::to_string(input_channel)+"';";  
+		mysql_query (connect,query.c_str());
+		return mysql_affected_rows(connect);		
+	}
 
 	int dbHandler :: deleteLockedPrograms() 
 	{
@@ -1570,7 +1573,7 @@ int dbHandler :: getTunerChannelType(int control_fpga,int rmx_no,int channel_no,
 		std::string query="(SELECT  tuner_type FROM  `input` WHERE  `rmx_id` =  '"+std::to_string(rmx_no1)+"' ) UNION ALL (SELECT tuner_type FROM  `input` WHERE  `rmx_id` = '"+std::to_string(rmx_no2)+"');";
 		mysql_query (connect,query.c_str());
 		unsigned int i =0;
-		std::cout<<query<<std::endl;
+		// std::cout<<query<<std::endl;
 		res_set = mysql_store_result(connect);
 		if(res_set){
 			unsigned int numrows = mysql_num_rows(res_set);
@@ -1602,7 +1605,7 @@ int dbHandler :: getTunerChannelType(int control_fpga){
 		std::string query="(SELECT  tuner_type FROM  `input` WHERE  `rmx_id` =  '"+std::to_string(rmx_no1)+"' ) UNION ALL (SELECT tuner_type FROM  `input` WHERE  `rmx_id` = '"+std::to_string(rmx_no2)+"');";
 		mysql_query (connect,query.c_str());
 		unsigned int i =0;
-		std::cout<<query<<std::endl;
+		// std::cout<<query<<std::endl;
 		res_set = mysql_store_result(connect);
 		if(res_set){
 			unsigned int numrows = mysql_num_rows(res_set);

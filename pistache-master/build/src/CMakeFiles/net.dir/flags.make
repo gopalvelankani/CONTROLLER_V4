@@ -7,11 +7,11 @@ C_FLAGS = -fPIC
 
 C_DEFINES = -Dnet_EXPORTS
 
-C_INCLUDES = -I/home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/include 
+C_INCLUDES = -I/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/include 
 
 CXX_FLAGS =  -std=c++11 -fPIC  
 
 CXX_DEFINES = -Dnet_EXPORTS
 
-CXX_INCLUDES = -I/home/user/Music/new_build_git/rmx_mxl_api_git/Rmx_Controller_v3/pistache-master/include 
+CXX_INCLUDES = -I/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/include 
 
