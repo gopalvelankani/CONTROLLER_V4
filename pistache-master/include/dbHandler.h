@@ -30,7 +30,7 @@ public:
 	int addLcnNumbers(std::string program_number,std::string channel_number,std::string input,int rmx_no);
 	int addPmtAlarm(std::string program_number,std::string alarm,std::string input,int rmx_no);
 	int addFrequency(std::string center_frequency,std::string str_rmx_no);
-	int addChannelname(int channel_number,std::string channel_name,int rmx_no);
+	int addChannelname(int channel_number,std::string channel_name,int rmx_no,int addOrDel);
 	int flushServiceNames();
 	int addServiceId(int channel_number,int service_id,int rmx_no);
 	int flushServiceId();

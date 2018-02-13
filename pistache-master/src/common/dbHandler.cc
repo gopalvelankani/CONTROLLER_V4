@@ -108,9 +108,14 @@ using namespace std;
 		return mysql_affected_rows(connect);
 	}
 
-	int dbHandler :: addChannelname(int channel_number,std::string channel_name,int rmx_no)
+	int dbHandler :: addChannelname(int channel_number,std::string channel_name,int rmx_no,int addOrDel)
 	{
-		string query = "Insert into new_service_namelist (channel_number,channel_name,rmx_id) VALUES ('"+std::to_string(channel_number)+"','"+channel_name+"','"+std::to_string(rmx_no)+"') ON DUPLICATE KEY UPDATE channel_name = '"+channel_name+"'  ;";  
+		string query="";
+		if(addOrDel==1)
+		{
+			query = "Insert into new_service_namelist (channel_number,channel_name,rmx_id) VALUES ('"+std::to_string(channel_number)+"','"+channel_name+"','"+std::to_string(rmx_no)+"') ON DUPLICATE KEY UPDATE channel_name = '"+channel_name+"'  ;";  
+		}else
+			query = "Insert into new_service_namelist (channel_number,channel_name,rmx_id) VALUES ('"+std::to_string(channel_number)+"','-1','"+std::to_string(rmx_no)+"') ON DUPLICATE KEY UPDATE channel_name = '-1'  ;";  
 		mysql_query (connect,query.c_str());
 		return mysql_affected_rows(connect);
 	}

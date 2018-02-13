@@ -110,7 +110,7 @@ public:
         // forkEMMChannels();
         // forkChannels();
         // forkCWthread();
-        runBootupscript();
+        // runBootupscript();
     }
     void start() {
         
@@ -6929,35 +6929,48 @@ private:
         Json::Value json;
         Json::FastWriter fastWriter;        
         bool all_para_valid=true;
-        std::string para[] = {"pname","pnumber","input","rmx_no"};
+        std::string para[] = {"addFlag","pnumber","input","rmx_no"};
         int error[ sizeof(para) / sizeof(para[0])];
         addToLog("setServiceName",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
-        if(res=="0"){   
-            std::string rmx_no =getParameter(request.body(),"rmx_no");
-            std::string input = getParameter(request.body(),"input"); 
-            std::string NewName = getParameter(request.body(),"pname"); 
-            std::string progNumber = getParameter(request.body(),"pnumber"); 
-           
-            error[0] = verifyString(NewName,30);
-            error[1] = verifyInteger(progNumber);
-            error[2] = verifyInteger(input,1,1,INPUT_COUNT);
-            error[3] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
-            
-            
-            
-            for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
-            {
-               if(error[i]!=0){
-                    continue;
-                }
-                all_para_valid=false;
-                json["error"]= true;
-                json[para[i]]= (i==0)? "Require Integer between 1-6!" :((i==1)? "Require Integer between 0-"+std::to_string(INPUT_COUNT)+" !" : ((i==2)?  "Require Integer!" : "Require valid string (Max 30 charecter)!") );
-            }
-            if(all_para_valid){
-               json = callSetServiceName(NewName,progNumber,input,std::stoi(rmx_no));
-            }
+        if(res=="0"){
+        	std::string addFlag_str = getParameter(request.body(),"addFlag");
+        	if(verifyInteger(addFlag_str,1,1)){
+        		std::string NewName;
+        		int addFlag = std::stoi(addFlag_str);
+        		if(addFlag == 1){
+        			NewName = getParameter(request.body(),"pname"); 
+        			error[0] =verifyString(NewName,30);	
+        		}else{
+        			NewName = -1;
+        			error[0] =1;	
+        		}   
+	            std::string rmx_no =getParameter(request.body(),"rmx_no");
+	            std::string input = getParameter(request.body(),"input"); 
+	            std::string progNumber = getParameter(request.body(),"pnumber"); 
+	           
+	            error[1] = verifyInteger(progNumber);
+	            error[2] = verifyInteger(input,1,1,INPUT_COUNT);
+	            error[3] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+
+	            for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
+	            {
+	               if(error[i]!=0){
+	                    continue;
+	                }
+	                all_para_valid=false;
+	                json["error"]= true;
+	                json[para[i]]= (i==0)? "Require Integer between 1-6!" :((i==1)? "Require Integer between 0-"+std::to_string(INPUT_COUNT)+" !" : ((i==2)?  "Require Integer!" : "Require valid string (Max 30 charecter)!") );
+	            }
+	            if(all_para_valid){
+	               json = callSetServiceName(NewName,progNumber,input,std::stoi(rmx_no),addFlag);
+	               if(json["error"] == false) 
+	               		db->addChannelname(std::stoi(progNumber),NewName,std::stoi(rmx_no),addFlag);  
+	            }
+	        }else{
+	        	json["error"]= true;
+            	json["addFlag"]= "Required Integer between 0-1!";	
+	        }
         }else{
             json["error"]= true;
             json["message"]= res;
@@ -6965,13 +6978,14 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
-    Json::Value callSetServiceName(std::string NewName,std::string progNumber,std::string input_channel,int rmx_no){
+    Json::Value callSetServiceName(std::string NewName,std::string progNumber,std::string input_channel,int rmx_no,int addFlag = 1){
         unsigned char RxBuffer[10]={0};
         int uLen;
         Json::Value json,iojson,jsonMsg;
         unsigned int len = 8+NewName.length();
         iojson = callSetInputOutput(input_channel,"0",rmx_no);
         if(iojson["error"]==false){
+        	jsonMsg["addFlag"] = addFlag;
             jsonMsg["NewName"] = NewName;
             jsonMsg["progNumber"] = progNumber;
             uLen = c1.callCommand(19,RxBuffer,10,len,jsonMsg,1);
@@ -6988,8 +7002,7 @@ private:
                 }else{
                     json["status"] = RxBuffer[4];
                     json["error"]= false;
-                    json["message"]= "Set new name!";   
-                    db->addChannelname(std::stoi(progNumber),NewName,rmx_no);       
+                    json["message"]= "Set new name!";                       	     
                     addToLog("setServiceName","Success");
                 }
             }

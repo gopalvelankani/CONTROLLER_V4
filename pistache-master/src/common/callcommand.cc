@@ -349,22 +349,28 @@
 				    msgBuf[6] = 0;
 				    msgBuf[7] = ETX;
 			    }else{
-					std::string tmp=json["NewName"].asString();
+					std::string service_name=json["NewName"].asString();
 					uProg=(unsigned short)std::stoi(json["progNumber"].asString());
-					char y[1024];
-					strcpy(y, tmp.c_str());
-					char *NewName=y;
-					std::cout<<strlen(NewName);
+					int addFlag = json["addFlag"].asInt();
 					len=0;
-					len = 2+strlen(NewName);
+					if(addFlag != 0)
+					{
+						char y[1024];
+						strcpy(y, service_name.c_str());
+						char *NewName=y;
+						std::cout<<"-----------------------------------";
+						len = 2+strlen(NewName);
+						for (int i=0; i<strlen(NewName); i++) {
+							msgBuf[6+i] = NewName[i];	
+						}
+					}else{
+						len = 2;
+					}
 					msgBuf[1] = (unsigned char) (len>>8);
 					msgBuf[2] = (unsigned char) len;
 					msgBuf[3] = CMD_CHANGE_NAME;
 				    msgBuf[4] = uProg>>8;
-					msgBuf[5] = (unsigned char)uProg;
-					for (int i=0; i<strlen(NewName); i++) {
-						msgBuf[6+i] = NewName[i];	
-					}
+					msgBuf[5] = (unsigned char)uProg;	
 					msgBuf[4+len] = ETX;
 				}
 			    break;
