@@ -32,7 +32,7 @@ public:
 	int addFrequency(std::string center_frequency,std::string str_rmx_no);
 	int addChannelname(int channel_number,std::string channel_name,int rmx_no,int addOrDel);
 	int flushServiceNames();
-	int addServiceId(int channel_number,int service_id,int rmx_no);
+	int addServiceId(int channel_number,int service_id,int rmx_no,int addFlag);
 	int flushServiceId();
 	int addNetworkname(std::string network_name,std::string output,int rmx_no);
 	int addTablesVersion(std::string pat_ver,std::string pat_isenable,std::string std_ver,std::string sdt_isenable,std::string nit_ver,std::string nit_isenable,std::string output,int rmx_no);
@@ -71,7 +71,8 @@ public:
 	Json::Value getCenterFrequency();
 	int getServiceInputChannel(std::string service_no);
 	Json::Value getServiceNewnames();
-	Json::Value getServiceIds();
+	Json::Value getServiceIds(int rmx_no);
+	Json::Value getServiceIds(int rmx_no,std::string old_service_id);
 	Json::Value getStreams();
 	Json::Value getChannels();
 	Json::Value getEMMChannels();

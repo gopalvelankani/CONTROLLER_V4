@@ -125,9 +125,14 @@ using namespace std;
 		mysql_query (connect,query.c_str());
 		return mysql_affected_rows(connect);
 	}
-	int dbHandler :: addServiceId(int channel_number,int service_id,int rmx_no)
+	int dbHandler :: addServiceId(int channel_number,int service_id,int rmx_no,int addFlag)
 	{
-		string query = "Insert into new_service_namelist (channel_number,service_id,rmx_id) VALUES ('"+std::to_string(channel_number)+"','"+std::to_string(service_id)+"','"+std::to_string(rmx_no)+"') ON DUPLICATE KEY UPDATE service_id = '"+std::to_string(service_id)+"';";  
+		string query="";
+		if(addFlag){
+			query = "Insert into new_service_namelist (channel_number,service_id,rmx_id) VALUES ('"+std::to_string(channel_number)+"','"+std::to_string(service_id)+"','"+std::to_string(rmx_no)+"') ON DUPLICATE KEY UPDATE service_id = '"+std::to_string(service_id)+"';";  
+		}else{
+			query = "Insert into new_service_namelist (channel_number,service_id,rmx_id) VALUES ('"+std::to_string(channel_number)+"','-1','"+std::to_string(rmx_no)+"') ON DUPLICATE KEY UPDATE service_id = '-1';";  
+		}
 		mysql_query (connect,query.c_str());
 		return mysql_affected_rows(connect);
 	}
@@ -1235,11 +1240,11 @@ using namespace std;
 		}
 	 	return jsonArray;
 	}
-	Json::Value dbHandler :: getServiceIds(){
+	Json::Value dbHandler :: getServiceIds(int rmx_no){
 		MYSQL_RES *res_set;
 		MYSQL_ROW row;
 		Json::Value jsonList;
-		std::string query="SELECT DISTINCT n.channel_number, n.service_id,n.rmx_id FROM new_service_namelist n,channel_list c WHERE c.channel_number = n.channel_number AND service_id !=-1 AND n.rmx_id = c.rmx_id;";
+		std::string query="SELECT DISTINCT n.channel_number, n.service_id FROM new_service_namelist n,channel_list c WHERE c.channel_number = n.channel_number AND service_id !=-1 AND n.rmx_id = c.rmx_id AND n.rmx_id = '"+std::to_string(rmx_no)+"';";
 		mysql_query (connect,query.c_str());
 		unsigned int i =0;
 		res_set = mysql_store_result(connect);
@@ -1253,7 +1258,35 @@ using namespace std;
 					Json::Value jsonObj;
 					jsonObj["channel_number"]=row[i];
 					jsonObj["service_id"]=row[i+1];
-					jsonObj["rmx_no"]=row[i+2];
+					jsonList.append(jsonObj);
+				}
+			}else{	
+				jsonArray["error"] = true;
+			}
+			jsonArray["list"]=jsonList;
+		}else{ 		
+			jsonArray["error"] = true;
+		}
+	 	return jsonArray;
+	}
+	Json::Value dbHandler :: getServiceIds(int rmx_no,std::string old_service_id){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+		std::string query="SELECT DISTINCT n.channel_number, n.service_id FROM new_service_namelist n,channel_list c WHERE c.channel_number = n.channel_number AND service_id !=-1 AND n.rmx_id = c.rmx_id AND n.rmx_id = '"+std::to_string(rmx_no)+"' AND n.channel_number !='"+old_service_id+"';";
+		mysql_query (connect,query.c_str());
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		if(res_set){
+			unsigned int numrows = mysql_num_rows(res_set);
+			if(numrows>0)
+			{
+				jsonArray["error"] = false;
+				while (((row= mysql_fetch_row(res_set)) !=NULL ))
+				{ 
+					Json::Value jsonObj;
+					jsonObj["channel_number"]=row[i];
+					jsonObj["service_id"]=row[i+1];
 					jsonList.append(jsonObj);
 				}
 			}else{	

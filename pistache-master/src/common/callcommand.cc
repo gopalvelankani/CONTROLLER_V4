@@ -391,21 +391,8 @@
 				    msgBuf[4] = 0;
 				    msgBuf[5] = ETX;
 				}else{
-					unsigned short oPno = (unsigned short)std::stoi(json["oldpronum"].asString());
-					unsigned short nPno = (unsigned short)std::stoi(json["newprognum"].asString());
-					len = 4;
-					msgBuf[0] = STX;
-					msgBuf[1] = (unsigned char) (len>>8);
-					msgBuf[2] = (unsigned char) len;
-					msgBuf[3] = CMD_CHANGE_SID;
-					msgBuf[4] = (oPno&0xFF00)>>8;
-					msgBuf[5] = (oPno&0xFF);
-					msgBuf[6] = (nPno&0xFF00)>>8;
-					msgBuf[7] = (nPno&0xFF);
-					msgBuf[8] = ETX;
-
-					//The commented code is for array of service ids
-					/*unsigned short length=json["oldpronum"].size();
+					
+					unsigned short length=json["oldpronum"].size();
 					len = 4*length;
 					msgBuf[0] = STX;
 					msgBuf[1] = (unsigned char) (len>>8);
@@ -419,7 +406,7 @@
 		    			msgBuf[6 + i*4] = (nPno&0xFF00)>>8;
 						msgBuf[7 + i*4] = (nPno&0xFF);
 					}
-					msgBuf[4+length*4] = ETX;*/
+					msgBuf[4+length*4] = ETX;
 				}
 			    break;
 			case 241:

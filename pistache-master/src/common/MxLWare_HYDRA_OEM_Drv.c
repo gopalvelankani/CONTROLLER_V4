@@ -425,6 +425,7 @@ void mvdWriteI2C(oem_data_t *oemDataPtr, UINT16 dataLen, UINT8 *buffPtr) {
 	// Check I2C core is not busy
 	do {
 		status = read32bCPU(I2C_CS, 8);
+    usleep(100);
 		i++;
 	} while (status & (1 << 19));
 
@@ -433,12 +434,13 @@ void mvdWriteI2C(oem_data_t *oemDataPtr, UINT16 dataLen, UINT8 *buffPtr) {
 	}
 
 	write32bCPU(I2C_CS, 8, word0);
-
+  usleep(100);
 	for (i = 0; i < dataLen; i++) {
 		dataOut <<= 8;
 		dataOut |= buffPtr[i];
 		if (index_out == 3) {
 			write32bCPU(I2C_CS, 4, dataOut);
+      usleep(100);
 			index_out = 0;
 		} else {
 			index_out++;
@@ -447,16 +449,21 @@ void mvdWriteI2C(oem_data_t *oemDataPtr, UINT16 dataLen, UINT8 *buffPtr) {
 
 	if ( index_out == 1 ) {
 		write32bCPU(I2C_CS, 4, (dataOut << 24));
+    usleep(100);
 	} else if ( index_out == 2 ) {
 		write32bCPU(I2C_CS, 4, (dataOut << 16));
+    usleep(100);
 	} else if ( index_out == 3 ) {
 		write32bCPU(I2C_CS, 4, (dataOut << 8));
+    usleep(100);
 	}
 
 	word0 |= (I2C_DELAY|(1 << 18));
 	write32bCPU(I2C_CS, 8, word0);
+  usleep(100);
 	do {
       status = read32bCPU(I2C_CS, 8);
+      usleep(100);
       i++;
    } while (status & (1 << 19));
 }
@@ -592,17 +599,21 @@ void mvdReadI2C(oem_data_t *oemDataPtr, UINT16 dataLen, UINT8 *buffPtr) {
 	unsigned int DataIn;
 	//mvdWriteI2C(oemDataPtr, 0, NULL);
 	write32bCPU(I2C_CS, 8, I2C_DELAY | (I2C_RMODE << 16) | dataLen);
+  usleep(100);
 	write32bCPU(I2C_CS, 4, (((oemDataPtr->i2cAddress*2)|1)<<24));
+  usleep(100);
 	write32bCPU(I2C_CS, 8, (I2C_DELAY | (1 << 18) | (1 << 17) | (I2C_RMODE << 16) | dataLen));
-	// Boucle jusqu' not busy
+  usleep(100);
 	// Check I2C core is not busy
 	do {
 		status = read32bCPU(I2C_CS, 8);
+    usleep(100);
 		i++;
 	} while (status & (1 << 19));
 
 	for (i = 0; i < dataLen; ) {
 		DataIn = read32bCPU(I2C_CS, 4);
+    usleep(100);
 		for (j = 0; (j < 4) && (i < dataLen); j++) {
 			buffPtr[i] = ((DataIn & 0xFF000000) >> 24);
 			DataIn <<= 8;
