@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/examples/commandline.cc
+iostream
+-
+stdio.h
+-
+limits
+-
+sys/socket.h
+-
+netinet/in.h
+-
+stdlib.h
+-
+unistd.h
+-
+string.h
+-
+arpa/inet.h
+-
+

@@ -29,7 +29,7 @@ extern "C" {
 #define ETX 0x03
 #define RMX_COUNT 6
 #define INPUT_COUNT 7
-#define OUTPUT_COUNT 3
+#define OUTPUT_COUNT 7
 #define CMD_VER_FIMWARE  0x00
 using namespace std;
 using namespace Net;
@@ -216,9 +216,9 @@ private:
         Routes::Post(router, "/setLcnProvider", Routes::bind(&StatsEndpoint::setLcnProvider, this));
         Routes::Get(router, "/getLcnProvider/:rmx_no", Routes::bind(&StatsEndpoint::getLcnProvider, this));
         Routes::Post(router, "/getLcnProvider", Routes::bind(&StatsEndpoint::getLcnProviders, this));
-        Routes::Post(router, "/setNewProvName", Routes::bind(&StatsEndpoint::setNewProvName, this));
-        Routes::Get(router, "/getNewProvName/:uProg/:rmx_no", Routes::bind(&StatsEndpoint::getNewProvName, this));
-        Routes::Post(router, "/getNewProvName", Routes::bind(&StatsEndpoint::getNewProviderName, this));
+        Routes::Post(router, "/setServiceProvider", Routes::bind(&StatsEndpoint::setServiceProvider, this));
+        Routes::Get(router, "/getServiceProvider/:uProg/:rmx_no", Routes::bind(&StatsEndpoint::getServiceProviderName, this));
+        Routes::Post(router, "/getServiceProvider", Routes::bind(&StatsEndpoint::getServiceProvider, this));
 
         Routes::Get(router, "/getProgramOriginalName/:uProg/:rmx_no", Routes::bind(&StatsEndpoint::getProgramOriginalName, this));
         Routes::Post(router, "/getProgramOriginalName", Routes::bind(&StatsEndpoint::getProgramOriginalname, this));
@@ -260,7 +260,6 @@ private:
         //UDP IP STACK Commands
         Routes::Post(router, "/readWrite32bUdpCpu", Routes::bind(&StatsEndpoint::readWrite32bUdpCpu, this));
         Routes::Post(router, "/readWrite32bUdpI2C", Routes::bind(&StatsEndpoint::readWrite32bUdpI2C, this));
-        // Routes::Post(router, "/setTuner", Routes::bind(&StatsEndpoint::setTuners, this));
         Routes::Get(router, "/getVersionofcore", Routes::bind(&StatsEndpoint::getVersionofcore, this));
         Routes::Post(router, "/setIpdestination", Routes::bind(&StatsEndpoint::setIpdestination, this));
         Routes::Get(router, "/getIpdestination", Routes::bind(&StatsEndpoint::getIpdestination, this));
@@ -352,7 +351,7 @@ private:
     }
     /*****************************************************************************/
     /*  function setMxlTuner                           
-		confAllegro, tuneMxl, setMpegMode, RF authorization
+        confAllegro, tuneMxl, setMpegMode, RF authorization
     */
     /*****************************************************************************/
     void  setMxlTuner(const Rest::Request& request, Net::Http::ResponseWriter response){
@@ -368,7 +367,7 @@ private:
         addToLog("setMxlTuner",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
-        	std::string str_mxl_id,str_rmx_no,str_demod_id,str_lnb_id,str_dvb_standard,str_frequency,str_symbol_rate,str_mod,str_fec,str_rolloff,str_pilots,str_spectrum,str_lo_frequency,str_polarization,auth_bit,str_voltage;        
+            std::string str_mxl_id,str_rmx_no,str_demod_id,str_lnb_id,str_dvb_standard,str_frequency,str_symbol_rate,str_mod,str_fec,str_rolloff,str_pilots,str_spectrum,str_lo_frequency,str_polarization,auth_bit,str_voltage;        
             str_mxl_id = getParameter(request.body(),"mxl_id");
             str_rmx_no = getParameter(request.body(),"rmx_no");
             str_demod_id = getParameter(request.body(),"demod_id");
@@ -386,7 +385,7 @@ private:
             auth_bit =getParameter(request.body(),"auth_bit");
             str_voltage =getParameter(request.body(),"voltage");
             
-			error[0] = verifyInteger(str_mxl_id,1,1,6,1);
+            error[0] = verifyInteger(str_mxl_id,1,1,6,1);
             error[1] = verifyInteger(str_rmx_no,1,1,6,1);
             error[2] = verifyInteger(str_demod_id,1,1,7);
             error[3] = verifyInteger(str_lnb_id,1,1,3);
@@ -412,75 +411,75 @@ private:
                 json[para[i]]= rangeMsg[i];
             }
             if(all_para_valid){
-            	int lnb_id,rmx_no,mxl_id,dvb_standard,demod_id,frequency,symbol_rate,mod,fec,rolloff,pilots,spectrum,lo_frequency,polarization,voltage;
-            	lnb_id = std::stoi(str_lnb_id);
-            	rmx_no = std::stoi(str_rmx_no);
-            	mxl_id = std::stoi(str_mxl_id);
-            	dvb_standard = std::stoi(str_dvb_standard);
-            	demod_id = std::stoi(str_demod_id);
-            	frequency = std::stoi(str_frequency);
-            	symbol_rate = std::stoi(str_symbol_rate);
-            	mod = std::stoi(str_mod);
-            	fec = std::stoi(str_fec);
-            	rolloff = std::stoi(str_rolloff);
-            	pilots = std::stoi(str_pilots);
-            	spectrum = std::stoi(str_spectrum);
-            	lo_frequency = std::stoi(str_lo_frequency);
-            	polarization = std::stoi(str_polarization);
-            	voltage = std::stoi(str_voltage);
-	            MXL_STATUS_E mxlStatus;
+                int lnb_id,rmx_no,mxl_id,dvb_standard,demod_id,frequency,symbol_rate,mod,fec,rolloff,pilots,spectrum,lo_frequency,polarization,voltage;
+                lnb_id = std::stoi(str_lnb_id);
+                rmx_no = std::stoi(str_rmx_no);
+                mxl_id = std::stoi(str_mxl_id);
+                dvb_standard = std::stoi(str_dvb_standard);
+                demod_id = std::stoi(str_demod_id);
+                frequency = std::stoi(str_frequency);
+                symbol_rate = std::stoi(str_symbol_rate);
+                mod = std::stoi(str_mod);
+                fec = std::stoi(str_fec);
+                rolloff = std::stoi(str_rolloff);
+                pilots = std::stoi(str_pilots);
+                spectrum = std::stoi(str_spectrum);
+                lo_frequency = std::stoi(str_lo_frequency);
+                polarization = std::stoi(str_polarization);
+                voltage = std::stoi(str_voltage);
+                MXL_STATUS_E mxlStatus;
                 int ifrequency = calculateIfrequency(frequency,lo_frequency); 
                 if(ifrequency==-1){
                     json["error"]= true;
                     json["message"]= "Invalid frequency range!";
                 }else{
-    	            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
-    	            if(connectI2Clines(target)){
-    	            	usleep(100);
-    	            	Json::Value fwJson = downloadMxlFW(mxl_id,rmx_no);
-    	            	if(fwJson["error"]==true){
-    	            		json["error"]= true;
-                        	json["message"]= "Download FW failed!";
-    	            	}
+                    int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
+                    if(connectI2Clines(target)){
+                        usleep(100);
+                        Json::Value fwJson = downloadMxlFW(mxl_id,rmx_no);
+                        if(fwJson["error"]==true){
+                            json["error"]= true;
+                            json["message"]= "Download FW failed!";
+                        }
                         usleep(1000000);
-    	           		if(lnb_id==0 || lnb_id==1){
-    	           			json["allegro"] = confAllegro(8,lnb_id,voltage,mxl_id);
-    	           			usleep(1000);
-    	           			std::cout<<"callReadAllegro(8) H LNB 0,1\n";
-    	           		}
-    	           		else{
-    	           			json["allegro"] = confAllegro(9,lnb_id,voltage,mxl_id);
-    	           			usleep(1000);
+                        if(lnb_id==0 || lnb_id==1){
+                            json["allegro"] = confAllegro(8,lnb_id,voltage,mxl_id);
+                            usleep(1000);
+                            std::cout<<"callReadAllegro(8) H LNB 0,1\n";
+                        }
+                        else{
+                            json["allegro"] = confAllegro(9,lnb_id,voltage,mxl_id);
+                            usleep(1000);
                             std::cout<<"callReadAllegro(9) H LNB 2,3\n";
-    	           		}
-        	           //Set demod 
-        	           	usleep(1000000);
-        	           	json = tuneMxl(demod_id,lnb_id,dvb_standard,ifrequency,symbol_rate,mod,fec,rolloff,pilots,spectrum,lo_frequency,mxl_id,rmx_no);
-        	        	//get Demod
-        	        	 if(connectI2Clines(target)){
-	        	        	usleep(1000000);
-	        	        	unsigned char locked=0,modulation=MXL_HYDRA_MOD_AUTO,standard= MXL_HYDRA_DVBS,Fec=MXL_HYDRA_FEC_AUTO,roll_off=MXL_HYDRA_ROLLOFF_AUTO,pilot=MXL_HYDRA_PILOTS_AUTO,spectrums= MXL_HYDRA_SPECTRUM_AUTO;
-	        				unsigned int freq,RxPwr,rate,SNR;
-	        				mxlStatus = getTuneInfo(demod_id,&locked,&standard,&freq, &rate, &modulation, &Fec, &roll_off, &pilot,&spectrums, &RxPwr,&SNR);
-	        	        	json["locked"]=locked;
-	        	        	//Set Output
-	        	        	usleep(1000000);
-	        	        	setMpegMode(demod_id,1,MXL_HYDRA_MPEG_CLK_CONTINUOUS,MXL_HYDRA_MPEG_CLK_IN_PHASE,50,MXL_HYDRA_MPEG_CLK_PHASE_SHIFT_0_DEG,1,1,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_MODE_SERIAL_3_WIRE,MXL_HYDRA_MPEG_ERR_INDICATION_DISABLED);
-	        	        	//Set RF authorization
-	        	        	usleep(1000000);
-	        	        	RFauthorization(rmx_no);
-	    			        // write32bCPU(0,0,12);
-	    			        // write32bI2C(32, 0 ,std::stoi(auth_bit));
-	        	        }else{
-	        	        	json["error"]= true;
-                        	json["message"]= "Connection error!";	
-	        	        }
+                        }
+                       //Set demod 
+                        usleep(1000000);
+                        json = tuneMxl(demod_id,lnb_id,dvb_standard,ifrequency,symbol_rate,mod,fec,rolloff,pilots,spectrum,lo_frequency,mxl_id,rmx_no);
+                        //get Demod
+                         if(connectI2Clines(target)){
+                            usleep(1000000);
+                            unsigned char locked=0,modulation=MXL_HYDRA_MOD_AUTO,standard= MXL_HYDRA_DVBS,Fec=MXL_HYDRA_FEC_AUTO,roll_off=MXL_HYDRA_ROLLOFF_AUTO,pilot=MXL_HYDRA_PILOTS_AUTO,spectrums= MXL_HYDRA_SPECTRUM_AUTO;
+                            unsigned int freq,RxPwr,rate,SNR;
+                            mxlStatus = getTuneInfo(demod_id,&locked,&standard,&freq, &rate, &modulation, &Fec, &roll_off, &pilot,&spectrums, &RxPwr,&SNR);
+                            json["locked"]=locked;
+                            //Set Output
+                            usleep(1000000);
+                            setMpegMode(demod_id,1,MXL_HYDRA_MPEG_CLK_CONTINUOUS,MXL_HYDRA_MPEG_CLK_IN_PHASE,50,MXL_HYDRA_MPEG_CLK_PHASE_SHIFT_0_DEG,1,1,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_MODE_SERIAL_3_WIRE,MXL_HYDRA_MPEG_ERR_INDICATION_DISABLED);
+                            //Set RF authorization
+                            usleep(1000000);
+                            RFauthorization(rmx_no);
+                            // write32bCPU(0,0,12);
+                            // write32bI2C(32, 0 ,std::stoi(auth_bit));
+                        }else{
+                            json["error"]= true;
+                            json["message"]= "Connection error!";   
+                        }
                     }else{
                         json["error"]= true;
                         json["message"]= "Connection error!";
                     }
                 }
-	        }
+            }
         }else{
             json["error"]= true;
             json["message"]= res;
@@ -489,7 +488,7 @@ private:
         response.send(Http::Code::Ok, resp);
     }
     /*****************************************************************************/
-    /*  function setDemodMxl                           						    */
+    /*  function setDemodMxl                                                    */
     /*****************************************************************************/
     void  setDemodMxl(const Rest::Request& request, Net::Http::ResponseWriter response){
         unsigned char RxBuffer[20]={0};
@@ -519,7 +518,7 @@ private:
             str_spectrum = getParameter(request.body(),"spectrum");
             str_lo_frequency= getParameter(request.body(),"lo_frequency");
             
-			error[0] = verifyInteger(str_mxl_id,1,1,6,1);
+            error[0] = verifyInteger(str_mxl_id,1,1,6,1);
             error[1] = verifyInteger(str_rmx_no,1,1,6,1);
             error[2] = verifyInteger(str_demod_id,1,1,7);
             error[3] = verifyInteger(str_lnb_id,1,1,3);
@@ -542,20 +541,20 @@ private:
                 json[para[i]]= rangeMsg[i];
             }
             if(all_para_valid){
-            	int lnb_id,rmx_no,mxl_id,dvb_standard,demod_id,frequency,symbol_rate,mod,fec,rolloff,pilots,spectrum,lo_frequency;
-            	lnb_id = std::stoi(str_lnb_id);
-            	rmx_no = std::stoi(str_rmx_no);
-            	mxl_id = std::stoi(str_mxl_id);
-            	dvb_standard = std::stoi(str_dvb_standard);
-            	demod_id = std::stoi(str_demod_id);
-            	frequency = std::stoi(str_frequency);
-            	symbol_rate = std::stoi(str_symbol_rate);
-            	mod = std::stoi(str_mod);
-            	fec = std::stoi(str_fec);
-            	rolloff = std::stoi(str_rolloff);
-            	pilots = std::stoi(str_pilots);
-            	spectrum = std::stoi(str_spectrum);
-            	lo_frequency = std::stoi(str_lo_frequency);
+                int lnb_id,rmx_no,mxl_id,dvb_standard,demod_id,frequency,symbol_rate,mod,fec,rolloff,pilots,spectrum,lo_frequency;
+                lnb_id = std::stoi(str_lnb_id);
+                rmx_no = std::stoi(str_rmx_no);
+                mxl_id = std::stoi(str_mxl_id);
+                dvb_standard = std::stoi(str_dvb_standard);
+                demod_id = std::stoi(str_demod_id);
+                frequency = std::stoi(str_frequency);
+                symbol_rate = std::stoi(str_symbol_rate);
+                mod = std::stoi(str_mod);
+                fec = std::stoi(str_fec);
+                rolloff = std::stoi(str_rolloff);
+                pilots = std::stoi(str_pilots);
+                spectrum = std::stoi(str_spectrum);
+                lo_frequency = std::stoi(str_lo_frequency);
                 int ifrequency =calculateIfrequency(frequency,lo_frequency);
                 if(ifrequency==-1){
                     json["error"]= true;
@@ -564,7 +563,7 @@ private:
                     json = tuneMxl(demod_id,lnb_id,dvb_standard,ifrequency,symbol_rate,mod,fec,rolloff,pilots,spectrum,lo_frequency,mxl_id,rmx_no);
                     json["freq"] = ifrequency;
                 }
-	        }
+            }
         }else{
             json["error"]= true;
             json["message"]= res;
@@ -574,42 +573,42 @@ private:
     }
 
     Json::Value tuneMxl(int demod_id,int lnb_id,int dvb_standard,int frequency,int symbol_rate,int mod,int fec,int rolloff,int pilots,int spectrum,int lo_frequency,int mxl_id,int rmx_no, int notFromBootup = 1){
-    	unsigned char enable=1,low_hihg=1;
-    	Json::Value json;
-    	MXL_STATUS_E mxlStatus;
-    	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
-    	if(connectI2Clines(target)){
-	        int symbol_rate_hrz = symbol_rate*1000; 
-	        mxlStatus = configureLNB(lnb_id,enable,low_hihg);
-	        usleep(1000);
-	        mxlStatus = getLNB(lnb_id,&enable,&low_hihg);
-	        usleep(10000);
-	        // mxlStatus = setTuner(demod_id,1,2,1274000000,14300000,0,0,0,2,0,0,0);
-	        // json["demod_id"] = demod_id;json["lnb_id"] = lnb_id;json["demod_id"] = demod_id;json["dvb_standard"] = dvb_standard;json["frequency"] = frequency;json["symbol_rate_hrz"] = symbol_rate_hrz;json["mod"] = mod;json["fec"] = fec;json["rolloff"] = rolloff;json["pilots"] = pilots;json["spectrum"] = spectrum;
-	        std::cout<<demod_id<<lnb_id<<dvb_standard<<frequency<<symbol_rate_hrz<<mod<<fec<<rolloff<<pilots<<spectrum;
-	        std::cout<<"------------------------TUNER-------------------------"<<std::endl;
-	        mxlStatus = setTuner(demod_id,lnb_id,dvb_standard,frequency,symbol_rate_hrz,mod,fec,rolloff,pilots,spectrum,0,0);
-	        if(mxlStatus == MXL_SUCCESS){
-	        	if(notFromBootup){
-		        	int control_fpga =ceil(double(rmx_no)/2);
-		        	int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
-	        		if(write32bCPU(0,0,target) != -1){
-			        	int tuner_ch= db->getTunerChannelType(control_fpga,rmx_no,demod_id,0);
-			        	if(write32bI2C(4,0,tuner_ch) == -1){
-				        	json["error"]= true;
-				        	json["message"]= "Failed IGMP Channel Number!";
-				        }
-				    }
-				    json["add"] = db->addTunerDetails(mxl_id,rmx_no,demod_id,lnb_id,dvb_standard,frequency,symbol_rate,mod,fec,rolloff,pilots,spectrum,lo_frequency);
-				}
-	            printf("\nStatus Set demode success");
-	            json["error"] = false;
-	            json["message"] = "Set demode success!";
-	        }else{
-	            printf("\nStatus Set demode fail");
-	            json["error"] = true;
-	            json["message"] = "Set demode failed!";
-	        }
+        unsigned char enable=1,low_hihg=1;
+        Json::Value json;
+        MXL_STATUS_E mxlStatus;
+        int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
+        if(connectI2Clines(target)){
+            int symbol_rate_hrz = symbol_rate*1000; 
+            mxlStatus = configureLNB(lnb_id,enable,low_hihg);
+            usleep(1000);
+            mxlStatus = getLNB(lnb_id,&enable,&low_hihg);
+            usleep(10000);
+            // mxlStatus = setTuner(demod_id,1,2,1274000000,14300000,0,0,0,2,0,0,0);
+            // json["demod_id"] = demod_id;json["lnb_id"] = lnb_id;json["demod_id"] = demod_id;json["dvb_standard"] = dvb_standard;json["frequency"] = frequency;json["symbol_rate_hrz"] = symbol_rate_hrz;json["mod"] = mod;json["fec"] = fec;json["rolloff"] = rolloff;json["pilots"] = pilots;json["spectrum"] = spectrum;
+            std::cout<<demod_id<<lnb_id<<dvb_standard<<frequency<<symbol_rate_hrz<<mod<<fec<<rolloff<<pilots<<spectrum;
+            std::cout<<"------------------------TUNER-------------------------"<<std::endl;
+            mxlStatus = setTuner(demod_id,lnb_id,dvb_standard,frequency,symbol_rate_hrz,mod,fec,rolloff,pilots,spectrum,0,0);
+            if(mxlStatus == MXL_SUCCESS){
+                if(notFromBootup){
+                    int control_fpga =ceil(double(rmx_no)/2);
+                    int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
+                    if(write32bCPU(0,0,target) != -1){
+                        int tuner_ch= db->getTunerChannelType(control_fpga,rmx_no,demod_id,0);
+                        if(write32bI2C(4,0,tuner_ch) == -1){
+                            json["error"]= true;
+                            json["message"]= "Failed IGMP Channel Number!";
+                        }
+                    }
+                    json["add"] = db->addTunerDetails(mxl_id,rmx_no,demod_id,lnb_id,dvb_standard,frequency,symbol_rate,mod,fec,rolloff,pilots,spectrum,lo_frequency);
+                }
+                printf("\nStatus Set demode success");
+                json["error"] = false;
+                json["message"] = "Set demode success!";
+            }else{
+                printf("\nStatus Set demode fail");
+                json["error"] = true;
+                json["message"] = "Set demode failed!";
+            }
         }else{
             json["error"]= true;
             json["message"]= "Connection error!";
@@ -632,7 +631,7 @@ private:
         
     }
     /*****************************************************************************/
-    /*  function getDemodMxl                           						    */
+    /*  function getDemodMxl                                                    */
     /*****************************************************************************/
     void  getDemodMxl(const Rest::Request& request, Net::Http::ResponseWriter response){
         unsigned char RxBuffer[20]={0};
@@ -649,8 +648,8 @@ private:
         addToLog("getDemodMxl",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){ 
-        	std::string str_mxl_id,str_rmx_no,str_demod_id;
-        	str_mxl_id = getParameter(request.body(),"mxl_id");
+            std::string str_mxl_id,str_rmx_no,str_demod_id;
+            str_mxl_id = getParameter(request.body(),"mxl_id");
             str_rmx_no = getParameter(request.body(),"rmx_no");
             str_demod_id = getParameter(request.body(),"demod_id"); 
             error[0] = verifyInteger(str_mxl_id,1,1,6,1);
@@ -666,40 +665,40 @@ private:
                 json[para[i]]= rangeMsg[i];
             }
             if(all_para_valid){
-	            int mxl_id =std::stoi(str_mxl_id); 
-	            int rmx_no=std::stoi(str_rmx_no); 
-	            int demod_id=std::stoi(str_demod_id); 
-	            
-	            MXL_STATUS_E mxlStatus;
-	            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
-	            if(connectI2Clines(target)){
-    		        mxlStatus = getTuneInfo(demod_id,&locked,&standard,&freq, &rate, &modulation, &fec, &rolloff, &pilots,&spectrum, &RxPwr,&SNR);
-    		        if(mxlStatus == MXL_SUCCESS){
-    		            printf("\nStatus Get demode success");
-    		            json["error"] = false;
-    		            json["message"] = "Get demode success!";
-    		        }else{
-    		            printf("\nStatus Get demode fail");
-    		            json["error"] = true;
-    		            json["message"] = "Get demode failed!";
-    		        }
-    		        json["locked"] = locked;
-    		       	json["demod_id"] = demod_id;
-    		       	json["dvb_standard"] = standard;
-    		       	json["frequency"] = freq;
-    		       	json["rate"] = rate;
-    		       	json["fec"] =fec;
-    		       	json["modulation"] = modulation;
-    		       	json["rolloff"] = rolloff;
-    		       	json["spectrum"] =spectrum;
-    		       	json["pilots"] = pilots;
-    		       	json["snr"] = SNR;
-    		       	json["rx_pwr"] = RxPwr;
+                int mxl_id =std::stoi(str_mxl_id); 
+                int rmx_no=std::stoi(str_rmx_no); 
+                int demod_id=std::stoi(str_demod_id); 
+                
+                MXL_STATUS_E mxlStatus;
+                int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
+                if(connectI2Clines(target)){
+                    mxlStatus = getTuneInfo(demod_id,&locked,&standard,&freq, &rate, &modulation, &fec, &rolloff, &pilots,&spectrum, &RxPwr,&SNR);
+                    if(mxlStatus == MXL_SUCCESS){
+                        printf("\nStatus Get demode success");
+                        json["error"] = false;
+                        json["message"] = "Get demode success!";
+                    }else{
+                        printf("\nStatus Get demode fail");
+                        json["error"] = true;
+                        json["message"] = "Get demode failed!";
+                    }
+                    json["locked"] = locked;
+                    json["demod_id"] = demod_id;
+                    json["dvb_standard"] = standard;
+                    json["frequency"] = freq;
+                    json["rate"] = rate;
+                    json["fec"] =fec;
+                    json["modulation"] = modulation;
+                    json["rolloff"] = rolloff;
+                    json["spectrum"] =spectrum;
+                    json["pilots"] = pilots;
+                    json["snr"] = SNR;
+                    json["rx_pwr"] = RxPwr;
                 }else{
                     json["error"]= true;
                     json["message"]= "Connection error!";
                 }
-		    }
+            }
         }else{
             json["error"]= true;
             json["message"]= res;
@@ -708,11 +707,11 @@ private:
         response.send(Http::Code::Ok, resp);
     }
     /*****************************************************************************/
-    /*  function setConfAllegro                           						    */
+    /*  function setConfAllegro                                                     */
     /*****************************************************************************/
     void  setConfAllegro(const Rest::Request& request, Net::Http::ResponseWriter response){
   
-    	unsigned char RxBuffer[20]={0};
+        unsigned char RxBuffer[20]={0};
         int uLen;
         Json::Value json;
         Json::FastWriter fastWriter;     
@@ -723,11 +722,11 @@ private:
         addToLog("setConfAllegro",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){     
-        	std::string lnb_id,voltage,str_mxl_id,str_rmx_no;
-        	// address = getParameter(request.body(),"address");
-        	lnb_id = getParameter(request.body(),"lnb_id");
-        	voltage = getParameter(request.body(),"voltage");
-        	str_mxl_id = getParameter(request.body(),"mxl_id");
+            std::string lnb_id,voltage,str_mxl_id,str_rmx_no;
+            // address = getParameter(request.body(),"address");
+            lnb_id = getParameter(request.body(),"lnb_id");
+            voltage = getParameter(request.body(),"voltage");
+            str_mxl_id = getParameter(request.body(),"mxl_id");
             
             // error[0] = verifyInteger(address);
             error[0] = verifyInteger(lnb_id,1,1,3);
@@ -743,18 +742,18 @@ private:
                 json[para[i]]= rangeMsg[i];
             }
             if(all_para_valid){
-	            int mxl_id =std::stoi(str_mxl_id); 
-	            int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
-		        if(connectI2Clines(target)){
-		        	int lnb_id_i = std::stoi(lnb_id);
-		        	int address = (lnb_id_i == 0 || lnb_id_i == 1)?8 : 9;
-					json = confAllegro(address,lnb_id_i,std::stoi(voltage),mxl_id);
-				}else{
-		            json["error"]= true;
-		            json["message"]= "Connection error!";
-		        }
-	            
-	        }
+                int mxl_id =std::stoi(str_mxl_id); 
+                int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
+                if(connectI2Clines(target)){
+                    int lnb_id_i = std::stoi(lnb_id);
+                    int address = (lnb_id_i == 0 || lnb_id_i == 1)?8 : 9;
+                    json = confAllegro(address,lnb_id_i,std::stoi(voltage),mxl_id);
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Connection error!";
+                }
+                
+            }
         }else{
             json["error"]= true;
             json["message"]= res;
@@ -764,34 +763,34 @@ private:
     }
     
     Json::Value confAllegro(int address,int lnb_id,int voltage,int mxl_id){
-    	int mxlStatus =0;
-    	Json::Value json;
+        int mxlStatus =0;
+        Json::Value json;
 
-    	callReadAllegro(address);
-       	usleep(500000);
-    	Json::Value json_allegro = db->getConfAllegro(mxl_id,address);
- 		int enable1,enable2,volt1,volt2;
-    	if(json_allegro["error"] == false){
-    		if(lnb_id == 0 || lnb_id == 2){
-    			enable2 = std::stoi(json_allegro["enable2"].asString());
-    			volt2 = std::stoi(json_allegro["volt2"].asString());
-    			enable1 = 1;
-    			volt1 = voltage;
-    		}else{
-    			enable1 = std::stoi(json_allegro["enable1"].asString());
-    			volt1 = std::stoi(json_allegro["volt1"].asString());
-    			enable2 = 1;
-    			volt2 = voltage;
-    		}
-    	}else{
-    		enable1 = 1;
-			volt1 = voltage;
-			enable2 = 1;
-			volt2 = voltage;
-    	}
-    	mxlStatus = confAllegro8297(address,enable1,volt1,enable2,volt2);
+        callReadAllegro(address);
+        usleep(500000);
+        Json::Value json_allegro = db->getConfAllegro(mxl_id,address);
+        int enable1,enable2,volt1,volt2;
+        if(json_allegro["error"] == false){
+            if(lnb_id == 0 || lnb_id == 2){
+                enable2 = std::stoi(json_allegro["enable2"].asString());
+                volt2 = std::stoi(json_allegro["volt2"].asString());
+                enable1 = 1;
+                volt1 = voltage;
+            }else{
+                enable1 = std::stoi(json_allegro["enable1"].asString());
+                volt1 = std::stoi(json_allegro["volt1"].asString());
+                enable2 = 1;
+                volt2 = voltage;
+            }
+        }else{
+            enable1 = 1;
+            volt1 = voltage;
+            enable2 = 1;
+            volt2 = voltage;
+        }
+        mxlStatus = confAllegro8297(address,enable1,volt1,enable2,volt2);
         if(mxlStatus == 1){
-        	json["added"] = db->addConfAllegro(mxl_id, address,enable1,volt1,enable2,volt2);
+            json["added"] = db->addConfAllegro(mxl_id, address,enable1,volt1,enable2,volt2);
             printf("\nStatus conf allegro  success");
             json["message"] = "Status conf allegro  success!";
             json["error"] = false;
@@ -803,7 +802,7 @@ private:
         return json;
     }
     /*****************************************************************************/
-    /*  function readAllegro                           						    */
+    /*  function readAllegro                                                    */
     /*****************************************************************************/
     void  readAllegro(const Rest::Request& request, Net::Http::ResponseWriter response){
         unsigned char RxBuffer[20]={0};
@@ -815,14 +814,14 @@ private:
         addToLog("readAllegro",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){  
-        	std::string str_addr = getParameter(request.body(),"address");
-        	if(verifyInteger(str_addr)){      
-	            int address =std::stoi(str_addr); 
-	            json = callReadAllegro(address);
-	        }else{
-	        	json["message"] = "Required Integer!";
-	            json["error"] = true;
-	        }
+            std::string str_addr = getParameter(request.body(),"address");
+            if(verifyInteger(str_addr)){      
+                int address =std::stoi(str_addr); 
+                json = callReadAllegro(address);
+            }else{
+                json["message"] = "Required Integer!";
+                json["error"] = true;
+            }
         }else{
             json["error"]= true;
             json["message"]= res;
@@ -831,10 +830,10 @@ private:
         response.send(Http::Code::Ok, resp);
     }
     Json::Value callReadAllegro(int address){
-    	Json::Value json;
-    	readAllegro8297(address,0);
-    	usleep(10000);
-    	json["allegroStatus"] = readAllegro8297(address,0);
+        Json::Value json;
+        readAllegro8297(address,0);
+        usleep(10000);
+        json["allegroStatus"] = readAllegro8297(address,0);
         // if(mxlStatus == 1){
             printf("\nStatus read allegro  success");
             json["message"] = "Status read allegro  success!";
@@ -847,7 +846,7 @@ private:
         return json;
     }
     /*****************************************************************************/
-    /*  function setMPEGOut                           						    */
+    /*  function setMPEGOut                                                     */
     /*****************************************************************************/
     void  setMPEGOut(const Rest::Request& request, Net::Http::ResponseWriter response){
         unsigned char RxBuffer[20]={0};
@@ -862,8 +861,8 @@ private:
         addToLog("setMPEGOut",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){   
-        	std::string str_mxl_id,str_rmx_no,str_demod_id;
-        	str_mxl_id = getParameter(request.body(),"mxl_id");
+            std::string str_mxl_id,str_rmx_no,str_demod_id;
+            str_mxl_id = getParameter(request.body(),"mxl_id");
             str_rmx_no = getParameter(request.body(),"rmx_no");
             str_demod_id = getParameter(request.body(),"demod_id"); 
             error[0] = verifyInteger(str_mxl_id,1,1,6,1);
@@ -879,12 +878,12 @@ private:
                 json[para[i]]= rangeMsg[i];
             }
             if(all_para_valid){
-	            int mxl_id =std::stoi(str_mxl_id); 
-	            int rmx_no=std::stoi(str_rmx_no); 
-	            int demod_id=std::stoi(str_demod_id); 
+                int mxl_id =std::stoi(str_mxl_id); 
+                int rmx_no=std::stoi(str_rmx_no); 
+                int demod_id=std::stoi(str_demod_id); 
 
-		        int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
-		        if(connectI2Clines(target)){
+                int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
+                if(connectI2Clines(target)){
                     setMpegMode(demod_id,1,MXL_HYDRA_MPEG_CLK_CONTINUOUS,MXL_HYDRA_MPEG_CLK_IN_PHASE,50,MXL_HYDRA_MPEG_CLK_PHASE_SHIFT_0_DEG,1,1,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_MODE_SERIAL_3_WIRE,MXL_HYDRA_MPEG_ERR_INDICATION_DISABLED);
                     json["message"]= "Set OutPut";
                     json["error"] = false;
@@ -892,7 +891,7 @@ private:
                     json["error"]= true;
                     json["message"]= "Connection error!";
                 }
-		    }
+            }
         }else{
             json["error"]= true;
             json["message"]= res;
@@ -901,7 +900,7 @@ private:
         response.send(Http::Code::Ok, resp);
     }
     /*****************************************************************************/
-    /*  function authorizeRFout                           						    */
+    /*  function authorizeRFout                                                     */
     /*****************************************************************************/
     void  authorizeRFout(const Rest::Request& request, Net::Http::ResponseWriter response){
         Json::Value json;
@@ -913,7 +912,7 @@ private:
             // json = RFauthorization(rmx_no);
             int rmx_bit = 1<<(rmx_no-1); 
             if(write32bCPU(0,0,12) != -1){
-            	usleep(1000);
+                usleep(1000);
                 write32bI2C(32, 0 ,rmx_bit);
                 json["added"]= db->addRFauthorization(rmx_no,1);        
                 json["message"] = "Authorize RF out!";
@@ -926,7 +925,7 @@ private:
             json["VALUE"] = read32bI2C(32,0);
             // std::cout<<rmx_no<<"\n";
             
-		}else{
+        }else{
             json["error"]= true;
             json["message"]= res;
         }
@@ -934,22 +933,22 @@ private:
         response.send(Http::Code::Ok, resp);
     }
     Json::Value RFauthorization(int rmx_no){
-    	Json::Value json;
-    	int rmx_bit = 1<<(rmx_no-1); 
-	 	if(write32bCPU(0,0,12) != -1){
+        Json::Value json;
+        int rmx_bit = 1<<(rmx_no-1); 
+        if(write32bCPU(0,0,12) != -1){
             write32bI2C(32, 0 ,rmx_bit);
-            json["added"]= db->addRFauthorization(rmx_no,1);      	
-        	json["message"] = "Authorize RF out!";
-        	json["error"] = false;
-        	
+            json["added"]= db->addRFauthorization(rmx_no,1);        
+            json["message"] = "Authorize RF out!";
+            json["error"] = false;
+            
         }else{
-        	json["error"] = true;
-        	json["message"] = "Connection error!";
+            json["error"] = true;
+            json["message"] = "Connection error!";
         }
         return json;
     }
     /*****************************************************************************/
-    /*  function setIPTV                           						    */
+    /*  function setIPTV                                                    */
     /*****************************************************************************/
     void  setIPTV(const Rest::Request& request, Net::Http::ResponseWriter response){
         unsigned char RxBuffer[20]={0};
@@ -964,7 +963,7 @@ private:
         response.send(Http::Code::Ok, resp);
     }
     /*****************************************************************************/
-    /*  function connectMxl                           						    */
+    /*  function connectMxl                                                     */
     /*****************************************************************************/
     void  connectMxl(const Rest::Request& request, Net::Http::ResponseWriter response){
         unsigned char RxBuffer[20]={0};
@@ -976,8 +975,8 @@ private:
         addToLog("connectMxl",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){  
-        	std::string str_mxl_id,str_rmx_no;
-        	str_mxl_id = getParameter(request.body(),"mxl_id");
+            std::string str_mxl_id,str_rmx_no;
+            str_mxl_id = getParameter(request.body(),"mxl_id");
             str_rmx_no = getParameter(request.body(),"rmx_no");
             error[0] = verifyInteger(str_mxl_id,1,1,6);
             error[1] = verifyInteger(str_rmx_no,1,1,6,1);
@@ -991,18 +990,18 @@ private:
                 json[para[i]] = "Required integer between 1-6!";
             }
             if(all_para_valid){      
-	            int mxl_id =std::stoi(str_mxl_id); 
-	            int rmx_no=std::stoi(str_rmx_no); 
-	            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
-	            if(connectI2Clines(target)){
+                int mxl_id =std::stoi(str_mxl_id); 
+                int rmx_no=std::stoi(str_rmx_no); 
+                int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
+                if(connectI2Clines(target)){
                     json["error"]= false;
-	            	json["message"]= "Mxl Connected!";	
-	            }else{
+                    json["message"]= "Mxl Connected!";  
+                }else{
                     json["error"]= true;
                     json["message"]= "Connection error!";
-                }	
-	            json["target"]= target;
-	        }
+                }   
+                json["target"]= target;
+            }
         }else{
             json["error"]= true;
             json["message"]= res;
@@ -1030,20 +1029,20 @@ private:
                 printf("Status chip connection failed");
                 return 0;
             }else{
-            	printf("\n Status OK  chip version %d ",versionInfo.chipVer);
+                printf("\n Status OK  chip version %d ",versionInfo.chipVer);
                 // printf("\n Status chip connection successfull! ");
                 // printf("\n Status OK \n chip version %d \n MxlWare vers %d.%d.%d.%d.%d",versionInfo.chipVer,versionInfo.mxlWareVer[0],versionInfo.mxlWareVer[1],versionInfo.mxlWareVer[2],versionInfo.mxlWareVer[3],versionInfo.mxlWareVer[4]);
-        		// printf("\n \n Firmware Vers %d.%d.%d.%d.%d",versionInfo.firmwareVer[0],versionInfo.firmwareVer[1],versionInfo.firmwareVer[2],versionInfo.firmwareVer[3],versionInfo.firmwareVer[4]);
-        	return 1;
+                // printf("\n \n Firmware Vers %d.%d.%d.%d.%d",versionInfo.firmwareVer[0],versionInfo.firmwareVer[1],versionInfo.firmwareVer[2],versionInfo.firmwareVer[3],versionInfo.firmwareVer[4]);
+            return 1;
             }
         }
     }
     /*****************************************************************************/
-    /*  function getMxlVersion                           						    */
+    /*  function getMxlVersion                                                      */
     /*****************************************************************************/
     void  getMxlVersion(const Rest::Request& request, Net::Http::ResponseWriter response){
         
-    	Json::Value json;
+        Json::Value json;
         Json::FastWriter fastWriter;     
         MXL_STATUS_E mxlStatus;
         MXL_HYDRA_VER_INFO_T versionInfo;
@@ -1057,13 +1056,13 @@ private:
         }else{
             // printf("\n Status chip connection successfull! ");
             printf("chip version %d \n MxlWare vers %d.%d.%d.%d.%d",versionInfo.chipVer,versionInfo.mxlWareVer[0],versionInfo.mxlWareVer[1],versionInfo.mxlWareVer[2],versionInfo.mxlWareVer[3],versionInfo.mxlWareVer[4]);
-    		printf(" Firmware Vers %d.%d.%d.%d.%d",versionInfo.firmwareVer[0],versionInfo.firmwareVer[1],versionInfo.firmwareVer[2],versionInfo.firmwareVer[3],versionInfo.firmwareVer[4]);
-    		json["message"] = "MxL connected!";
-    		json["chip_version"] =versionInfo.chipVer;
-    		json["mxlware_vers"] = std::to_string(versionInfo.mxlWareVer[0])+'.'+std::to_string(versionInfo.mxlWareVer[1])+'.'+std::to_string(versionInfo.mxlWareVer[2])+'.'+std::to_string(versionInfo.mxlWareVer[3])+'.'+std::to_string(versionInfo.mxlWareVer[4]);
-    		json["firmware_vers"] = std::to_string(versionInfo.firmwareVer[0])+'.'+std::to_string(versionInfo.firmwareVer[1])+'.'+std::to_string(versionInfo.firmwareVer[2])+'.'+std::to_string(versionInfo.firmwareVer[3])+'.'+std::to_string(versionInfo.firmwareVer[4]);
-    		// json["frm_ware_ver"] = frm_ware_version;
-    		if(versionInfo.firmwareDownloaded){
+            printf(" Firmware Vers %d.%d.%d.%d.%d",versionInfo.firmwareVer[0],versionInfo.firmwareVer[1],versionInfo.firmwareVer[2],versionInfo.firmwareVer[3],versionInfo.firmwareVer[4]);
+            json["message"] = "MxL connected!";
+            json["chip_version"] =versionInfo.chipVer;
+            json["mxlware_vers"] = std::to_string(versionInfo.mxlWareVer[0])+'.'+std::to_string(versionInfo.mxlWareVer[1])+'.'+std::to_string(versionInfo.mxlWareVer[2])+'.'+std::to_string(versionInfo.mxlWareVer[3])+'.'+std::to_string(versionInfo.mxlWareVer[4]);
+            json["firmware_vers"] = std::to_string(versionInfo.firmwareVer[0])+'.'+std::to_string(versionInfo.firmwareVer[1])+'.'+std::to_string(versionInfo.firmwareVer[2])+'.'+std::to_string(versionInfo.firmwareVer[3])+'.'+std::to_string(versionInfo.firmwareVer[4]);
+            // json["frm_ware_ver"] = frm_ware_version;
+            if(versionInfo.firmwareDownloaded){
                 printf("\n Firmware Loaded True");
                 json["FW Downloaded"] = true; 
             }else{
@@ -1077,7 +1076,7 @@ private:
         response.send(Http::Code::Ok, resp);
     }
     /*****************************************************************************/
-    /*  function downloadFirmware                           						    */
+    /*  function downloadFirmware                                                       */
     /*****************************************************************************/
     void  downloadFirmware(const Rest::Request& request, Net::Http::ResponseWriter response){
         unsigned char RxBuffer[20]={0};
@@ -1092,8 +1091,8 @@ private:
         addToLog("downloadFirmware",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
-			std::string str_mxl_id,str_rmx_no;
-        	str_mxl_id = getParameter(request.body(),"mxl_id");
+            std::string str_mxl_id,str_rmx_no;
+            str_mxl_id = getParameter(request.body(),"mxl_id");
             str_rmx_no = getParameter(request.body(),"rmx_no");
             error[0] = verifyInteger(str_mxl_id,1,1,6,1);
             error[1] = verifyInteger(str_rmx_no,1,1,6,1);
@@ -1107,8 +1106,8 @@ private:
                 json[para[i]]="Required integer between 1-6!";
             }
             if(all_para_valid){ 
-	            json = downloadMxlFW(std::stoi(str_mxl_id),(std::stoi(str_rmx_no) - 1));
-	        }
+                json = downloadMxlFW(std::stoi(str_mxl_id),(std::stoi(str_rmx_no) - 1));
+            }
         }else{
             json["error"]= true;
             json["message"]= res;
@@ -1117,8 +1116,8 @@ private:
         response.send(Http::Code::Ok, resp);
     }
     Json::Value downloadMxlFW(int mxl_id,int rmx_no){
-    	Json::Value json;
-    	MXL_STATUS_E mxlStatus;
+        Json::Value json;
+        MXL_STATUS_E mxlStatus;
         MXL_HYDRA_VER_INFO_T versionInfo;
         int target =((0&0x3)<<8) | ((rmx_no&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
         if(connectI2Clines(target)){
@@ -1129,7 +1128,7 @@ private:
                 printf("CWD error\n");
             strcat(cwd,"/FW/MxL_5xx_FW.mbin");
             if (std::ifstream(cwd))
-    		{
+            {
                 MxL_GetVersion(&versionInfo);
                 if(versionInfo.chipId == MXL_HYDRA_DEVICE_584 && versionInfo.firmwareDownloaded){
                     printf("\n MXL already downloaded! ");
@@ -1141,41 +1140,41 @@ private:
                     json["firmware_vers"] = std::to_string(versionInfo.firmwareVer[0])+'.'+std::to_string(versionInfo.firmwareVer[1])+'.'+std::to_string(versionInfo.firmwareVer[2])+'.'+std::to_string(versionInfo.firmwareVer[3])+'.'+std::to_string(versionInfo.firmwareVer[4]); 
                     json["FW Downloaded"] = true; 
                 }else{
-        		    printf("\n\n \t\t\t DOWNLOADING FIRMWARE PLEASE WAIT.... \n");
-        	        mxlStatus = App_FirmwareDownload(cwd);
-        	        if(mxlStatus != MXL_SUCCESS){
-        	            printf("Status FW download");
-        	        }else{
-        	            printf("Status FW download fail");
-        	        }
-        	        MxL_GetVersion(&versionInfo);
-        	        if(versionInfo.chipId != MXL_HYDRA_DEVICE_584){
-        	            printf("Status chip connection failed");
-        	            json["message"] = "MxL not connected!";
-        	            json["error"]= true;
-        	        }else{
-        	            printf("\n Status chip connection successfull! ");
-        	            printf("\n Status OK \n chip version %d \n MxlWare vers %d.%d.%d.%d.%d",versionInfo.chipVer,versionInfo.mxlWareVer[0],versionInfo.mxlWareVer[1],versionInfo.mxlWareVer[2],versionInfo.mxlWareVer[3],versionInfo.mxlWareVer[4]);
-        	            printf("\n \n Firmware Vers %d.%d.%d.%d.%d",versionInfo.firmwareVer[0],versionInfo.firmwareVer[1],versionInfo.firmwareVer[2],versionInfo.firmwareVer[3],versionInfo.firmwareVer[4]);
-        	            json["message"] = "MxL connected!";
-        	    		json["chip_version"] =versionInfo.chipVer;
-        	    		json["mxlware_vers"] = std::to_string(versionInfo.mxlWareVer[0])+'.'+std::to_string(versionInfo.mxlWareVer[1])+'.'+std::to_string(versionInfo.mxlWareVer[2])+'.'+std::to_string(versionInfo.mxlWareVer[3])+'.'+std::to_string(versionInfo.mxlWareVer[4]);
-        	    		json["firmware_vers"] = std::to_string(versionInfo.firmwareVer[0])+'.'+std::to_string(versionInfo.firmwareVer[1])+'.'+std::to_string(versionInfo.firmwareVer[2])+'.'+std::to_string(versionInfo.firmwareVer[3])+'.'+std::to_string(versionInfo.firmwareVer[4]);
-        	            if(versionInfo.firmwareDownloaded){
-        	                printf("\n Firmware Loaded True");
-        	                json["FW Downloaded"] = true; 
-        	            }else{
-        	                printf("\n Firmware Loaded False");
-        	                json["FW Downloaded"] = false; 
-        	            }
-        	            json["error"]= false;
-        	        }
+                    printf("\n\n \t\t\t DOWNLOADING FIRMWARE PLEASE WAIT.... \n");
+                    mxlStatus = App_FirmwareDownload(cwd);
+                    if(mxlStatus != MXL_SUCCESS){
+                        printf("Status FW download");
+                    }else{
+                        printf("Status FW download fail");
+                    }
+                    MxL_GetVersion(&versionInfo);
+                    if(versionInfo.chipId != MXL_HYDRA_DEVICE_584){
+                        printf("Status chip connection failed");
+                        json["message"] = "MxL not connected!";
+                        json["error"]= true;
+                    }else{
+                        printf("\n Status chip connection successfull! ");
+                        printf("\n Status OK \n chip version %d \n MxlWare vers %d.%d.%d.%d.%d",versionInfo.chipVer,versionInfo.mxlWareVer[0],versionInfo.mxlWareVer[1],versionInfo.mxlWareVer[2],versionInfo.mxlWareVer[3],versionInfo.mxlWareVer[4]);
+                        printf("\n \n Firmware Vers %d.%d.%d.%d.%d",versionInfo.firmwareVer[0],versionInfo.firmwareVer[1],versionInfo.firmwareVer[2],versionInfo.firmwareVer[3],versionInfo.firmwareVer[4]);
+                        json["message"] = "MxL connected!";
+                        json["chip_version"] =versionInfo.chipVer;
+                        json["mxlware_vers"] = std::to_string(versionInfo.mxlWareVer[0])+'.'+std::to_string(versionInfo.mxlWareVer[1])+'.'+std::to_string(versionInfo.mxlWareVer[2])+'.'+std::to_string(versionInfo.mxlWareVer[3])+'.'+std::to_string(versionInfo.mxlWareVer[4]);
+                        json["firmware_vers"] = std::to_string(versionInfo.firmwareVer[0])+'.'+std::to_string(versionInfo.firmwareVer[1])+'.'+std::to_string(versionInfo.firmwareVer[2])+'.'+std::to_string(versionInfo.firmwareVer[3])+'.'+std::to_string(versionInfo.firmwareVer[4]);
+                        if(versionInfo.firmwareDownloaded){
+                            printf("\n Firmware Loaded True");
+                            json["FW Downloaded"] = true; 
+                        }else{
+                            printf("\n Firmware Loaded False");
+                            json["FW Downloaded"] = false; 
+                        }
+                        json["error"]= false;
+                    }
                 }
             }else{
-            	string str(cwd);
-    	    	json["message"]= "FirmWare file path "+str+" does not exists!";
-    	    	json["error"]= true;
-            	printf("\n FW file path not exists \n");
+                string str(cwd);
+                json["message"]= "FirmWare file path "+str+" does not exists!";
+                json["error"]= true;
+                printf("\n FW file path not exists \n");
             }
         }else{
             printf("\n Download failed: Connection error! \n");
@@ -1186,7 +1185,7 @@ private:
         return json;
     }
     /*****************************************************************************/
-    /*  function setMxlTunerOff                           						    */
+    /*  function setMxlTunerOff                                                     */
     /*****************************************************************************/
     void  setMxlTunerOff(const Rest::Request& request, Net::Http::ResponseWriter response){
         unsigned char RxBuffer[20]={0};
@@ -1199,23 +1198,23 @@ private:
         addToLog("setMxlTunerOff",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){  
-        	std::string demod_id = getParameter(request.body(),"demod_id");
-        	if(verifyInteger(demod_id,1,1,7)){      
-	            mxlStatus = setTuneOff(std::stoi(demod_id));
-	            if(mxlStatus==MXL_SUCCESS){
-			        json["status"]=1;
-			        json["message"]="Mxl tuner off successfull!";
-			        json["error"]=false;
-	            }
-			    else{
-			        json["status"]=0;
-			        json["message"]="Mxl tuner off failed!";
-			        json["error"]=true;
-			    }
-	        }else{
-	        	json["message"] = "Required Integer!";
-	            json["error"] = true;
-	        }
+            std::string demod_id = getParameter(request.body(),"demod_id");
+            if(verifyInteger(demod_id,1,1,7)){      
+                mxlStatus = setTuneOff(std::stoi(demod_id));
+                if(mxlStatus==MXL_SUCCESS){
+                    json["status"]=1;
+                    json["message"]="Mxl tuner off successfull!";
+                    json["error"]=false;
+                }
+                else{
+                    json["status"]=0;
+                    json["message"]="Mxl tuner off failed!";
+                    json["error"]=true;
+                }
+            }else{
+                json["message"] = "Required Integer!";
+                json["error"] = true;
+            }
         }else{
             json["error"]= true;
             json["message"]= res;
@@ -1224,7 +1223,7 @@ private:
         response.send(Http::Code::Ok, resp);
     }
     /*****************************************************************************/
-    /*  function readWrite32bUdpCpu                           						    */
+    /*  function readWrite32bUdpCpu                                                     */
     /*****************************************************************************/
     void  readWrite32bUdpCpu(const Rest::Request& request, Net::Http::ResponseWriter response){
         unsigned char RxBuffer[20]={0};
@@ -1241,14 +1240,14 @@ private:
             std::string cs = getParameter(request.body(),"cs"); 
             std::string mode = getParameter(request.body(),"mode"); 
             if(std::stoi(mode) == 1){
-            	if(write32bCPU(std::stoi(cs),std::stoi(address),std::stoi(data)) != -1){
-            		std::cout<<"SC => "<<cs<<"ADDRESS => "<<address<<"DATA => "<<data;
-            		json["error"]= false;
-                	json["message"]= "Success!";
-            	}else{
-            		json["error"]= true;
-                	json["message"]= "Failed!";
-            	}
+                if(write32bCPU(std::stoi(cs),std::stoi(address),std::stoi(data)) != -1){
+                    std::cout<<"SC => "<<cs<<"ADDRESS => "<<address<<"DATA => "<<data;
+                    json["error"]= false;
+                    json["message"]= "Success!";
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Failed!";
+                }
             }
             // injson["address"] = address;
             // injson["data"] = data;
@@ -1273,7 +1272,7 @@ private:
         response.send(Http::Code::Ok, resp);
     }
     /*****************************************************************************/
-    /*  function readWrite32bUdpI2C                           						    */
+    /*  function readWrite32bUdpI2C                                                     */
     /*****************************************************************************/
     void  readWrite32bUdpI2C(const Rest::Request& request, Net::Http::ResponseWriter response){
         unsigned char RxBuffer[20]={0};
@@ -1293,14 +1292,14 @@ private:
             injson["data"] = data;
             injson["cs"] = cs;
             if(std::stoi(mode) == 1){
-            	if(write32bI2C(std::stoi(cs),std::stoi(address),std::stoi(data)) != -1){
-            		std::cout<<"SC => "<<cs<<"ADDRESS => "<<address<<"DATA => "<<data;
-            		json["error"]= false;
-                	json["message"]= "Success!";
-            	}
+                if(write32bI2C(std::stoi(cs),std::stoi(address),std::stoi(data)) != -1){
+                    std::cout<<"SC => "<<cs<<"ADDRESS => "<<address<<"DATA => "<<data;
+                    json["error"]= false;
+                    json["message"]= "Success!";
+                }
             }else{
-               	json["resp"]=read32bI2C(std::stoi(cs),std::stoi(address));
-               	std::cout<<"CS => "<<cs<<"ADDRESS => "<<address;
+                json["resp"]=read32bI2C(std::stoi(cs),std::stoi(address));
+                std::cout<<"CS => "<<cs<<"ADDRESS => "<<address;
             }
             // uLen = c2.callCommand(90,RxBuffer,20,20,injson,std::stoi(mode));
             // if (RxBuffer[0] != STX1 || RxBuffer[1] != STX2 || RxBuffer[2] != STX3 || uLen != 12 ) {
@@ -1322,63 +1321,7 @@ private:
         response.send(Http::Code::Ok, resp);
     }
     
-    // void  setTuners(const Rest::Request& request, Net::Http::ResponseWriter response){
-    //     unsigned char RxBuffer[20]={0};
-        
-    //     int uLen;
-    //     Json::Value json,injson;
-    //     Json::FastWriter fastWriter;  
-    //     std::string hCom ,demodId ,lnbId ,standard ,frequency ,rate ,modulation ,fec ,rollOff ,pilots ,spectumInverted ,scramblingIndex ,searchRange;
-    //     std::string para[] = {"demodId","lnbId","standard","frequency","rate","modulation","fec","rollOff","pilots","spectumInverted","scramblingIndex","searchRange"};
-    //     addToLog("setTuner",request.body());
-    //     std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
-    //     if(res=="0"){        
-    //         demodId = getParameter(request.body(),"demodId"); 
-    //         lnbId= getParameter(request.body(),"lnbId"); 
-    //         standard = getParameter(request.body(),"standard");
-    //         frequency = getParameter(request.body(),"frequency"); 
-    //         rate = getParameter(request.body(),"rate"); 
-    //         modulation = getParameter(request.body(),"modulation"); 
-    //         fec = getParameter(request.body(),"fec");
-    //         rollOff = getParameter(request.body(),"rollOff");
-    //         pilots = getParameter(request.body(),"pilots");   
-    //         spectumInverted = getParameter(request.body(),"spectumInverted"); 
-    //         scramblingIndex = getParameter(request.body(),"scramblingIndex"); 
-    //         searchRange = getParameter(request.body(),"searchRange"); 
-
-    //         injson["demodId"] = demodId;
-    //         injson["lnbId"] = lnbId;
-    //         injson["standard"] = standard;
-    //         injson["frequency"] = frequency;
-    //         injson["rate"] = rate;
-    //         injson["modulation"] = modulation;
-    //         injson["fec"] = fec;
-    //         injson["rollOff"] = rollOff;
-    //         injson["pilots"] = pilots;
-    //         injson["spectumInverted"] = spectumInverted;
-    //         injson["scramblingIndex"] = scramblingIndex;
-    //         injson["searchRange"] = searchRange;
-
-    //         uLen = c2.callCommand(91,RxBuffer,20,20,injson,1);
-    //         if (RxBuffer[0] != STX1 || RxBuffer[1] != STX2 || RxBuffer[2] != STX3 || uLen != 12 ) {
-    //             json["error"]= true;
-    //             json["message"]= "STATUS COMMAND ERROR!";
-    //             addToLog("setTuner","Error");
-    //         }else{
-    //             json["done"] = RxBuffer[6];
-    //             json["error"]= false;
-    //             json["message"]= "set Tuner!";
-    //             json["data"] =  RxBuffer[8]<<24 | RxBuffer[9]<<16 | RxBuffer[8]<<8 | RxBuffer[9];
-    //              addToLog("setTuner","Success");
-    //         }
-    //         json = injson;
-    //     }else{
-    //         json["error"]= true;
-    //         json["message"]= res;
-    //     }
-    //     std::string resp = fastWriter.write(json);
-    //     response.send(Http::Code::Ok, resp);
-    // }
+    
     void initRedisConn()
     {
         // const char *hostname = "127.0.0.1";
@@ -1417,8 +1360,8 @@ private:
         Json::FastWriter fastWriter;        
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetFirmwareVersion(rmx_no);
             }else{
                 json["error"]= true;
@@ -1507,8 +1450,8 @@ private:
         Json::FastWriter fastWriter;        
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetHardwareVersion(rmx_no);
             }else{
                 json["error"]= true;
@@ -1605,8 +1548,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetInputOutput(rmx_no);
             }else{
                 json["error"]= true;
@@ -1654,8 +1597,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetInputMode(rmx_no);
             }else{
                 json["error"]= true;
@@ -1773,11 +1716,11 @@ private:
                 if(verifyInteger(cs) && std::stoi(cs) <=128){
                     std::string address = getParameter(request.body(),"address"); 
                     int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-					if(write32bCPU(0,0,target) != -1)
-                    	json = callGetCore(cs,address);
+                    if(write32bCPU(0,0,target) != -1)
+                        json = callGetCore(cs,address);
                     else{
-                    	json["error"]= true;
-                    	json["message"]= "Connection error!";	
+                        json["error"]= true;
+                        json["message"]= "Connection error!";   
                     }
                 }else{
                     json["error"]= true;
@@ -1813,7 +1756,7 @@ private:
                 addToLog("getCORE","Error");  
             }else{
                  // long unsigned int  data = (long unsigned int)(RxBuffer[4] << 24) |(RxBuffer[5] << 16) |(RxBuffer[6] << 8) |(RxBuffer[7]);
-               	json["data"] =std::to_string(((long unsigned int)(RxBuffer[4]) << 24) | ((long unsigned int)(RxBuffer[5]) << 16) | ((long unsigned int)(RxBuffer[6]) << 8) |(long unsigned int)(RxBuffer[7]));
+                json["data"] =std::to_string(((long unsigned int)(RxBuffer[4]) << 24) | ((long unsigned int)(RxBuffer[5]) << 16) | ((long unsigned int)(RxBuffer[6]) << 8) |(long unsigned int)(RxBuffer[7]));
                 json["error"]= false;
                 json["message"]= "Get CORE!";  
                 addToLog("getCORE","Success");
@@ -1833,8 +1776,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){   
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 int uLen = c1.callCommand(06,RxBuffer,20,5,json,0);
                 if (!uLen|| RxBuffer[0] != STX || RxBuffer[3] != 0x06 || uLen != 9 || RxBuffer[8] != ETX ) {
                     json["error"]= true;
@@ -1900,8 +1843,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 int uLen = c1.callCommand(8,RxBuffer,10,10,json,0);
                 if (!uLen || RxBuffer[0] != STX || RxBuffer[3] != 07 || uLen != 5 || RxBuffer[4] != ETX ) {
                     json["error"]= true;
@@ -1933,8 +1876,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(0 < rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetNITmode(rmx_no);
             }else{
                 json["error"]= true;
@@ -2020,8 +1963,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetLCN(rmx_no);
             }else{
                 json["error"]= true;
@@ -2109,8 +2052,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 int uLen = c1.callCommand(12,RxBuffer,6,6,json,0);
                 string stx=getDecToHex((int)RxBuffer[0]);
                 string cmd = getDecToHex((int)RxBuffer[3]);
@@ -2209,8 +2152,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetTsId(rmx_no);
             }else{
                 json["error"]= true;
@@ -2301,8 +2244,8 @@ private:
         Json::FastWriter fastWriter;
          int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetDvbSpiOutputMode(rmx_no);
             }else{
                 json["error"]= true;
@@ -2399,8 +2342,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetPsiSiInterval(rmx_no);
             }else{
                 json["error"]= true;
@@ -2492,8 +2435,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetNetworkName(rmx_no);
             }else{
                 json["error"]= true;
@@ -2588,8 +2531,8 @@ private:
         
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 std::string progNumber = request.param(":uProg").as<std::string>();
                 json = callGetServiceName(rmx_no,progNumber);
             }else{
@@ -2629,9 +2572,9 @@ private:
                 nName=nName+getDecToHex((int)RxBuffer[4 + i]);
             }
             if(nName == "")
-            	json["nName"] = -1;
+                json["nName"] = -1;
             else
-            	json["nName"] = hex_to_string(nName);
+                json["nName"] = hex_to_string(nName);
             addToLog("getServiceName","Success");
         }
        return json;
@@ -2689,14 +2632,14 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetDynamicStateWinSize(rmx_no);
             }else{
                 json["error"]= true;
                 json["message"]= "Connection error!";
             }
-           	
+            
         }else{
             json["error"] = false;
             json["message"] = "Invalid remux id";
@@ -2771,8 +2714,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetFilterCA(rmx_no);
             }else{
                 json["error"]= true;
@@ -2869,8 +2812,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetServiceID(rmx_no);
             }else{
                 json["error"]= true;
@@ -3026,8 +2969,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetTablesVersion(rmx_no);
             }else{
                 json["error"]= true;
@@ -3129,8 +3072,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetSmoothFilterInfo(rmx_no);
             }else{
                 json["error"]= true;
@@ -3219,8 +3162,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetDataflowRates(rmx_no);
             }else{
                 json["error"]= true;
@@ -3511,8 +3454,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if( rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetCryptedProg(rmx_no);
             }else{
                 json["error"]= true;
@@ -3691,8 +3634,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 auto uProg = request.param(":uProg").as<std::string>();
                 json = callGetPrograminfo(uProg,rmx_no);
             }else{
@@ -3792,8 +3735,8 @@ private:
         Json::FastWriter fastWriter; 
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){  
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetAllReferencedPIDInfo(rmx_no);
             }else{
                 json["error"]= true;
@@ -3886,8 +3829,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetEraseCAMod(rmx_no);
             }else{
                 json["error"]= true;
@@ -4071,8 +4014,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json =  callEraseCAMod(rmx_no);
             }else{
                 json["error"]= true;
@@ -4169,8 +4112,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 int uLen = c1.callCommand(39,RxBuffer,4090,7,json,0);
                 string stx=getDecToHex((int)RxBuffer[0]);
                 string cmd = getDecToHex((int)RxBuffer[3]);
@@ -4214,8 +4157,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json =callGetProgActivation(rmx_no);
             }else{
                 json["error"]= true;
@@ -4249,20 +4192,20 @@ private:
             jsonNewIds = callGetServiceID(rmx_no);
 
             for(int i=0; i<num_prog; i++) {
-            	Json::Value jsondata,jservName;
+                Json::Value jsondata,jservName;
                 // pProg[i] = (RxBuffer[2*i+4]<<8)|RxBuffer[2*i+5];
                 int pnum = (RxBuffer[2*i+4]<<8)|RxBuffer[2*i+5];
                 jpnames = callGetProgramOriginalName(std::to_string(pnum),rmx_no);
                 if(jpnames["error"] == false){
-                	jsondata["original_name"] = jpnames["name"];
+                    jsondata["original_name"] = jpnames["name"];
                 }else{
-                	jsondata["original_name"] = -1;
+                    jsondata["original_name"] = -1;
                 }
                 jservName = callGetServiceName(rmx_no,std::to_string(pnum));
                 if(jservName["error"]==false){
-                	jsondata["new_name"] = jservName["nName"];
+                    jsondata["new_name"] = jservName["nName"];
                 }else{
-                	jsondata["new_name"] = -1;
+                    jsondata["new_name"] = -1;
                 }
                 jsondata["original_service_id"] = pnum;
                 jsondata["new_service_id"] = getNewServiceIdIfExists(jsonNewIds,pnum);
@@ -4277,20 +4220,20 @@ private:
         return json;
     }
     int getNewServiceIdIfExists(Json::Value jsonNewIds,int progNum){
-    	int serviceId=-1;
-    	if(jsonNewIds["error"]==false){
-    		Json::Value oldProgNumber = jsonNewIds["oldProgNumber"];
-    		Json::Value newProgNumber = jsonNewIds["newProgNumber"];
-    		if(oldProgNumber.size() > 0){
-    			for (int i = 0; i < oldProgNumber.size(); ++i)
-	    		{
-	    			if(progNum != oldProgNumber[i].asInt())
-	    				continue;
-	    			serviceId = newProgNumber[i].asInt();
-	    		}	
-    		}
-    	}
-    	return serviceId;
+        int serviceId=-1;
+        if(jsonNewIds["error"]==false){
+            Json::Value oldProgNumber = jsonNewIds["oldProgNumber"];
+            Json::Value newProgNumber = jsonNewIds["newProgNumber"];
+            if(oldProgNumber.size() > 0){
+                for (int i = 0; i < oldProgNumber.size(); ++i)
+                {
+                    if(progNum != oldProgNumber[i].asInt())
+                        continue;
+                    serviceId = newProgNumber[i].asInt();
+                }   
+            }
+        }
+        return serviceId;
     }
     void getActivatedProgs(const Rest::Request& request, Net::Http::ResponseWriter response){
         Json::Value json,iojson;
@@ -4340,8 +4283,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetLockedPIDs(rmx_no);
             }else{
                 json["error"]= true;
@@ -4430,8 +4373,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json =callFlushLockedPIDs(rmx_no);
             }else{
                 json["error"]= true;
@@ -4522,8 +4465,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetHighPriorityServices(rmx_no);
             }else{
                 json["error"]= true;
@@ -4612,8 +4555,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callFlushHighPriorityServices(rmx_no);
             }else{
                 json["error"]= true;
@@ -4704,8 +4647,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetPsiSiDecodingStatus(rmx_no);
             }else{
                 json["error"]= true;
@@ -4804,8 +4747,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetTSFeatures(rmx_no);
             }else{
                 json["error"]= true;
@@ -4905,8 +4848,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetLcnProvider(rmx_no);
             }else{
                 json["error"]= true;
@@ -4986,8 +4929,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 auto uProg = request.param(":uProg").as<std::string>();
                 json = callGetProgramOriginalName(uProg,rmx_no);
             }else{
@@ -5076,8 +5019,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 auto uProg = request.param(":uProg").as<std::string>();
                 json = callGetProgramOriginalProviderName(uProg,rmx_no);
             }else{
@@ -5168,8 +5111,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 auto uProg = request.param(":uProg").as<std::string>();
                 json = callGetProgramOriginalNetworkName(rmx_no,uProg);
             }else{
@@ -5278,8 +5221,8 @@ private:
                 if (parsedSuccess)
                 {
                     if(verifyJsonArray(root,"service_list",1)){
-                    	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-						if(write32bCPU(0,0,target) != -1) {
+                        int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+                        if(write32bCPU(0,0,target) != -1) {
                             jsonMsg["service_list"] = root["service_list"];
                             uLen = c1.callCommand(29,RxBuffer,1024,1024,jsonMsg,0);
                             string cmd = getDecToHex((int)RxBuffer[3]);
@@ -5522,7 +5465,7 @@ private:
             {
                 pro_id = getParameter(request.body(),"provId");
                 if(verifyInteger(pro_id)){
-                	int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+                    int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                     if(write32bCPU(0,0,target) != -1) {
                         json = callSetLcnProvider(pro_id,std::stoi(rmx_no));
                     }else{
@@ -5606,7 +5549,7 @@ private:
                 json[para[i]]= (i==5)? "Require Integer between 1 to 6!":"Require Integer!";
             }
             if(all_para_valid){
-            	int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+                int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1) {
                     json = callCreateAlarmFlags(FIFO_Threshold0,FIFO_Threshold1,FIFO_Threshold2,FIFO_Threshold3,mode,std::stoi(rmx_no));
                 }else{
@@ -6130,7 +6073,7 @@ private:
                 json[para[i]]= (i!=0)? "table: Require Integer between 0-4!" :((i==1)?"timeout: Require Integer between 500-65535!": "Require Integer between 1-6!");
             }
             if(all_para_valid){
-            	int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+                int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1) {
                     json=callSetTableTimeout(table,timeout,std::stoi(rmx_no)); 
                 }else{
@@ -6292,8 +6235,8 @@ private:
                 json[para[i]]= (i == 0)? "Require Integer!!" :((i==3)? "Require Integer between 0 to "+std::to_string(INPUT_COUNT)+"!" : ((i==4)?"Require Integer between 1 to 6!" : "Require Integer 0 or 1!"));
             }
             if(all_para_valid){
-            	
-            	int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+                
+                int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1) {
                     json = callSetDvbSpiOutputMode(rate,falling,mode,output,std::stoi(rmx_no));
                 }else{
@@ -6488,15 +6431,15 @@ private:
         Json::Value json;
         Json::Reader reader;
         Json::FastWriter fastWriter;
-        std::string para[] = {"oldpronum","newprognum","input","output","rmx_no","addFlag"};
+        std::string para[] = {"original_service_id","new_service_id","input","output","rmx_no","addFlag"};
         int error[ sizeof(para) / sizeof(para[0])];
         bool all_para_valid=true;
         addToLog("setServiceID",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
             std::string rmx_no =getParameter(request.body(),"rmx_no") ;
-            std::string oldpronum = getParameter(request.body(),"oldpronum"); 
-            std::string newprognum = getParameter(request.body(),"newprognum"); 
+            std::string oldpronum = getParameter(request.body(),"original_service_id"); 
+            std::string newprognum = getParameter(request.body(),"new_service_id"); 
             std::string input = getParameter(request.body(),"input");
             std::string output = getParameter(request.body(),"output");
             std::string addFlag = getParameter(request.body(),"addFlag");
@@ -6516,40 +6459,40 @@ private:
                 json[para[i]]=(i==2)? "Require Integer between 1 to 6 !" : ((i==3 || i==4)?"Require Integer between 1 to "+std::to_string(INPUT_COUNT)+"!" :((i==5)? "Require Integer between 0-1" : "Require Integer between 1 to 65535 !"));
             }
             if(all_para_valid){
-            	Json::Value service_ids,new_service_ids,old_service_ids;
-            	int rmx_no_i = std::stoi(rmx_no);
-            	int flag = std::stoi(addFlag);
-            	Json::Value iojson = callSetInputOutput(input,output,rmx_no_i);
+                Json::Value service_ids,new_service_ids,old_service_ids;
+                int rmx_no_i = std::stoi(rmx_no);
+                int flag = std::stoi(addFlag);
+                Json::Value iojson = callSetInputOutput(input,output,rmx_no_i);
                 if(iojson["error"] == false){
-                	Json::Value service_ids = db->getServiceIds(rmx_no_i,oldpronum);
-                	int is_present = 0;
-                	if(service_ids["error"] == false){
-                		for (int i = 0; i < service_ids["list"].size(); ++i)
-                		{
-                			std::string old_service_id = service_ids["list"][i]["channel_number"].asString();
-                			if(std::stoi(oldpronum) != std::stoi(old_service_id)){
-                				old_service_ids[i] = old_service_id;
-                				new_service_ids[i] = service_ids["list"][i]["service_id"].asString();	
-                			}
-                		}
-                		if(flag){
-	                		old_service_ids[service_ids["list"].size()] = oldpronum;
-	                		new_service_ids[service_ids["list"].size()] = newprognum;	
-	                	}
-                	}else{
-                		if(flag){
-	                		old_service_ids[0] = oldpronum;
-	                		new_service_ids[0] = newprognum;	
-	                	}
-                	}
-                	json["old_service_ids"] = old_service_ids;
-                	json["new_service_ids"] = new_service_ids;
-                	json = callSetServiceID(old_service_ids,new_service_ids,rmx_no_i);
-                	if(json["error"] == false)
-                		db->addServiceId(std::stoi(oldpronum),std::stoi(newprognum),rmx_no_i,flag);
+                    Json::Value service_ids = db->getServiceIds(rmx_no_i,oldpronum);
+                    int is_present = 0;
+                    if(service_ids["error"] == false){
+                        for (int i = 0; i < service_ids["list"].size(); ++i)
+                        {
+                            std::string old_service_id = service_ids["list"][i]["channel_number"].asString();
+                            if(std::stoi(oldpronum) != std::stoi(old_service_id)){
+                                old_service_ids[i] = old_service_id;
+                                new_service_ids[i] = service_ids["list"][i]["service_id"].asString();   
+                            }
+                        }
+                        if(flag){
+                            old_service_ids[service_ids["list"].size()] = oldpronum;
+                            new_service_ids[service_ids["list"].size()] = newprognum;   
+                        }
+                    }else{
+                        if(flag){
+                            old_service_ids[0] = oldpronum;
+                            new_service_ids[0] = newprognum;    
+                        }
+                    }
+                    json["old_service_ids"] = old_service_ids;
+                    json["new_service_ids"] = new_service_ids;
+                    json = callSetServiceID(old_service_ids,new_service_ids,rmx_no_i);
+                    if(json["error"] == false)
+                        db->addServiceId(std::stoi(oldpronum),std::stoi(newprognum),rmx_no_i,flag);
                 }
                 else
-                	json = iojson;
+                    json = iojson;
             }else{
                 json["error"]= true;
             }
@@ -6600,7 +6543,7 @@ private:
         std::string rmx_no = getParameter(request.body(),"rmx_no") ; 
         if(verifyInteger(rmx_no,1,1,RMX_COUNT)==1)
         {
-        	int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
             if(write32bCPU(0,0,target) != -1) {
                 uLen = c1.callCommand(241,RxBuffer,20,200,paraJson,1);      
                 if (!uLen|| RxBuffer[0] != STX || RxBuffer[3] != CMD_CHANGE_SID || RxBuffer[4]!=1 || RxBuffer[5] != ETX ){
@@ -6665,8 +6608,8 @@ private:
                 json[para[i]]= (i==0)? "Require Integer between 1 to 6!" : ((i==1)? "Require Integer between 1 to 128!" : "Require Integer!");
             }
             if(all_para_valid){
-            	int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-				if(write32bCPU(0,0,target) != -1) {
+                int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+                if(write32bCPU(0,0,target) != -1) {
                     json = callSetCore(cs,address,data,std::stoi(rmx_no));
                 }else{
                     json["error"]= true;
@@ -6812,8 +6755,8 @@ private:
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
                 json = callGetPmtAlarm(rmx_no);
             }else{
                 json["error"]= true;
@@ -6980,43 +6923,43 @@ private:
         addToLog("setServiceName",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
-        	std::string addFlag_str = getParameter(request.body(),"addFlag");
-        	if(verifyInteger(addFlag_str,1,1)){
-        		std::string NewName;
-        		int addFlag = std::stoi(addFlag_str);
-        		if(addFlag == 1){
-        			NewName = getParameter(request.body(),"pname"); 
-        			error[0] =verifyString(NewName,30);	
-        		}else{
-        			NewName = -1;
-        			error[0] =1;	
-        		}   
-	            std::string rmx_no =getParameter(request.body(),"rmx_no");
-	            std::string input = getParameter(request.body(),"input"); 
-	            std::string progNumber = getParameter(request.body(),"pnumber"); 
-	           
-	            error[1] = verifyInteger(progNumber);
-	            error[2] = verifyInteger(input,1,1,INPUT_COUNT);
-	            error[3] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            std::string addFlag_str = getParameter(request.body(),"addFlag");
+            if(verifyInteger(addFlag_str,1,1)){
+                std::string NewName;
+                int addFlag = std::stoi(addFlag_str);
+                if(addFlag == 1){
+                    NewName = getParameter(request.body(),"pname"); 
+                    error[0] =verifyString(NewName,30); 
+                }else{
+                    NewName = -1;
+                    error[0] =1;    
+                }   
+                std::string rmx_no =getParameter(request.body(),"rmx_no");
+                std::string input = getParameter(request.body(),"input"); 
+                std::string progNumber = getParameter(request.body(),"pnumber"); 
+               
+                error[1] = verifyInteger(progNumber);
+                error[2] = verifyInteger(input,1,1,INPUT_COUNT);
+                error[3] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
 
-	            for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
-	            {
-	               if(error[i]!=0){
-	                    continue;
-	                }
-	                all_para_valid=false;
-	                json["error"]= true;
-	                json[para[i]]= (i==0)? "Require Integer between 1-6!" :((i==1)? "Require Integer between 0-"+std::to_string(INPUT_COUNT)+" !" : ((i==2)?  "Require Integer!" : "Require valid string (Max 30 charecter)!") );
-	            }
-	            if(all_para_valid){
-	               json = callSetServiceName(NewName,progNumber,input,std::stoi(rmx_no),addFlag);
-	               if(json["error"] == false) 
-	               		db->addChannelname(std::stoi(progNumber),NewName,std::stoi(rmx_no),addFlag);  
-	            }
-	        }else{
-	        	json["error"]= true;
-            	json["addFlag"]= "Required Integer between 0-1!";	
-	        }
+                for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
+                {
+                   if(error[i]!=0){
+                        continue;
+                    }
+                    all_para_valid=false;
+                    json["error"]= true;
+                    json[para[i]]= (i==0)? "Require Integer between 1-6!" :((i==1)? "Require Integer between 0-"+std::to_string(INPUT_COUNT)+" !" : ((i==2)?  "Require Integer!" : "Require valid string (Max 30 charecter)!") );
+                }
+                if(all_para_valid){
+                   json = callSetServiceName(NewName,progNumber,input,std::stoi(rmx_no),addFlag);
+                   if(json["error"] == false) 
+                        db->addChannelname(std::stoi(progNumber),NewName,std::stoi(rmx_no),addFlag);  
+                }
+            }else{
+                json["error"]= true;
+                json["addFlag"]= "Required Integer between 0-1!";   
+            }
         }else{
             json["error"]= true;
             json["message"]= res;
@@ -7031,7 +6974,7 @@ private:
         unsigned int len = 8+NewName.length();
         iojson = callSetInputOutput(input_channel,"0",rmx_no);
         if(iojson["error"]==false){
-        	jsonMsg["addFlag"] = addFlag;
+            jsonMsg["addFlag"] = addFlag;
             jsonMsg["NewName"] = NewName;
             jsonMsg["progNumber"] = progNumber;
             uLen = c1.callCommand(19,RxBuffer,10,len,jsonMsg,1);
@@ -7048,7 +6991,7 @@ private:
                 }else{
                     json["status"] = RxBuffer[4];
                     json["error"]= false;
-                    json["message"]= "Set new name!";                       	     
+                    json["message"]= "Set new name!";                                
                     addToLog("setServiceName","Success");
                 }
             }
@@ -7059,39 +7002,45 @@ private:
         return json;
     }
     /*****************************************************************************/
-    /*  Commande 0x1A  function setNewProvName                         */
+    /*  Commande 0x1A  function setServiceProvider                         */
     /*****************************************************************************/
-    void  setNewProvName(const Rest::Request& request, Net::Http::ResponseWriter response){
+    void  setServiceProvider(const Rest::Request& request, Net::Http::ResponseWriter response){
         unsigned char RxBuffer[6]={0};
         
         int uLen;
         Json::Value json;
         Json::FastWriter fastWriter;        
-         bool all_para_valid=true;
-        std::string para[] = {"NewName","progNumber","rmx_no","input"};
-        addToLog("setNewProvName",request.body());
+        bool all_para_valid=true;
+        std::string para[] = {"providerName","serviceNumber","rmx_no","input","addFlag"};
+        int error[ sizeof(para) / sizeof(para[0])];
+        addToLog("setServiceProvider",request.body());
         std::string res=validateRequiredParameter(request.body(),para,  sizeof(para) / sizeof(para[0]));
         if(res=="0"){ 
             std::string rmx_no = getParameter(request.body(),"rmx_no") ; 
             if(verifyInteger(rmx_no,1,1,RMX_COUNT)==1){  
-                std::string NewName = getParameter(request.body(),"NewName"); 
-                std::string progNumber = getParameter(request.body(),"progNumber"); 
+                std::string providerName = getParameter(request.body(),"providerName"); 
+                std::string serviceNumber = getParameter(request.body(),"serviceNumber"); 
                 std::string input = getParameter(request.body(),"input"); 
-                 if(!verifyString(NewName,30)){
-                    json["error"] = true;
-                    json["NewName"] = "Give valide string!";
+                std::string addFlag = getParameter(request.body(),"addFlag"); 
+                error[0] = verifyString(providerName,30);
+                error[1] = verifyInteger(serviceNumber,0,0,65535,1);
+                error[2] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+                error[3] = verifyInteger(input,1,1,INPUT_COUNT);
+                error[4] = verifyInteger(addFlag,1,1,1);
+                
+                for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
+                {
+                   if(error[i]!=0){
+                        continue;
+                    }
                     all_para_valid=false;
-                }if(!verifyInteger(progNumber)){
-                    json["error"] = true;
-                    all_para_valid=false;
-                    json["progNumber"] = "Give valid integer for program number!";
-                }if(!verifyInteger(input,1,1,INPUT_COUNT)){
-                    json["error"] = true;
-                    all_para_valid=false;
-                    json["progNumber"] = "Require integer between 0 - "+std::to_string(INPUT_COUNT)+" !";
+                    json["error"]= true;
+                    json[para[i]]= (i==0)? "Require string (length 1-30)!" :((i==3)? "Require Integer between 0-"+std::to_string(INPUT_COUNT)+" !" : ((i==2)?  "Require Integer between 1-"+std::to_string(RMX_COUNT)+" !" : ((i == 1) ? "Require Integer between 1 - 65535!" : "Require Integer 0 or 1!") ));
                 }
                 if(all_para_valid){
-                        json = callSetNewProvName(NewName,progNumber,input,std::stoi(rmx_no));
+                    json = callSetServiceProvider(providerName,serviceNumber,input,std::stoi(rmx_no),std::stoi(addFlag));
+                    if(json["error"] == false)
+                        db->addNewProviderName(serviceNumber,providerName,rmx_no,addFlag);        
                 }
             }else{
                 json["error"] = false;
@@ -7104,7 +7053,7 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
-    Json::Value callSetNewProvName(std::string NewName,std::string progNumber,std::string input_channel,int rmx_no){
+    Json::Value callSetServiceProvider(std::string providerName,std::string serviceNumber,std::string input_channel,int rmx_no,int addFlag = 1){
         unsigned char RxBuffer[6]={0};
         
         int uLen;
@@ -7113,27 +7062,26 @@ private:
         iojson = callSetInputOutput(input_channel,"0",rmx_no);
         // std::cout<<"------------------TEST--------------------- "<<progNumber<<std::endl;
         if(iojson["error"]==false){
-            jsonMsg["NewName"] = NewName;
-            jsonMsg["progNumber"] = progNumber;
+            jsonMsg["providerName"] = providerName;
+            jsonMsg["serviceNumber"] = serviceNumber;
+            jsonMsg["addFlag"] = addFlag;
             uLen = c1.callCommand(26,RxBuffer,10,1024,jsonMsg,1);
             if (!uLen|| RxBuffer[0] != STX || RxBuffer[3] != CMD_CHANGE_PROV || uLen != 6 || RxBuffer[4] != 1 || RxBuffer[5] != ETX ) {
                 json["error"]= true;
                 json["message"]= "STATUS COMMAND ERROR!";
             }            
             else{
-                addToLog("setNewProvName",progNumber);
+                addToLog("callSetServiceProvider",serviceNumber);
                 uLen = ((RxBuffer[1]<<8) | RxBuffer[2]);
                 if (uLen != 1 ) {
                     json["error"]= true;
                     json["message"]= "STATUS COMMAND ERROR!";
-                    addToLog("setNewProvName","Error");
+                    addToLog("callSetServiceProvider","Error");
                 }else{
                     json["status"] = RxBuffer[4];
                     json["error"]= false;
                     json["message"]= "set provider name";  
-
-                    db->addNewProviderName(progNumber,NewName,rmx_no);        
-                    addToLog("setNewProvName","Success");
+                    addToLog("callSetServiceProvider","Success");
                 }
             }
         }else{
@@ -7143,17 +7091,17 @@ private:
         return json;
     }
     /*****************************************************************************/
-    /*  Commande 0x1A   function getNewProvName                          */
+    /*  Commande 0x1A   function getServiceProviderName                         */
     /*****************************************************************************/
-    void getNewProvName(const Rest::Request& request, Net::Http::ResponseWriter response){
+    void getServiceProviderName(const Rest::Request& request, Net::Http::ResponseWriter response){
          Json::Value json;
         Json::FastWriter fastWriter;
         int rmx_no = request.param(":rmx_no").as<int>();
         if(rmx_no > 0 && rmx_no <= 6){
-        	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-			if(write32bCPU(0,0,target) != -1) {
-                auto programNumber = request.param(":uProg").as<std::string>();
-                json = callGetNewProvName(rmx_no , programNumber);
+            int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
+                auto serviceNumber = request.param(":uProg").as<std::string>();
+                json = callGetServiceProvider(rmx_no , serviceNumber);
             }else{
                 json["error"]= true;
                 json["message"]= "Connection error!";
@@ -7165,13 +7113,13 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
-    Json::Value callGetNewProvName(int rmx_no,std::string programNumber){
+    Json::Value callGetServiceProvider(int rmx_no,std::string serviceNumber){
         unsigned char RxBuffer[100]={0};
         Json::Value json;
         Json::Value jsonInput;
         unsigned char *name;
-        jsonInput["uProg"] = programNumber;
-        addToLog("getNewProvName",programNumber);
+        jsonInput["uProg"] = serviceNumber;
+        addToLog("getNewProvName",serviceNumber);
 
         int uLen = c1.callCommand(26,RxBuffer,100,8,jsonInput,0);
         string stx=getDecToHex((int)RxBuffer[0]);
@@ -7195,24 +7143,24 @@ private:
         }
         return json;
     }
-    void getNewProviderName(const Rest::Request& request, Net::Http::ResponseWriter response){
+    void getServiceProvider(const Rest::Request& request, Net::Http::ResponseWriter response){
         Json::Value json,iojson;
         Json::FastWriter fastWriter;
-        std::string para[] = {"rmx_no","input","progNumber"};
+        std::string para[] = {"rmx_no","input","serviceNumber"};
         int error[ sizeof(para) / sizeof(para[0])];
         bool all_para_valid=true;
-        addToLog("getNewProviderName",request.body());
-        std::string input, output,str_rmx_no,progNumber;
+        addToLog("getServiceProvider",request.body());
+        std::string input, output,str_rmx_no,serviceNumber;
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
             str_rmx_no = getParameter(request.body(),"rmx_no");
             input = getParameter(request.body(),"input");
             // output = getParameter(request.body(),"output");
-            progNumber = getParameter(request.body(),"progNumber");
+            serviceNumber = getParameter(request.body(),"serviceNumber");
             error[0] = verifyInteger(str_rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(input,1,1,INPUT_COUNT);
             // error[2] = verifyInteger(output,1,1,OUTPUT_COUNT);
-            error[2] = verifyInteger(progNumber);
+            error[2] = verifyInteger(serviceNumber,0,0,65535,1);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
                if(error[i]!=0){
@@ -7225,7 +7173,7 @@ private:
             if(all_para_valid){
                 iojson=callSetInputOutput(input,"0",std::stoi(str_rmx_no));
                 if(iojson["error"]==false){
-                    json = callGetNewProvName(std::stoi(str_rmx_no),progNumber);
+                    json = callGetServiceProvider(std::stoi(str_rmx_no),serviceNumber);
                 }else{
                     json = iojson;
                 }
@@ -7338,8 +7286,8 @@ private:
                     //     }
                     // }
                     // json["names"] = pnameList;
-                	json["error"]= false;
-					addToLog("setKeepProg","Success");
+                    json["error"]= false;
+                    addToLog("setKeepProg","Success");
                     db->addActivatedPrograms(input,output,programNumbers,rmx_no,includeFlag,prog_nos_str);
                     json["message"]= "Set keep programs!";    
                 }
@@ -7383,8 +7331,8 @@ private:
                 json[para[i]]= (i == 0)? "Require Integer between 1-6!" :((i == 2)?"Require Integer between 1 to 6!":"Require Integer between 0 to 65535!");
             }
             if(all_para_valid){
-            	int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-				if(write32bCPU(0,0,target) != -1) {
+                int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+                if(write32bCPU(0,0,target) != -1) {
                     uLen = c1.callCommand(85,RxBuffer,255 * 1024,11,jsonMsg,1);
                     if (!uLen|| RxBuffer[0] != STX || std::stoi(getDecToHex((int)RxBuffer[3])) != 55){
                         json["error"]= true;
@@ -7490,43 +7438,43 @@ private:
                 json[para[i]]= (i == 0)? "Invalid IP address!" :((i == 2)?"Require Integer between 1 to 9!":"Require Integer between 1000 to 65535!");
             }
             if(all_para_valid){
-            	int rmx_no = std::stoi(str_rmx_no);
-            	int control_fpga =ceil(double(rmx_no)/2);
-            	int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
-        		if(write32bCPU(0,0,target) != -1){
-	                std::string hex_ip_part1,hex_ip_part2,hex_ip_part3,hex_ip_part4,hex_ip; 
-	                std::stringstream split_str(ip_address);
-					unsigned int ip_part1,ip_part2,ip_part3,ip_part4; //to store the 4 ints
-					unsigned char ch; //to temporarily store the '.'
-					split_str >> ip_part1 >> ch >> ip_part2 >> ch >> ip_part3 >> ch >> ip_part4;
-	                hex_ip_part1 = getDecToHex(ip_part1);
-	                hex_ip_part1 = (hex_ip_part1.length() ==2)? hex_ip_part1 : "0"+hex_ip_part1;
-	                hex_ip_part2 = getDecToHex(ip_part2);
-	                hex_ip_part2 = (hex_ip_part2.length() ==2)? hex_ip_part2 : "0"+hex_ip_part2;
-	                hex_ip_part3 = getDecToHex(ip_part3);
-	                hex_ip_part3 = (hex_ip_part3.length() ==2)? hex_ip_part3 : "0"+hex_ip_part3;
-	                hex_ip_part4 = getDecToHex(ip_part4);
-	                hex_ip_part4 = (hex_ip_part4.length() ==2)? hex_ip_part4 : "0"+hex_ip_part4;
-	                hex_ip = hex_ip_part1 +""+hex_ip_part2+""+hex_ip_part3+""+hex_ip_part4;
-	                unsigned long int ip_addr = getHexToLongDec(hex_ip);
-	                int rmx_no_of_controller = (rmx_no % 2 == 0)?1:0;
-	                int ch_no = ((rmx_no_of_controller)*8)+std::stoi(channel_no);
-	                json = callSetEthernetOut(ip_addr,std::stoi(port),ch_no);
-	                if(json["error"] == false){
-	                	db->addIPOutputChannels(rmx_no,std::stoi(channel_no),std::to_string(ip_addr),std::stoi(port));
-	                }
-	                json["sreadport"] = read32bI2C(2,40);
-	                 usleep(1000);
-	                json["dreadport"] = read32bI2C(2,44);
-	                 usleep(1000);
-	                json["readch"] = read32bI2C(2,48);
-	                 usleep(1000);
-	                json["readip"] = (read32bI2C(2,36)&0xFFFFFFFF);
-	                 usleep(1000);
-	            }else{
-	        		json["error"]= true;
-            		json["message"]= "Error while connection!";    	
-	            }
+                int rmx_no = std::stoi(str_rmx_no);
+                int control_fpga =ceil(double(rmx_no)/2);
+                int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
+                if(write32bCPU(0,0,target) != -1){
+                    std::string hex_ip_part1,hex_ip_part2,hex_ip_part3,hex_ip_part4,hex_ip; 
+                    std::stringstream split_str(ip_address);
+                    unsigned int ip_part1,ip_part2,ip_part3,ip_part4; //to store the 4 ints
+                    unsigned char ch; //to temporarily store the '.'
+                    split_str >> ip_part1 >> ch >> ip_part2 >> ch >> ip_part3 >> ch >> ip_part4;
+                    hex_ip_part1 = getDecToHex(ip_part1);
+                    hex_ip_part1 = (hex_ip_part1.length() ==2)? hex_ip_part1 : "0"+hex_ip_part1;
+                    hex_ip_part2 = getDecToHex(ip_part2);
+                    hex_ip_part2 = (hex_ip_part2.length() ==2)? hex_ip_part2 : "0"+hex_ip_part2;
+                    hex_ip_part3 = getDecToHex(ip_part3);
+                    hex_ip_part3 = (hex_ip_part3.length() ==2)? hex_ip_part3 : "0"+hex_ip_part3;
+                    hex_ip_part4 = getDecToHex(ip_part4);
+                    hex_ip_part4 = (hex_ip_part4.length() ==2)? hex_ip_part4 : "0"+hex_ip_part4;
+                    hex_ip = hex_ip_part1 +""+hex_ip_part2+""+hex_ip_part3+""+hex_ip_part4;
+                    unsigned long int ip_addr = getHexToLongDec(hex_ip);
+                    int rmx_no_of_controller = (rmx_no % 2 == 0)?1:0;
+                    int ch_no = ((rmx_no_of_controller)*8)+std::stoi(channel_no);
+                    json = callSetEthernetOut(ip_addr,std::stoi(port),ch_no);
+                    if(json["error"] == false){
+                        db->addIPOutputChannels(rmx_no,std::stoi(channel_no),std::to_string(ip_addr),std::stoi(port));
+                    }
+                    json["sreadport"] = read32bI2C(2,40);
+                     usleep(1000);
+                    json["dreadport"] = read32bI2C(2,44);
+                     usleep(1000);
+                    json["readch"] = read32bI2C(2,48);
+                     usleep(1000);
+                    json["readip"] = (read32bI2C(2,36)&0xFFFFFFFF);
+                     usleep(1000);
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Error while connection!";     
+                }
             }
         }else{
             json["error"]= true;
@@ -7536,8 +7484,8 @@ private:
         response.send(Http::Code::Ok, resp);
     }
     Json::Value callSetEthernetOut(unsigned long int ip_addr, int port,int channel_no ){
-    	Json::Value json;
-    	json["message"]= "successfully assigned IP OUT!";
+        Json::Value json;
+        json["message"]= "successfully assigned IP OUT!";
         if (write32bI2C (2,36,ip_addr) == -1) {
             json["error"]= true;
             json["message"]= "STATUS COMMAND ERROR!";
@@ -7578,7 +7526,7 @@ private:
         }
         return json;
     }
-	/*****************************************************************************/
+    /*****************************************************************************/
     /*  UDP Ip Stack Command    function getEthernetOut                      */
     /*****************************************************************************/
     void  getEthernetOut(const Rest::Request& request, Net::Http::ResponseWriter response){
@@ -7608,53 +7556,53 @@ private:
                 json[para[i]]= (i == 0)? "Require Integer between 1 to 8!" :"Require Integer between 1 to 6!";
             }
             if(all_para_valid){
-            	int rmx_no = std::stoi(str_rmx_no);
-            	int control_fpga =ceil(double(rmx_no)/2);
-            	int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
-        		if(write32bCPU(0,0,target) != -1){
-        			int rmx_no_of_controller = (rmx_no % 2 == 0)?1:0;
-	                int ch_no = ((rmx_no_of_controller)*8)+std::stoi(channel_no);
-			        json["error"]= false;
-	                //Validation
-			        if (write32bI2C(2,48,ch_no) == -1) {
-			            json["error"]= true;
-			            json["message"]= "STATUS COMMAND ERROR!";
-			            addToLog("setEthernetOut IP channel","Error");
-			        }else{
-			            json["error"]= false;
-			            addToLog("setEthernetOut","Success");
-			        }
-			        unsigned long int ip_addr= (read32bI2C(2,36)&0xFFFFFFFF);
-			        if (ip_addr == -1) {
-			            json["error"]= true;
-			            json["message"]= "STATUS COMMAND ERROR!";
-			            addToLog("getEthernetOut IP","Error");
-			        }else{
-			        	json["ip"]=std::to_string(ip_addr);
-			            addToLog("setEthernetOut","Success");
-			        }
-			        unsigned int src_port = read32bI2C(2,40);
-			        if (src_port == -1) {
-			            json["error"]= true;
-			            json["message"]= "STATUS COMMAND ERROR!";
-			            addToLog("getEthernetOut","Error");
-			        }else{
-			        	json["src_port"]=std::to_string(src_port);
-			            addToLog("setEthernetOut","Success");
-			        }
-			        unsigned int dest_port = read32bI2C(2,44);
-			        if (dest_port == -1) {
-			            json["error"]= true;
-			            json["message"]= "STATUS COMMAND ERROR!";
-			            addToLog("getEthernetOut","Error");
-			        }else{
-			        	json["dest_port"]=std::to_string(dest_port);
-			            addToLog("setEthernetOut","Success");
-			        }
- 	            }else{
-	        		json["error"]= true;
-            		json["message"]= "Error while connection!";    	
-	            }
+                int rmx_no = std::stoi(str_rmx_no);
+                int control_fpga =ceil(double(rmx_no)/2);
+                int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
+                if(write32bCPU(0,0,target) != -1){
+                    int rmx_no_of_controller = (rmx_no % 2 == 0)?1:0;
+                    int ch_no = ((rmx_no_of_controller)*8)+std::stoi(channel_no);
+                    json["error"]= false;
+                    //Validation
+                    if (write32bI2C(2,48,ch_no) == -1) {
+                        json["error"]= true;
+                        json["message"]= "STATUS COMMAND ERROR!";
+                        addToLog("setEthernetOut IP channel","Error");
+                    }else{
+                        json["error"]= false;
+                        addToLog("setEthernetOut","Success");
+                    }
+                    unsigned long int ip_addr= (read32bI2C(2,36)&0xFFFFFFFF);
+                    if (ip_addr == -1) {
+                        json["error"]= true;
+                        json["message"]= "STATUS COMMAND ERROR!";
+                        addToLog("getEthernetOut IP","Error");
+                    }else{
+                        json["ip"]=std::to_string(ip_addr);
+                        addToLog("setEthernetOut","Success");
+                    }
+                    unsigned int src_port = read32bI2C(2,40);
+                    if (src_port == -1) {
+                        json["error"]= true;
+                        json["message"]= "STATUS COMMAND ERROR!";
+                        addToLog("getEthernetOut","Error");
+                    }else{
+                        json["src_port"]=std::to_string(src_port);
+                        addToLog("setEthernetOut","Success");
+                    }
+                    unsigned int dest_port = read32bI2C(2,44);
+                    if (dest_port == -1) {
+                        json["error"]= true;
+                        json["message"]= "STATUS COMMAND ERROR!";
+                        addToLog("getEthernetOut","Error");
+                    }else{
+                        json["dest_port"]=std::to_string(dest_port);
+                        addToLog("setEthernetOut","Success");
+                    }
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Error while connection!";     
+                }
             }
         }else{
             json["error"]= true;
@@ -7682,20 +7630,20 @@ private:
             std::string channel_no = getParameter(request.body(),"channel_no"); 
             std::string str_rmx_no = getParameter(request.body(),"rmx_no"); 
             if(verifyInteger(channel_no,1,1,9,1) && verifyInteger(str_rmx_no,1,1,RMX_COUNT,1)){
-            	int rmx_no = std::stoi(str_rmx_no);
-            	int control_fpga =ceil(double(rmx_no)/2);
-            	int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
-        		if(write32bCPU(0,0,target) != -1){
-        			int rmx_no_of_controller = (rmx_no % 2 == 0)?1:0;
-        			int ch_no = ((rmx_no_of_controller)*8)+std::stoi(channel_no);
-        			json = callSetEthernetOutOff(ch_no);
-        			if(json["error"] == false){
-        				db->removeIPOutputChannels(rmx_no,std::stoi(channel_no));
-        			}
-	            }else{
-	            	json["error"]= true;
-            		json["message"]= "Error while connection!"; 
-	            }
+                int rmx_no = std::stoi(str_rmx_no);
+                int control_fpga =ceil(double(rmx_no)/2);
+                int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
+                if(write32bCPU(0,0,target) != -1){
+                    int rmx_no_of_controller = (rmx_no % 2 == 0)?1:0;
+                    int ch_no = ((rmx_no_of_controller)*8)+std::stoi(channel_no);
+                    json = callSetEthernetOutOff(ch_no);
+                    if(json["error"] == false){
+                        db->removeIPOutputChannels(rmx_no,std::stoi(channel_no));
+                    }
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Error while connection!"; 
+                }
             }else{
                 json["error"]= true;
                 json["message"]= "channel_no & rmx_no: Required Integer!";    
@@ -7708,8 +7656,8 @@ private:
         response.send(Http::Code::Ok, resp);
     }
     Json::Value callSetEthernetOutOff(int channel_no ){
-    	Json::Value json;
-      	json["message"]= "Ethernet Out torned off!";
+        Json::Value json;
+        json["message"]= "Ethernet Out torned off!";
         if(write32bI2C (2,36,0) == -1){
             json["error"]= true;
             json["message"]= "Error while torning off ethernet out!";
@@ -7745,7 +7693,7 @@ private:
         addToLog("setEthernetIn",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){        
-	            
+                
             std::string ip_address = getParameter(request.body(),"ip_address"); 
             std::string port = getParameter(request.body(),"port"); 
             std::string channel_no= getParameter(request.body(),"channel_no");
@@ -7766,60 +7714,60 @@ private:
                 json[para[i]]= (i == 0)? "Invalid IP address!" :((i == 2)?"Require Integer between 1 to 9!":((i==1)? "Require Integer between 1000 to 65535!":"Required Integer between 0-1"));
             }
             if(all_para_valid){
-            	int rmx_no = std::stoi(str_rmx_no);
-            	int control_fpga =ceil(double(rmx_no)/2);
-            	int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
-        		if(write32bCPU(0,0,target) != -1){
-	                std::string hex_ip_part1,hex_ip_part2,hex_ip_part3,hex_ip_part4,hex_ip; 
-	                std::stringstream split_str(ip_address);
-					unsigned int ip_part1,ip_part2,ip_part3,ip_part4; //to store the 4 ints
-					unsigned char ch; //to temporarily store the '.'
-					split_str >> ip_part1 >> ch >> ip_part2 >> ch >> ip_part3 >> ch >> ip_part4;
-	                hex_ip_part1 = getDecToHex(ip_part1);
-	                hex_ip_part1 = (hex_ip_part1.length() ==2)? hex_ip_part1 : "0"+hex_ip_part1;
-	                hex_ip_part2 = getDecToHex(ip_part2);
-	                hex_ip_part2 = (hex_ip_part2.length() ==2)? hex_ip_part2 : "0"+hex_ip_part2;
-	                hex_ip_part3 = getDecToHex(ip_part3);
-	                hex_ip_part3 = (hex_ip_part3.length() ==2)? hex_ip_part3 : "0"+hex_ip_part3;
-	                hex_ip_part4 = getDecToHex(ip_part4);
-	                hex_ip_part4 = (hex_ip_part4.length() ==2)? hex_ip_part4 : "0"+hex_ip_part4;
-	                hex_ip = hex_ip_part1 +""+hex_ip_part2+""+hex_ip_part3+""+hex_ip_part4;
-	                unsigned long int ip_addr = getHexToLongDec(hex_ip);
-	                json["dec"] =std::to_string(ip_addr);
-	                //Multicast IP
-	                json["error"]= false;
-	                json["message"]= "successfully assigned IP OUT!";
-	                int rmx_no1,rmx_no2;
-	                int tuner_ch= db->getTunerChannelType(control_fpga,rmx_no,std::stoi(channel_no)-1,1);
-	                (control_fpga == 1)? (rmx_no1 = 1,rmx_no2 = 2) : ((control_fpga == 2)? (rmx_no1 = 3,rmx_no2 = 4) : (rmx_no1 = 5,rmx_no2 = 6));
-	                json["rmx_no1"] = rmx_no1;
-	                json["rmx_no2"] = rmx_no2;
-	                int controller_of_rmx = (rmx_no % 2 == 0)?1:0;
-        			int ch_no = ((controller_of_rmx)*8)+std::stoi(channel_no);
-	                json = callSetEthernetIn(ch_no,ip_addr,std::stoi(port),std::stoi(str_type));
-	                usleep(1000);
-				    if(write32bI2C(4,0,tuner_ch) == -1){
-			        	json["error"]= true;
-			        	json["message"]= "Failed IGMP Channel Number!";
-			        }
-	                if(json["error"] == false){
-	                	db->addIPInputChannels(rmx_no,std::stoi(channel_no),std::to_string(ip_addr),std::stoi(port),std::stoi(str_type));
-	                }
-	                json["tuner_ch"] = tuner_ch;
-	                json["target"] = target;
-	                json["control_fpga"] = control_fpga;
-	                // json["channel_no"] = read32bI2C(6,4);
-	                // json["ip"] = (read32bI2C(6,8))&0xFFFFFFFF;
-	                // json["port"] = read32bI2C(6,12);
-	                // json["channel"] = read32bI2C(6,16);
-	                // usleep(1000);
-	                // json["igmpip"] = (read32bI2C(2,28))&0xFFFFFFFF;
-	                // json["igmpch"] = read32bI2C(2,32);
-	                // json["input"] = read32bI2C(4,0);
-	            }else{
-	        		json["error"]= true;
-            		json["message"]= "Error while connection!";    	
-	            }
+                int rmx_no = std::stoi(str_rmx_no);
+                int control_fpga =ceil(double(rmx_no)/2);
+                int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
+                if(write32bCPU(0,0,target) != -1){
+                    std::string hex_ip_part1,hex_ip_part2,hex_ip_part3,hex_ip_part4,hex_ip; 
+                    std::stringstream split_str(ip_address);
+                    unsigned int ip_part1,ip_part2,ip_part3,ip_part4; //to store the 4 ints
+                    unsigned char ch; //to temporarily store the '.'
+                    split_str >> ip_part1 >> ch >> ip_part2 >> ch >> ip_part3 >> ch >> ip_part4;
+                    hex_ip_part1 = getDecToHex(ip_part1);
+                    hex_ip_part1 = (hex_ip_part1.length() ==2)? hex_ip_part1 : "0"+hex_ip_part1;
+                    hex_ip_part2 = getDecToHex(ip_part2);
+                    hex_ip_part2 = (hex_ip_part2.length() ==2)? hex_ip_part2 : "0"+hex_ip_part2;
+                    hex_ip_part3 = getDecToHex(ip_part3);
+                    hex_ip_part3 = (hex_ip_part3.length() ==2)? hex_ip_part3 : "0"+hex_ip_part3;
+                    hex_ip_part4 = getDecToHex(ip_part4);
+                    hex_ip_part4 = (hex_ip_part4.length() ==2)? hex_ip_part4 : "0"+hex_ip_part4;
+                    hex_ip = hex_ip_part1 +""+hex_ip_part2+""+hex_ip_part3+""+hex_ip_part4;
+                    unsigned long int ip_addr = getHexToLongDec(hex_ip);
+                    json["dec"] =std::to_string(ip_addr);
+                    //Multicast IP
+                    json["error"]= false;
+                    json["message"]= "successfully assigned IP OUT!";
+                    int rmx_no1,rmx_no2;
+                    int tuner_ch= db->getTunerChannelType(control_fpga,rmx_no,std::stoi(channel_no)-1,1);
+                    (control_fpga == 1)? (rmx_no1 = 1,rmx_no2 = 2) : ((control_fpga == 2)? (rmx_no1 = 3,rmx_no2 = 4) : (rmx_no1 = 5,rmx_no2 = 6));
+                    json["rmx_no1"] = rmx_no1;
+                    json["rmx_no2"] = rmx_no2;
+                    int controller_of_rmx = (rmx_no % 2 == 0)?1:0;
+                    int ch_no = ((controller_of_rmx)*8)+std::stoi(channel_no);
+                    json = callSetEthernetIn(ch_no,ip_addr,std::stoi(port),std::stoi(str_type));
+                    usleep(1000);
+                    if(write32bI2C(4,0,tuner_ch) == -1){
+                        json["error"]= true;
+                        json["message"]= "Failed IGMP Channel Number!";
+                    }
+                    if(json["error"] == false){
+                        db->addIPInputChannels(rmx_no,std::stoi(channel_no),std::to_string(ip_addr),std::stoi(port),std::stoi(str_type));
+                    }
+                    json["tuner_ch"] = tuner_ch;
+                    json["target"] = target;
+                    json["control_fpga"] = control_fpga;
+                    // json["channel_no"] = read32bI2C(6,4);
+                    // json["ip"] = (read32bI2C(6,8))&0xFFFFFFFF;
+                    // json["port"] = read32bI2C(6,12);
+                    // json["channel"] = read32bI2C(6,16);
+                    // usleep(1000);
+                    // json["igmpip"] = (read32bI2C(2,28))&0xFFFFFFFF;
+                    // json["igmpch"] = read32bI2C(2,32);
+                    // json["input"] = read32bI2C(4,0);
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Error while connection!";     
+                }
             }
         }else{
             json["error"]= true;
@@ -7829,47 +7777,47 @@ private:
         response.send(Http::Code::Ok, resp);
     }
     Json::Value callSetEthernetIn(int channel_no,unsigned long int ip_addr,int port, int type,int tuner_ch=0){
-    	Json::Value json;
-    	json["error"]= false;
+        Json::Value json;
+        json["error"]= false;
         json["message"]= "successfully assigned IP OUT!";
         if(write32bI2C(6, 4,channel_no) == -1){
-        	json["error"]= true;
-        	json["message"]= "Fail to set channel_no!";
+            json["error"]= true;
+            json["message"]= "Fail to set channel_no!";
         }
         usleep(1000);
-	   	if(write32bI2C(6,8,ip_addr) == -1){
-        	json["error"]= true;
-        	json["message"]= "Fail to set IP address!";
+        if(write32bI2C(6,8,ip_addr) == -1){
+            json["error"]= true;
+            json["message"]= "Fail to set IP address!";
         }
         usleep(1000);
-	   	if(write32bI2C(6,12,port) == -1){
-        	json["error"]= true;
-        	json["message"]= "Fail to set port!";
+        if(write32bI2C(6,12,port) == -1){
+            json["error"]= true;
+            json["message"]= "Fail to set port!";
         }
         usleep(1000);
-	   	if(write32bI2C(6,16, 1) == -1){
-        	json["error"]= true;
-        	json["message"]= "Ethernet out failed!";
+        if(write32bI2C(6,16, 1) == -1){
+            json["error"]= true;
+            json["message"]= "Ethernet out failed!";
         }
-	  	usleep(1000);
-	  	if(type == 1)//If Multicat 
-	  	{
-		   	// IGMP multicast ip
-		   	if(write32bI2C(2,28,ip_addr) == -1){
-	        	json["error"]= true;
-	        	json["message"]= "Failed IGMP multicast ip!";
-	        }
-	        usleep(1000);
+        usleep(1000);
+        if(type == 1)//If Multicat 
+        {
+            // IGMP multicast ip
+            if(write32bI2C(2,28,ip_addr) == -1){
+                json["error"]= true;
+                json["message"]= "Failed IGMP multicast ip!";
+            }
+            usleep(1000);
             // IGMP Channel Number
-		   	if(write32bI2C(2,32,channel_no) == -1){
-	        	json["error"]= true;
-	        	json["message"]= "Failed IGMP Channel Number!";
-	        }
-	    }
-	    // usleep(1000);
-	    // if(write32bI2C(4,0,tuner_ch) == -1){
-     //    	json["error"]= true;
-     //    	json["message"]= "Failed IGMP Channel Number!";
+            if(write32bI2C(2,32,channel_no) == -1){
+                json["error"]= true;
+                json["message"]= "Failed IGMP Channel Number!";
+            }
+        }
+        // usleep(1000);
+        // if(write32bI2C(4,0,tuner_ch) == -1){
+     //     json["error"]= true;
+     //     json["message"]= "Failed IGMP Channel Number!";
      //    }
         return json;
     }
@@ -7888,7 +7836,7 @@ private:
         addToLog("getEthernetIn",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){        
-	            
+                
             std::string channel_no= getParameter(request.body(),"channel_no");
             std::string str_rmx_no = getParameter(request.body(),"rmx_no");
             error[0] = verifyInteger(channel_no,0,0,8,1);
@@ -7903,41 +7851,41 @@ private:
                 json[para[i]]= (i == 0)? "Require Integer between 1 to 8!" :"Required Integer between 1 to 6";
             }
             if(all_para_valid){
-            	int rmx_no = std::stoi(str_rmx_no);
-            	int control_fpga =ceil(double(rmx_no)/2);
-            	int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
-        		if(write32bCPU(0,0,target) != -1){
-	               
-	                //Multicast IP
-	                json["error"]= false;
-	                json["message"]= "successfully assigned IP OUT!";
-	                int controller_of_rmx = (rmx_no % 2 == 0)?1:0;
-        			int ch_no = ((controller_of_rmx)*8)+std::stoi(channel_no);
-        			usleep(1000);
-	                if(write32bI2C(6, 4,ch_no) == -1){
-			        	json["error"]= true;
-			        	json["message"]= "Fail to set channel_no!";
-			        }
-			        usleep(1000);
-			        unsigned long int ip_addr = (read32bI2C(6,8)&0xFFFFFFFF);
-			        if(ip_addr == -1){
-			        	json["error"]= true;
-			        	json["message"]= "Failed IP address!";
-			        }else{
-			        	json["ip_addr"] = std::to_string(ip_addr); 
-			        }
-			        usleep(1000);
-			        unsigned int port = read32bI2C(6,12);
-			        if(port == -1){
-			        	json["error"]= true;
-			        	json["message"]= "Failed IP address!";
-			        }else{
-			        	json["port"] =std::to_string(port); 
-			        }
-	            }else{
-	        		json["error"]= true;
-            		json["message"]= "Error while connection!";    	
-	            }
+                int rmx_no = std::stoi(str_rmx_no);
+                int control_fpga =ceil(double(rmx_no)/2);
+                int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
+                if(write32bCPU(0,0,target) != -1){
+                   
+                    //Multicast IP
+                    json["error"]= false;
+                    json["message"]= "successfully assigned IP OUT!";
+                    int controller_of_rmx = (rmx_no % 2 == 0)?1:0;
+                    int ch_no = ((controller_of_rmx)*8)+std::stoi(channel_no);
+                    usleep(1000);
+                    if(write32bI2C(6, 4,ch_no) == -1){
+                        json["error"]= true;
+                        json["message"]= "Fail to set channel_no!";
+                    }
+                    usleep(1000);
+                    unsigned long int ip_addr = (read32bI2C(6,8)&0xFFFFFFFF);
+                    if(ip_addr == -1){
+                        json["error"]= true;
+                        json["message"]= "Failed IP address!";
+                    }else{
+                        json["ip_addr"] = std::to_string(ip_addr); 
+                    }
+                    usleep(1000);
+                    unsigned int port = read32bI2C(6,12);
+                    if(port == -1){
+                        json["error"]= true;
+                        json["message"]= "Failed IP address!";
+                    }else{
+                        json["port"] =std::to_string(port); 
+                    }
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Error while connection!";     
+                }
             }
         }else{
             json["error"]= true;
@@ -7961,7 +7909,7 @@ private:
         addToLog("setEthernetInOff",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){        
-	            
+                
             std::string channel_no= getParameter(request.body(),"channel_no");
             std::string str_rmx_no = getParameter(request.body(),"rmx_no");
             error[0] = verifyInteger(channel_no,0,0,8,1);
@@ -7976,46 +7924,46 @@ private:
                 json[para[i]]= (i == 0)? "Require Integer between 1 to 8!" :"Required Integer between 1 to 6";
             }
             if(all_para_valid){
-            	int rmx_no = std::stoi(str_rmx_no);
-            	int control_fpga =ceil(double(rmx_no)/2);
-            	int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
-        		if(write32bCPU(0,0,target) != -1){
-	               
-	                //Multicast IP
-	                json["error"]= false;
-	                json["message"]= "successfully assigned IP OUT!";
-	                int controller_of_rmx = (rmx_no % 2 == 0)?1:0;
-        			int ch_no = ((controller_of_rmx)*8)+std::stoi(channel_no);
-	                if(write32bI2C(6, 4,ch_no) == -1){
-			        	json["error"]= true;
-			        	json["message"]= "Fail to set channel_no!";
-			        }
-				   	if(write32bI2C(6,8,0) == -1){
-			        	json["error"]= true;
-			        	json["message"]= "Fail to set IP address!";
-			        }
-			        if(write32bI2C(6,16, 1) == -1){
-			        	json["error"]= true;
-			        	json["message"]= "Ethernet out failed!";
-			        }
-			        // IGMP Channel Number
-				   	if(write32bI2C(2,32,ch_no) == -1){
-	                	json["error"]= true;
-	                	json["message"]= "Failed IGMP Channel Number!";
-	                }
-			        // IGMP multicast ip
-				   	if(write32bI2C(2,28,0) == -1){
-	                	json["error"]= true;
-	                	json["message"]= "Failed IGMP multicast ip!";
-	                }
-				   	
-	            }else{
-	        		json["error"]= true;
-            		json["message"]= "Error while connection!";    	
-	            }
-	            if(json["error"] == false){
-	            	db->removeIPInputChannels(rmx_no,std::stoi(channel_no));
-	            }
+                int rmx_no = std::stoi(str_rmx_no);
+                int control_fpga =ceil(double(rmx_no)/2);
+                int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
+                if(write32bCPU(0,0,target) != -1){
+                   
+                    //Multicast IP
+                    json["error"]= false;
+                    json["message"]= "successfully assigned IP OUT!";
+                    int controller_of_rmx = (rmx_no % 2 == 0)?1:0;
+                    int ch_no = ((controller_of_rmx)*8)+std::stoi(channel_no);
+                    if(write32bI2C(6, 4,ch_no) == -1){
+                        json["error"]= true;
+                        json["message"]= "Fail to set channel_no!";
+                    }
+                    if(write32bI2C(6,8,0) == -1){
+                        json["error"]= true;
+                        json["message"]= "Fail to set IP address!";
+                    }
+                    if(write32bI2C(6,16, 1) == -1){
+                        json["error"]= true;
+                        json["message"]= "Ethernet out failed!";
+                    }
+                    // IGMP Channel Number
+                    if(write32bI2C(2,32,ch_no) == -1){
+                        json["error"]= true;
+                        json["message"]= "Failed IGMP Channel Number!";
+                    }
+                    // IGMP multicast ip
+                    if(write32bI2C(2,28,0) == -1){
+                        json["error"]= true;
+                        json["message"]= "Failed IGMP multicast ip!";
+                    }
+                    
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Error while connection!";     
+                }
+                if(json["error"] == false){
+                    db->removeIPInputChannels(rmx_no,std::stoi(channel_no));
+                }
             }
         }else{
             json["error"]= true;
@@ -8037,28 +7985,28 @@ private:
         addToLog("setIpdestination",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){   
- 			std::string str_rmx_no = getParameter(request.body(),"rmx_no"); 
+            std::string str_rmx_no = getParameter(request.body(),"rmx_no"); 
             std::string ip_address = getParameter(request.body(),"ip_address"); 
             if(isValidIpAddress(ip_address.c_str()) && verifyInteger(str_rmx_no,1,1,RMX_COUNT,1)){
                 std::string hex_ip_part1,hex_ip_part2,hex_ip_part3,hex_ip_part4,hex_ip; 
-	            std::stringstream split_str(ip_address);
-				unsigned int ip_part1,ip_part2,ip_part3,ip_part4; //to store the 4 ints
-				unsigned char ch; //to temporarily store the '.'
-				split_str >> ip_part1 >> ch >> ip_part2 >> ch >> ip_part3 >> ch >> ip_part4;
-	            hex_ip_part1 = getDecToHex(ip_part1);
-	            hex_ip_part1 = (hex_ip_part1.length() ==2)? hex_ip_part1 : "0"+hex_ip_part1;
-	            hex_ip_part2 = getDecToHex(ip_part2);
-	            hex_ip_part2 = (hex_ip_part2.length() ==2)? hex_ip_part2 : "0"+hex_ip_part2;
-	            hex_ip_part3 = getDecToHex(ip_part3);
-	            hex_ip_part3 = (hex_ip_part3.length() ==2)? hex_ip_part3 : "0"+hex_ip_part3;
-	            hex_ip_part4 = getDecToHex(ip_part4);
-	            hex_ip_part4 = (hex_ip_part4.length() ==2)? hex_ip_part4 : "0"+hex_ip_part4;
-	            hex_ip = hex_ip_part1 +""+hex_ip_part2+""+hex_ip_part3+""+hex_ip_part4;
-	            long long int ip_addr = getHexToLongDec(hex_ip);
+                std::stringstream split_str(ip_address);
+                unsigned int ip_part1,ip_part2,ip_part3,ip_part4; //to store the 4 ints
+                unsigned char ch; //to temporarily store the '.'
+                split_str >> ip_part1 >> ch >> ip_part2 >> ch >> ip_part3 >> ch >> ip_part4;
+                hex_ip_part1 = getDecToHex(ip_part1);
+                hex_ip_part1 = (hex_ip_part1.length() ==2)? hex_ip_part1 : "0"+hex_ip_part1;
+                hex_ip_part2 = getDecToHex(ip_part2);
+                hex_ip_part2 = (hex_ip_part2.length() ==2)? hex_ip_part2 : "0"+hex_ip_part2;
+                hex_ip_part3 = getDecToHex(ip_part3);
+                hex_ip_part3 = (hex_ip_part3.length() ==2)? hex_ip_part3 : "0"+hex_ip_part3;
+                hex_ip_part4 = getDecToHex(ip_part4);
+                hex_ip_part4 = (hex_ip_part4.length() ==2)? hex_ip_part4 : "0"+hex_ip_part4;
+                hex_ip = hex_ip_part1 +""+hex_ip_part2+""+hex_ip_part3+""+hex_ip_part4;
+                long long int ip_addr = getHexToLongDec(hex_ip);
                 int rmx_no = std::stoi(str_rmx_no);
-            	int control_fpga =ceil(double(rmx_no)/2);
-            	int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
-	            if (write32bI2C (2,36,(ip_addr-127)) == -1) {
+                int control_fpga =ceil(double(rmx_no)/2);
+                int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
+                if (write32bI2C (2,36,(ip_addr-127)) == -1) {
                     json["error"]= true;
                     json["message"]= "STATUS COMMAND ERROR!";
                     addToLog("setEthernetOut IP","Error");
@@ -8918,7 +8866,7 @@ private:
         if(res=="0"){   
             std::string rmx_no = getParameter(request.body(),"rmx_no"); 
             std::string output = getParameter(request.body(),"output"); 
-			error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(output,1,1,OUTPUT_COUNT);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
@@ -8932,18 +8880,18 @@ private:
             if(all_para_valid){
                 int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1){
-	                Json::Value getcorejson = callGetCore(std::to_string(DVBC_OUTPUT_CS[std::stoi(output)]),std::to_string(QAM_ADDR));
-	                if(getcorejson["error"]==false){
-	                    json["qam"] =std::to_string(((std::stoul(getcorejson["data"].asString())&0xF)>>1));
-	                    json["error"] = false;
-	                    json["message"] ="get QAM";
-	                }else{
-	                    json = getcorejson;
-	                }
-	            }else{
-	            	json["error"]= true;
-	                json["message"] ="Connection error!";
-	            }
+                    Json::Value getcorejson = callGetCore(std::to_string(DVBC_OUTPUT_CS[std::stoi(output)]),std::to_string(QAM_ADDR));
+                    if(getcorejson["error"]==false){
+                        json["qam"] =std::to_string(((std::stoul(getcorejson["data"].asString())&0xF)>>1));
+                        json["error"] = false;
+                        json["message"] ="get QAM";
+                    }else{
+                        json = getcorejson;
+                    }
+                }else{
+                    json["error"]= true;
+                    json["message"] ="Connection error!";
+                }
             }
         }else{
             json["error"]= true;
@@ -8968,7 +8916,7 @@ private:
         if(res=="0"){   
             std::string rmx_no = getParameter(request.body(),"rmx_no"); 
             std::string output = getParameter(request.body(),"output"); 
-			error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(output,1,1,OUTPUT_COUNT);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
@@ -8982,21 +8930,21 @@ private:
             if(all_para_valid){
                 int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1){
-	                Json::Value getcorejson = callGetCore(std::to_string(DVBC_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBC_VER_ADDR));
-	                if(getcorejson["error"]==false){
-	                    long unsigned int data = std::stoul(getcorejson["data"].asString());
-	                    json["core_id"] = std::to_string(((data >> 8)&0xFF));
-	                    json["minor_ver"] = std::to_string(((data >> 16)&0xFF));
-	                    json["major_ver"] = std::to_string(((data >> 24)&0xFF));
-	                    json["error"]= false;
-	                    json["message"] ="DVBC core version!";
-	                }else{
-	                    json = getcorejson;
-	                }
-	            }else{
-	            	json["error"]= true;
-	                json["message"] ="Connection error!";
-	            }
+                    Json::Value getcorejson = callGetCore(std::to_string(DVBC_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBC_VER_ADDR));
+                    if(getcorejson["error"]==false){
+                        long unsigned int data = std::stoul(getcorejson["data"].asString());
+                        json["core_id"] = std::to_string(((data >> 8)&0xFF));
+                        json["minor_ver"] = std::to_string(((data >> 16)&0xFF));
+                        json["major_ver"] = std::to_string(((data >> 24)&0xFF));
+                        json["error"]= false;
+                        json["message"] ="DVBC core version!";
+                    }else{
+                        json = getcorejson;
+                    }
+                }else{
+                    json["error"]= true;
+                    json["message"] ="Connection error!";
+                }
             }
         }else{
             json["error"]= true;
@@ -9020,7 +8968,7 @@ private:
         if(res=="0"){   
             std::string rmx_no = getParameter(request.body(),"rmx_no"); 
             std::string output = getParameter(request.body(),"output"); 
-			error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(output,1,1,OUTPUT_COUNT);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
@@ -9034,21 +8982,21 @@ private:
             if(all_para_valid){
                 int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1){
-	                Json::Value getcorejson = callGetCore(std::to_string(DVBC_OUTPUT_CS[std::stoi(output)]),std::to_string(SPI_STATUS_ADDR));
-	                if(getcorejson["error"]==false){
-	                	long unsigned int data = std::stoul(getcorejson["data"].asString());
-	                    json["frame_status"] =std::to_string((data >> 29)&0x7);
-	                    json["stream"] = std::to_string((data >> 28)&0x1);
-	                    json["bitstream"] = std::to_string((data)&0xFFFFFFF);
-	                    json["error"]= false;
-	                    json["message"] ="SPI status register!";
-	                }else{
-	                    json = getcorejson;
-	                }
-	            }else{
-	            	json["error"]= true;
-	                json["message"] ="Connection error!";
-	            }
+                    Json::Value getcorejson = callGetCore(std::to_string(DVBC_OUTPUT_CS[std::stoi(output)]),std::to_string(SPI_STATUS_ADDR));
+                    if(getcorejson["error"]==false){
+                        long unsigned int data = std::stoul(getcorejson["data"].asString());
+                        json["frame_status"] =std::to_string((data >> 29)&0x7);
+                        json["stream"] = std::to_string((data >> 28)&0x1);
+                        json["bitstream"] = std::to_string((data)&0xFFFFFFF);
+                        json["error"]= false;
+                        json["message"] ="SPI status register!";
+                    }else{
+                        json = getcorejson;
+                    }
+                }else{
+                    json["error"]= true;
+                    json["message"] ="Connection error!";
+                }
             }
         }else{
             json["error"]= true;
@@ -9077,7 +9025,7 @@ private:
             std::string bypass_pcr = getParameter(request.body(),"bypass_pcr"); 
             std::string null_packets = getParameter(request.body(),"null_packets"); 
             std::string lost_frames = getParameter(request.body(),"lost_frames"); 
-			error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(output,1,1,OUTPUT_COUNT);
             error[2] = verifyInteger(fpga_clock);
             error[3] = verifyInteger(spi_edge_input,1,1,1);
@@ -9096,15 +9044,15 @@ private:
             if(all_para_valid){
                 int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1){
-	                long unsigned int value =  (std::stoul(lost_frames)&0x1)<<31 | (std::stoul(null_packets)&0x1)<<21 | (std::stoul(bypass_pcr)&0x1)<<20 | (std::stoul(spi_edge_input)&0x1)<<19 | (std::stoul(fpga_clock)&0x7FFFF);
+                    long unsigned int value =  (std::stoul(lost_frames)&0x1)<<31 | (std::stoul(null_packets)&0x1)<<21 | (std::stoul(bypass_pcr)&0x1)<<20 | (std::stoul(spi_edge_input)&0x1)<<19 | (std::stoul(fpga_clock)&0x7FFFF);
                      json =callSetCore(std::to_string(DVBC_OUTPUT_CS[std::stoi(output)]),std::to_string(SPI_CONF_ADDR),std::to_string(value),std::stoi(rmx_no));
-	                if(json["error"]==false){
-	                    json["message"] ="SPI configuration register!";
-	                }
-	            }else{
-	            	json["error"]= true;
-	                json["message"] ="Connection error!";
-	            }
+                    if(json["error"]==false){
+                        json["message"] ="SPI configuration register!";
+                    }
+                }else{
+                    json["error"]= true;
+                    json["message"] ="Connection error!";
+                }
             }
         }else{
             json["error"]= true;
@@ -9128,7 +9076,7 @@ private:
         if(res=="0"){   
             std::string rmx_no = getParameter(request.body(),"rmx_no"); 
             std::string output = getParameter(request.body(),"output"); 
-			error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(output,1,1,OUTPUT_COUNT);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
@@ -9142,23 +9090,23 @@ private:
             if(all_para_valid){
                 int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1){
-	                Json::Value getcorejson = callGetCore(std::to_string(DVBC_OUTPUT_CS[std::stoi(output)]),std::to_string(SPI_CONF_ADDR));
-	                if(getcorejson["error"]==false){
-	                	long unsigned int data = std::stoul(getcorejson["data"].asString());
-	                    json["lost_frames"] =std::to_string((data >> 31)&0x1);
-	                    json["null_packets"] = std::to_string((data >> 21)&0x1);
-	                    json["bypass_pcr"] = std::to_string((data >> 20)&0x1);
-	                    json["spi_edge_input"] = std::to_string((data >> 19)&0x1);
-	                    json["fpga_clock"] = std::to_string((data)&0x7FFFF);
-	                    json["error"]= false;
-	                    json["message"] ="SPI configuration register!";
-	                }else{
-	                    json = getcorejson;
-	                }
-	            }else{
-	            	json["error"]= true;
-	                json["message"] ="Connection error!";
-	            }
+                    Json::Value getcorejson = callGetCore(std::to_string(DVBC_OUTPUT_CS[std::stoi(output)]),std::to_string(SPI_CONF_ADDR));
+                    if(getcorejson["error"]==false){
+                        long unsigned int data = std::stoul(getcorejson["data"].asString());
+                        json["lost_frames"] =std::to_string((data >> 31)&0x1);
+                        json["null_packets"] = std::to_string((data >> 21)&0x1);
+                        json["bypass_pcr"] = std::to_string((data >> 20)&0x1);
+                        json["spi_edge_input"] = std::to_string((data >> 19)&0x1);
+                        json["fpga_clock"] = std::to_string((data)&0x7FFFF);
+                        json["error"]= false;
+                        json["message"] ="SPI configuration register!";
+                    }else{
+                        json = getcorejson;
+                    }
+                }else{
+                    json["error"]= true;
+                    json["message"] ="Connection error!";
+                }
             }
         }else{
             json["error"]= true;
@@ -9182,9 +9130,9 @@ private:
         addToLog("getGain",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
-        	std::string rmx_no = getParameter(request.body(),"rmx_no"); 
+            std::string rmx_no = getParameter(request.body(),"rmx_no"); 
             std::string output = getParameter(request.body(),"output"); 
-			error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(output,1,1,OUTPUT_COUNT);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
@@ -9198,21 +9146,21 @@ private:
             if(all_para_valid){
                 int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1){
-	                Json::Value getcorejson = callGetCore(std::to_string(UPSAMPLER_OUTPUT_CS[std::stoi(output)]),std::to_string(UPSAMPLER_VER_ADDR));
-	                if(getcorejson["error"]==false){
-	                	long unsigned int data = std::stoul(getcorejson["data"].asString());
-	                    json["core_id"] = std::to_string(((data >> 8)&0xFF));
-	                    json["minor_ver"] = std::to_string(((data >> 16)&0xFF));
-	                    json["major_ver"] = std::to_string(((data >> 24)&0xFF));
-	                    json["error"]= false;
-	                    json["message"] ="get Upsampler core version!";
-	                }else{
-	                    json = getcorejson;
-	                }
-	            }else{
-	            	json["error"]= true;
-	            	json["message"]= "Connection error!";
-	            }
+                    Json::Value getcorejson = callGetCore(std::to_string(UPSAMPLER_OUTPUT_CS[std::stoi(output)]),std::to_string(UPSAMPLER_VER_ADDR));
+                    if(getcorejson["error"]==false){
+                        long unsigned int data = std::stoul(getcorejson["data"].asString());
+                        json["core_id"] = std::to_string(((data >> 8)&0xFF));
+                        json["minor_ver"] = std::to_string(((data >> 16)&0xFF));
+                        json["major_ver"] = std::to_string(((data >> 24)&0xFF));
+                        json["error"]= false;
+                        json["message"] ="get Upsampler core version!";
+                    }else{
+                        json = getcorejson;
+                    }
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Connection error!";
+                }
             }
         }else{
             json["error"]= true;
@@ -9235,8 +9183,8 @@ private:
         addToLog("setFDAC",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
-        	std::string gain_satu = getParameter(request.body(),"gain_satu"); 
-        	std::string if_satu = getParameter(request.body(),"if_satu"); 
+            std::string gain_satu = getParameter(request.body(),"gain_satu"); 
+            std::string if_satu = getParameter(request.body(),"if_satu"); 
             std::string rmx_no =getParameter(request.body(),"rmx_no") ;
             std::string output = getParameter(request.body(),"output"); 
             error[0] = verifyInteger(gain_satu,1,1,1);
@@ -9258,9 +9206,9 @@ private:
                 {
                     int value = ((std::stoi(if_satu)&0x1)<<8) | ((0&0x7F)<<1) | (std::stoi(gain_satu)&0x1);
                     json = callSetCore(std::to_string(UPSAMPLER_OUTPUT_CS[std::stoi(output)]),std::to_string(STATUS_REG_ADDR),std::to_string(value),std::stoi(rmx_no));
-                	if(json["error"]==false){
-                		json["message"] ="Status register configuration!";
-                	}
+                    if(json["error"]==false){
+                        json["message"] ="Status register configuration!";
+                    }
                 }else{
                     json["error"]= true;
                     json["message"]= "Connection error!";
@@ -9285,9 +9233,9 @@ private:
         addToLog("getStatusReg",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
-        	std::string rmx_no = getParameter(request.body(),"rmx_no"); 
+            std::string rmx_no = getParameter(request.body(),"rmx_no"); 
             std::string output = getParameter(request.body(),"output"); 
-			error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(output,1,1,OUTPUT_COUNT);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
@@ -9301,20 +9249,20 @@ private:
             if(all_para_valid){
                 int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1){
-	                Json::Value getcorejson = callGetCore(std::to_string(UPSAMPLER_OUTPUT_CS[std::stoi(output)]),std::to_string(STATUS_REG_ADDR));
-	                if(getcorejson["error"]==false){
-	                    long unsigned int data = std::stoul(getcorejson["data"].asString());
-	                    json["gain_satu"] = std::to_string((data&0x1));
-	                    json["if_satu"] = std::to_string(((data >> 8)&0x1));
-	                    json["message"] ="Upsampler core status register!";
-	                    json["error"]= false;
-	                }else{
-	                    json = getcorejson;
-	                }
-	            }else{
-	            	json["error"]= true;
-	            	json["message"]= "Connection error!";
-	            }
+                    Json::Value getcorejson = callGetCore(std::to_string(UPSAMPLER_OUTPUT_CS[std::stoi(output)]),std::to_string(STATUS_REG_ADDR));
+                    if(getcorejson["error"]==false){
+                        long unsigned int data = std::stoul(getcorejson["data"].asString());
+                        json["gain_satu"] = std::to_string((data&0x1));
+                        json["if_satu"] = std::to_string(((data >> 8)&0x1));
+                        json["message"] ="Upsampler core status register!";
+                        json["error"]= false;
+                    }else{
+                        json = getcorejson;
+                    }
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Connection error!";
+                }
             }
         }else{
             json["error"]= true;
@@ -9337,8 +9285,8 @@ private:
         addToLog("setFSymbolRate",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
-        	std::string fsymbol_rate = getParameter(request.body(),"fsymbol_rate"); 
-        	std::string rolloff = getParameter(request.body(),"rolloff"); 
+            std::string fsymbol_rate = getParameter(request.body(),"fsymbol_rate"); 
+            std::string rolloff = getParameter(request.body(),"rolloff"); 
             std::string rmx_no =getParameter(request.body(),"rmx_no") ;
             std::string output = getParameter(request.body(),"output"); 
             error[0] = verifyInteger(fsymbol_rate);
@@ -9359,9 +9307,9 @@ private:
                 if(write32bCPU(0,0,target) != -1) {
                     int value = (0&0x3F)<<26 | ((std::stoi(rolloff)&0x3)<<24) | (std::stoi(fsymbol_rate)&0xFFFFFF);
                     json = callSetCore(std::to_string(UPSAMPLER_OUTPUT_CS[std::stoi(output)]),std::to_string(FSYMBOLRATE_ADDR),std::to_string(value),std::stoi(rmx_no));
-                	if(json["error"]==false){
-                		json["message"] ="FSymbol rate configuration!";
-                	}
+                    if(json["error"]==false){
+                        json["message"] ="FSymbol rate configuration!";
+                    }
                 }else{
                     json["error"]= true;
                     json["message"]= "Connection error!";
@@ -9386,9 +9334,9 @@ private:
         addToLog("getFSymbolRate",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
-        	std::string rmx_no = getParameter(request.body(),"rmx_no"); 
+            std::string rmx_no = getParameter(request.body(),"rmx_no"); 
             std::string output = getParameter(request.body(),"output"); 
-			error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(output,1,1,OUTPUT_COUNT);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
@@ -9402,20 +9350,20 @@ private:
             if(all_para_valid){
                 int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1) {
-	                Json::Value getcorejson = callGetCore(std::to_string(UPSAMPLER_OUTPUT_CS[std::stoi(output)]),std::to_string(FSYMBOLRATE_ADDR));
-	                if(getcorejson["error"]==false){
-	                	long unsigned int data = std::stoul(getcorejson["data"].asString());
-	                    json["fsymbol_rate"] = std::to_string((data&0xFFFFFF));
-	                    json["rolloff"] = std::to_string((data >> 24)&0x3);
-	                    json["error"] = false;
-	                    json["message"] ="FSymbol rate!";
-	                }else{
-	                    json = getcorejson;
-	                }
-	            }else{
-	            	json["error"]= true;
+                    Json::Value getcorejson = callGetCore(std::to_string(UPSAMPLER_OUTPUT_CS[std::stoi(output)]),std::to_string(FSYMBOLRATE_ADDR));
+                    if(getcorejson["error"]==false){
+                        long unsigned int data = std::stoul(getcorejson["data"].asString());
+                        json["fsymbol_rate"] = std::to_string((data&0xFFFFFF));
+                        json["rolloff"] = std::to_string((data >> 24)&0x3);
+                        json["error"] = false;
+                        json["message"] ="FSymbol rate!";
+                    }else{
+                        json = getcorejson;
+                    }
+                }else{
+                    json["error"]= true;
                     json["message"]= "Connection error!";
-	            }
+                }
             }
         }else{
             json["error"]= true;
@@ -9436,9 +9384,9 @@ private:
         addToLog("getFDAC",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
-        	std::string rmx_no = getParameter(request.body(),"rmx_no"); 
+            std::string rmx_no = getParameter(request.body(),"rmx_no"); 
             std::string output = getParameter(request.body(),"output"); 
-			error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(output,1,1,OUTPUT_COUNT);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
@@ -9452,18 +9400,18 @@ private:
             if(all_para_valid){
                 int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1){
-	                Json::Value getcorejson = callGetCore(std::to_string(UPSAMPLER_OUTPUT_CS[std::stoi(output)]),std::to_string(FDAC_ADDR));
-	                if(getcorejson["error"]==false){
-	                    json["fdac"] = getcorejson["data"].asString();
-	                    json["message"] ="get FDAC!";
-	                    json["error"]= false;
-	                }else{
-	                    json = getcorejson;
-	                }
-	            }else{
-	            	json["error"]= true;
-	            	json["message"]= "Connection error";
-	            }
+                    Json::Value getcorejson = callGetCore(std::to_string(UPSAMPLER_OUTPUT_CS[std::stoi(output)]),std::to_string(FDAC_ADDR));
+                    if(getcorejson["error"]==false){
+                        json["fdac"] = getcorejson["data"].asString();
+                        json["message"] ="get FDAC!";
+                        json["error"]= false;
+                    }else{
+                        json = getcorejson;
+                    }
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Connection error";
+                }
             }
         }else{
             json["error"]= true;
@@ -9486,7 +9434,7 @@ private:
         addToLog("setFDAC",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
-        	std::string fdac = getParameter(request.body(),"fdac"); 
+            std::string fdac = getParameter(request.body(),"fdac"); 
             std::string rmx_no =getParameter(request.body(),"rmx_no") ;
             std::string output = getParameter(request.body(),"output"); 
             error[0] = verifyInteger(fdac);
@@ -9506,9 +9454,9 @@ private:
                 if(write32bCPU(0,0,target) != -1) {
                     int value = std::stoi(fdac);
                     json = callSetCore(std::to_string(UPSAMPLER_OUTPUT_CS[std::stoi(output)]),std::to_string(FDAC_ADDR),std::to_string(value),std::stoi(rmx_no));
-                	if(json["error"]==false){
-                		json["message"] ="FDAC configuration!";
-                	}
+                    if(json["error"]==false){
+                        json["message"] ="FDAC configuration!";
+                    }
                 }else{
                     json["error"]= true;
                     json["message"]= "Connection error!";
@@ -9535,10 +9483,10 @@ private:
         addToLog("confGain",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
-        	std::string gain = getParameter(request.body(),"gain");
-        	std::string invert_IQ = getParameter(request.body(),"invert_IQ");
-        	std::string sin = getParameter(request.body(),"sin");
-        	std::string mute = getParameter(request.body(),"mute"); 
+            std::string gain = getParameter(request.body(),"gain");
+            std::string invert_IQ = getParameter(request.body(),"invert_IQ");
+            std::string sin = getParameter(request.body(),"sin");
+            std::string mute = getParameter(request.body(),"mute"); 
             std::string rmx_no =getParameter(request.body(),"rmx_no") ;
             std::string output = getParameter(request.body(),"output"); 
             error[0] = verifyInteger(gain);
@@ -9557,22 +9505,22 @@ private:
                 json[para[i]]= (i==4)? "Require Integer between 1 to 6!" :((i==5)?"Require Integer between 1 to 8!" : ((i==0)? "Invalid GAIN (should be in 0xFF ,0x80 or 0x40)":"Require Integer between 0 and 1!"));
             }
             if(all_para_valid){
-            	if(std::stoi(gain)==64 || std::stoi(gain)==128 || std::stoi(gain)==255){
-	                int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-	                if(write32bCPU(0,0,target) != -1) {
-	                    int value = ((std::stoi(mute)&0x1)<<10) | ((std::stoi(sin)&0x1)<<9) | ((std::stoi(invert_IQ)&0x1)<<8) | (std::stoi(gain)&0xFF);
-	                    json = callSetCore(std::to_string(UPSAMPLER_OUTPUT_CS[std::stoi(output)]),std::to_string(GAIN_ADDR),std::to_string(value),std::stoi(rmx_no));
-	                	if(json["error"]==false){
-	                		json["message"] ="GAIN configuration!";
-	                	}
-	                }else{
-	                    json["error"]= true;
-	                    json["message"]= "Connection error!";
-	                }
-	            }else{
-	            	 json["error"]= true;
-	            	 json["message"]= "Invalid GAIN (should be in 0xFF ,0x80 or 0x40)";
-	            }
+                if(std::stoi(gain)==64 || std::stoi(gain)==128 || std::stoi(gain)==255){
+                    int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+                    if(write32bCPU(0,0,target) != -1) {
+                        int value = ((std::stoi(mute)&0x1)<<10) | ((std::stoi(sin)&0x1)<<9) | ((std::stoi(invert_IQ)&0x1)<<8) | (std::stoi(gain)&0xFF);
+                        json = callSetCore(std::to_string(UPSAMPLER_OUTPUT_CS[std::stoi(output)]),std::to_string(GAIN_ADDR),std::to_string(value),std::stoi(rmx_no));
+                        if(json["error"]==false){
+                            json["message"] ="GAIN configuration!";
+                        }
+                    }else{
+                        json["error"]= true;
+                        json["message"]= "Connection error!";
+                    }
+                }else{
+                     json["error"]= true;
+                     json["message"]= "Invalid GAIN (should be in 0xFF ,0x80 or 0x40)";
+                }
             }
         }else{
             json["error"]= true;
@@ -9593,9 +9541,9 @@ private:
         addToLog("getGain",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
-        	std::string rmx_no = getParameter(request.body(),"rmx_no"); 
+            std::string rmx_no = getParameter(request.body(),"rmx_no"); 
             std::string output = getParameter(request.body(),"output"); 
-			error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(output,1,1,OUTPUT_COUNT);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
@@ -9609,22 +9557,22 @@ private:
             if(all_para_valid){
                 int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1){
-	                Json::Value getcorejson = callGetCore(std::to_string(UPSAMPLER_OUTPUT_CS[std::stoi(output)]),std::to_string(GAIN_ADDR));
-	                if(getcorejson["error"]==false){
-	                	long unsigned int data = std::stoul(getcorejson["data"].asString());
-	                    json["gain"] = std::to_string((data&0xFF));
-	                    json["invert_IQ"] = std::to_string(((data >> 8)&0x1));
-	                    json["sin"] = std::to_string(((data >> 9)&0x1));
-	                    json["mute"] = std::to_string(((data >> 10)&0x1));
-	                    json["message"] ="get GAIN!";
-	                    json["error"]= false;
-	                }else{
-	                    json = getcorejson;
-	                }
-	            }else{
-	            	json["error"]= true;
-	            	json["message"]= "Connection error!";
-	            }
+                    Json::Value getcorejson = callGetCore(std::to_string(UPSAMPLER_OUTPUT_CS[std::stoi(output)]),std::to_string(GAIN_ADDR));
+                    if(getcorejson["error"]==false){
+                        long unsigned int data = std::stoul(getcorejson["data"].asString());
+                        json["gain"] = std::to_string((data&0xFF));
+                        json["invert_IQ"] = std::to_string(((data >> 8)&0x1));
+                        json["sin"] = std::to_string(((data >> 9)&0x1));
+                        json["mute"] = std::to_string(((data >> 10)&0x1));
+                        json["message"] ="get GAIN!";
+                        json["error"]= false;
+                    }else{
+                        json = getcorejson;
+                    }
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Connection error!";
+                }
             }
         }else{
             json["error"]= true;
@@ -9651,7 +9599,7 @@ private:
         if(res=="0"){
             std::string center_frequency = getParameter(request.body(),"center_frequency"); 
             std::string str_rmx_no = getParameter(request.body(),"rmx_no"); 
-			error[0] = verifyInteger(str_rmx_no,1,1,RMX_COUNT,1);
+            error[0] = verifyInteger(str_rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(center_frequency);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
@@ -9663,8 +9611,8 @@ private:
                 json[para[i]]= (i==0)? "Require Integer between 1 to 6!" : "Require Integer between!";
             }
             if(all_para_valid){
-	            json = callsetCenterFrequency(center_frequency,str_rmx_no);
-	        }
+                json = callsetCenterFrequency(center_frequency,str_rmx_no);
+            }
         }else{
             json["error"]= true;
             json["message"]= res; 
@@ -9678,30 +9626,30 @@ private:
         int uLen;
         Json::Value json;
         int target =((0&0x3)<<8) | ((0&0x7)<<5) | ((6&0xF)<<1) | (0&0x1);
-	    if(write32bCPU(0,0,target) != -1) {
-			// double value = read32bI2C(8,0);
-			//4294967296 (2^32)
-	    	
+        if(write32bCPU(0,0,target) != -1) {
+            // double value = read32bI2C(8,0);
+            //4294967296 (2^32)
+            
 
-	    	int frequency = std::stoi(center_frequency);
-	    	int rmx_no = std::stoi(str_rmx_no) -1;
-	    	int reg_addr = rmx_no * 4;//(4 is no of outputs)
-	    	long long int reg_value = round(4294967296 * frequency/2100);
-	        json["frequency"]= reg_value;
-	        if(write32bI2C(8,reg_addr,reg_value) != -1){
-	    	    json["error"]= false;
-	            json["message"]= "Center frequency has changaed successfully!";
-	            db->addFrequency(center_frequency,str_rmx_no);
-	            addToLog("setCenterFrequency","Success");
-	        }else{
-	        	json["error"]= true;
-	            json["message"]= "Error while writing register!";
-	            addToLog("setCenterFrequency","Error");
-	        }
-	    }else{
-	            json["error"]= true;
-	            json["message"]= "Connection error!";
-	    }
+            int frequency = std::stoi(center_frequency);
+            int rmx_no = std::stoi(str_rmx_no) -1;
+            int reg_addr = rmx_no * 4;//(4 is no of outputs)
+            long long int reg_value = round(4294967296 * frequency/2100);
+            json["frequency"]= reg_value;
+            if(write32bI2C(8,reg_addr,reg_value) != -1){
+                json["error"]= false;
+                json["message"]= "Center frequency has changaed successfully!";
+                db->addFrequency(center_frequency,str_rmx_no);
+                addToLog("setCenterFrequency","Success");
+            }else{
+                json["error"]= true;
+                json["message"]= "Error while writing register!";
+                addToLog("setCenterFrequency","Error");
+            }
+        }else{
+                json["error"]= true;
+                json["message"]= "Connection error!";
+        }
         return json;
     }
     /*****************************************************************************/
@@ -9717,25 +9665,25 @@ private:
         str_rmx_no = request.param(":rmx_no").as<std::string>();
         double value;
         if(verifyInteger(str_rmx_no,1,1,RMX_COUNT,1)){
-        	int target =((0&0x3)<<8) | ((0&0x7)<<5) | ((6&0xF)<<1) | (0&0x1);
-		    if(write32bCPU(0,0,target) != -1) {
-	        	int rmx_no = std::stoi(str_rmx_no) -1;
-		    	int reg_addr = rmx_no * 4;//(4 is no of outputs)
-	        	int center_frequency =197;
-	        	while(center_frequency == 197){
-	        		usleep(1000);
-	        		value = read32bI2C(8,reg_addr);
-	        		center_frequency = round((value*2100)/4294967296);	
-	        	}
-				json["center_frequency"] =center_frequency;
-				json["value"] = value;
-	    	}else{
-	            json["error"]= true;
-	            json["message"]= "Connection error!";
-			}
+            int target =((0&0x3)<<8) | ((0&0x7)<<5) | ((6&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
+                int rmx_no = std::stoi(str_rmx_no) -1;
+                int reg_addr = rmx_no * 4;//(4 is no of outputs)
+                int center_frequency =197;
+                while(center_frequency == 197){
+                    usleep(1000);
+                    value = read32bI2C(8,reg_addr);
+                    center_frequency = round((value*2100)/4294967296);  
+                }
+                json["center_frequency"] =center_frequency;
+                json["value"] = value;
+            }else{
+                json["error"]= true;
+                json["message"]= "Connection error!";
+            }
         }else{
-        	json["error"]= true;
-	        json["message"]= "Connection error!";
+            json["error"]= true;
+            json["message"]= "Connection error!";
         }
        
         std::string resp = fastWriter.write(json);
@@ -9755,9 +9703,9 @@ private:
         addToLog("getDVBCSAVersion",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
-        	std::string rmx_no = getParameter(request.body(),"rmx_no"); 
+            std::string rmx_no = getParameter(request.body(),"rmx_no"); 
             std::string output = getParameter(request.body(),"output"); 
-			error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(output,1,1,OUTPUT_COUNT);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
@@ -9771,20 +9719,20 @@ private:
             if(all_para_valid){
                 int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1){
-	                Json::Value getcorejson = callGetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_VER_ADDR));
-	                if(getcorejson["error"]==false){
-	                	long unsigned int data = std::stoul(getcorejson["data"].asString());
-	                    json["minor_ver"] = std::to_string(((data >> 16)&0xFF));
-	                    json["major_ver"] = std::to_string(((data >> 24)&0xFF));
-	                    json["message"] ="DVB-CSA version!";
-	                    json["error"] = false;
-	                }else{
-	                    json = getcorejson;
-	                }
-	            }else{
-	            	json["error"] = true;
-	            	json["message"] = "Connection error!";
-	            }
+                    Json::Value getcorejson = callGetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_VER_ADDR));
+                    if(getcorejson["error"]==false){
+                        long unsigned int data = std::stoul(getcorejson["data"].asString());
+                        json["minor_ver"] = std::to_string(((data >> 16)&0xFF));
+                        json["major_ver"] = std::to_string(((data >> 24)&0xFF));
+                        json["message"] ="DVB-CSA version!";
+                        json["error"] = false;
+                    }else{
+                        json = getcorejson;
+                    }
+                }else{
+                    json["error"] = true;
+                    json["message"] = "Connection error!";
+                }
             }
         }else{
             json["error"]= true;
@@ -9805,9 +9753,9 @@ private:
         addToLog("getDVBCSACoreControlReg",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
-        	std::string rmx_no = getParameter(request.body(),"rmx_no"); 
+            std::string rmx_no = getParameter(request.body(),"rmx_no"); 
             std::string output = getParameter(request.body(),"output"); 
-			error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(output,1,1,OUTPUT_COUNT);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
@@ -9821,24 +9769,24 @@ private:
             if(all_para_valid){
                 int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1){
-	                Json::Value getcorejson = callGetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_CORE_CONTR_ADDR));
-	                if(getcorejson["error"]==false){
-	                	long unsigned int data = std::stoul(getcorejson["data"].asString());
-	                    json["enable_encryption"] = std::to_string((data&0x1));
-	                    json["parity"] = std::to_string(((data&0x2)>>1));
-	                    json["key_id"] = std::to_string(((data&0x7F)>>2));
-	                    json["pid_id"] = std::to_string(((data&0x3F00)>>8));
-	                    json["pid_value"] = std::to_string(((data&0x1FFF0000)>>16));
-	                    json["write_enable"] = std::to_string(((data&0x40000000)>>30));
-	                    json["message"] ="DVB-CSA control register!";
-	                    json["error"] = false;
-	                }else{
-	                    json = getcorejson;
-	                }
-	            }else{
-	            	json["error"] = true;
-	            	json["message"] = "Connection error!";
-	            }
+                    Json::Value getcorejson = callGetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_CORE_CONTR_ADDR));
+                    if(getcorejson["error"]==false){
+                        long unsigned int data = std::stoul(getcorejson["data"].asString());
+                        json["enable_encryption"] = std::to_string((data&0x1));
+                        json["parity"] = std::to_string(((data&0x2)>>1));
+                        json["key_id"] = std::to_string(((data&0x7F)>>2));
+                        json["pid_id"] = std::to_string(((data&0x3F00)>>8));
+                        json["pid_value"] = std::to_string(((data&0x1FFF0000)>>16));
+                        json["write_enable"] = std::to_string(((data&0x40000000)>>30));
+                        json["message"] ="DVB-CSA control register!";
+                        json["error"] = false;
+                    }else{
+                        json = getcorejson;
+                    }
+                }else{
+                    json["error"] = true;
+                    json["message"] = "Connection error!";
+                }
             }
         }else{
             json["error"]= true;
@@ -9859,7 +9807,7 @@ private:
         addToLog("setDVBCSACoreControlReg",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
-        	std::string rmx_no = getParameter(request.body(),"rmx_no"); 
+            std::string rmx_no = getParameter(request.body(),"rmx_no"); 
             std::string output = getParameter(request.body(),"output"); 
             std::string enable_encryption = getParameter(request.body(),"enable_encryption"); 
             std::string parity = getParameter(request.body(),"parity"); 
@@ -9867,7 +9815,7 @@ private:
             std::string pid_id = getParameter(request.body(),"pid_id"); 
             std::string pid_value = getParameter(request.body(),"pid_value"); 
             std::string write_enable = getParameter(request.body(),"write_enable"); 
-			error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(output,1,1,OUTPUT_COUNT);
             error[2] = verifyInteger(enable_encryption,1,1,1);
             error[3] = verifyInteger(parity,1,1,1);
@@ -9887,15 +9835,15 @@ private:
             if(all_para_valid){
                 int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1){
-                	int value =((std::stoi(write_enable)&0x1)<<30) | ((std::stoi(pid_value)&0x1FFF)<<16) | ((std::stoi(pid_id)&0x3F)<<8) | ((std::stoi(key_id)&0x1F)<<2) | ((std::stoi(parity)&0x1)<<1) | (std::stoi(enable_encryption)&0x1);
-	                json = callSetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_CORE_CONTR_ADDR),std::to_string(value),std::stoi(rmx_no));
-	                if(json["error"]==false){
-	                    json["message"] ="DVB-CSA control register!";
-	                }
-	            }else{
-	            	json["error"] = true;
-	            	json["message"] = "Connection error!";
-	            }
+                    int value =((std::stoi(write_enable)&0x1)<<30) | ((std::stoi(pid_value)&0x1FFF)<<16) | ((std::stoi(pid_id)&0x3F)<<8) | ((std::stoi(key_id)&0x1F)<<2) | ((std::stoi(parity)&0x1)<<1) | (std::stoi(enable_encryption)&0x1);
+                    json = callSetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_CORE_CONTR_ADDR),std::to_string(value),std::stoi(rmx_no));
+                    if(json["error"]==false){
+                        json["message"] ="DVB-CSA control register!";
+                    }
+                }else{
+                    json["error"] = true;
+                    json["message"] = "Connection error!";
+                }
             }
         }else{
             json["error"]= true;
@@ -9916,9 +9864,9 @@ private:
         addToLog("getDVBCSAKey",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
-        	std::string rmx_no = getParameter(request.body(),"rmx_no"); 
+            std::string rmx_no = getParameter(request.body(),"rmx_no"); 
             std::string output = getParameter(request.body(),"output"); 
-			error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(output,1,1,OUTPUT_COUNT);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
@@ -9932,26 +9880,26 @@ private:
             if(all_para_valid){
                 int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1){
-	                Json::Value lsbjson = callGetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_LSB_KEY_ADDR));
-	                Json::Value msbjson = callGetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_MSB_KEY_ADDR));
-	                Json::Value keyjson = callGetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_KEY_CONTR_ADDR));
-	                if(lsbjson["error"]==false && msbjson["error"]==false && keyjson["error"]==false){
-	                	json["key"] =getlongDecToHex(std::stoul(msbjson["data"].asString())) +""+ getlongDecToHex(std::stoul(lsbjson["data"].asString()));
-	                	// json["key_msb"] =getlongDecToHex(std::stoul(msbjson["data"].asString())); 
-	                	json["key_id"] = std::to_string(std::stoul(keyjson["data"].asString())&0x1F);
-	                    json["message"] ="DVB-CSA get key!";
-	                    json["error"] = false;
-	                }else{
-	                    json["error"] = true;
-	                    json["lsb"] = lsbjson["message"];
-	                    json["msb"] = msbjson["message"];
-	                    json["key"] = keyjson["message"];
+                    Json::Value lsbjson = callGetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_LSB_KEY_ADDR));
+                    Json::Value msbjson = callGetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_MSB_KEY_ADDR));
+                    Json::Value keyjson = callGetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_KEY_CONTR_ADDR));
+                    if(lsbjson["error"]==false && msbjson["error"]==false && keyjson["error"]==false){
+                        json["key"] =getlongDecToHex(std::stoul(msbjson["data"].asString())) +""+ getlongDecToHex(std::stoul(lsbjson["data"].asString()));
+                        // json["key_msb"] =getlongDecToHex(std::stoul(msbjson["data"].asString())); 
+                        json["key_id"] = std::to_string(std::stoul(keyjson["data"].asString())&0x1F);
+                        json["message"] ="DVB-CSA get key!";
+                        json["error"] = false;
+                    }else{
+                        json["error"] = true;
+                        json["lsb"] = lsbjson["message"];
+                        json["msb"] = msbjson["message"];
+                        json["key"] = keyjson["message"];
 
-	                }
-	            }else{
-	            	json["error"] = true;
-	            	json["message"] = "Connection error!";
-	            }
+                    }
+                }else{
+                    json["error"] = true;
+                    json["message"] = "Connection error!";
+                }
             }
         }else{
             json["error"]= true;
@@ -9972,11 +9920,11 @@ private:
         addToLog("setDVBCSAKey",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
-        	std::string rmx_no = getParameter(request.body(),"rmx_no"); 
+            std::string rmx_no = getParameter(request.body(),"rmx_no"); 
             std::string output = getParameter(request.body(),"output"); 
             std::string key = getParameter(request.body(),"key"); 
             std::string key_id = getParameter(request.body(),"key_id"); 
-			error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[0] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(output,1,1,OUTPUT_COUNT);
             error[2] = verifyInteger(key_id,0,0,31);
             error[3] = verifyIsHex(key,18);
@@ -9992,22 +9940,22 @@ private:
             if(all_para_valid){
                 int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1){
-                	std::string msb_key = std::to_string(getHexToLongDec(key.substr(2,8)));
-                	std::string lsb_key = std::to_string(getHexToLongDec(key.substr(10))); 
-	                json = callSetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_LSB_KEY_ADDR),lsb_key,std::stoi(rmx_no));
-	                if(json["error"]==false){
-	                	json = callSetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_MSB_KEY_ADDR),msb_key,std::stoi(rmx_no));
-	                	if(json["error"]==false){
-	                		json = callSetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_KEY_CONTR_ADDR),key_id,std::stoi(rmx_no));
-	                		if(json["error"]==false){
-	                			json["message"] = "DVB-CSA encrypt key!";
-	                		}
-	                	}
-	                }
-	            }else{
-	            	json["error"] = true;
-	            	json["message"] = "Connection error!";
-	            }
+                    std::string msb_key = std::to_string(getHexToLongDec(key.substr(2,8)));
+                    std::string lsb_key = std::to_string(getHexToLongDec(key.substr(10))); 
+                    json = callSetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_LSB_KEY_ADDR),lsb_key,std::stoi(rmx_no));
+                    if(json["error"]==false){
+                        json = callSetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_MSB_KEY_ADDR),msb_key,std::stoi(rmx_no));
+                        if(json["error"]==false){
+                            json = callSetCore(std::to_string(DVBCSA_OUTPUT_CS[std::stoi(output)]),std::to_string(DVBCSA_KEY_CONTR_ADDR),key_id,std::stoi(rmx_no));
+                            if(json["error"]==false){
+                                json["message"] = "DVB-CSA encrypt key!";
+                            }
+                        }
+                    }
+                }else{
+                    json["error"] = true;
+                    json["message"] = "Connection error!";
+                }
             }
         }else{
             json["error"]= true;
@@ -10964,111 +10912,111 @@ private:
         usleep(1000);
         Json::Value jsonAllegro = db->getConfAllegro();
         if(jsonAllegro["error"] == false){
-        	for(int i=0;i<jsonAllegro["list"].size();i++ ){
-        		int target =((0&0x3)<<8) | ((0&0x7)<<5) | ((((std::stoi(jsonAllegro["list"][i]["mxl_id"].asString()))+6)&0xF)<<1) | (0&0x1);
-        		if(write32bCPU(0,0,target) != -1){
-        			confAllegro8297(std::stoi(jsonAllegro["list"][i]["address"].asString()),std::stoi(jsonAllegro["list"][i]["enable1"].asString()),std::stoi(jsonAllegro["list"][i]["volt1"].asString()),std::stoi(jsonAllegro["list"][i]["enable2"].asString()),std::stoi(jsonAllegro["list"][i]["volt2"].asString()));
-        			usleep(1000);
-        		}
-        		
-        	}	
+            for(int i=0;i<jsonAllegro["list"].size();i++ ){
+                int target =((0&0x3)<<8) | ((0&0x7)<<5) | ((((std::stoi(jsonAllegro["list"][i]["mxl_id"].asString()))+6)&0xF)<<1) | (0&0x1);
+                if(write32bCPU(0,0,target) != -1){
+                    confAllegro8297(std::stoi(jsonAllegro["list"][i]["address"].asString()),std::stoi(jsonAllegro["list"][i]["enable1"].asString()),std::stoi(jsonAllegro["list"][i]["volt1"].asString()),std::stoi(jsonAllegro["list"][i]["enable2"].asString()),std::stoi(jsonAllegro["list"][i]["volt2"].asString()));
+                    usleep(1000);
+                }
+                
+            }   
         }
         
         Json::Value jsonTuner = db->getRFTunerDetails();
         if(jsonTuner["error"] == false){
-        	for(int i=0;i<jsonTuner["list"].size();i++ ){
-        		int rmx_no = std::stoi(jsonTuner["list"][i]["rmx_no"].asString());
-        		int mxl_id = std::stoi(jsonTuner["list"][i]["mxl_id"].asString());
-        		int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
-	            if(connectI2Clines(target)){
-	        		tuneMxl(std::stoi(jsonTuner["list"][i]["demod_id"].asString()),std::stoi(jsonTuner["list"][i]["lnb_id"].asString()),std::stoi(jsonTuner["list"][i]["dvb_standard"].asString()),std::stoi(jsonTuner["list"][i]["frequency"].asString()),std::stoi(jsonTuner["list"][i]["symbol_rate"].asString()),std::stoi(jsonTuner["list"][i]["modulation"].asString()),std::stoi(jsonTuner["list"][i]["fec"].asString()),std::stoi(jsonTuner["list"][i]["rolloff"].asString()),std::stoi(jsonTuner["list"][i]["pilots"].asString()),std::stoi(jsonTuner["list"][i]["spectrum"].asString()),std::stoi(jsonTuner["list"][i]["lo_frequency"].asString()),mxl_id,rmx_no,0);
-	        		usleep(1000);
-	        		setMpegMode(std::stoi(jsonTuner["list"][i]["demod_id"].asString()),1,MXL_HYDRA_MPEG_CLK_CONTINUOUS,MXL_HYDRA_MPEG_CLK_IN_PHASE,50,MXL_HYDRA_MPEG_CLK_PHASE_SHIFT_0_DEG,1,1,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_MODE_SERIAL_3_WIRE,MXL_HYDRA_MPEG_ERR_INDICATION_DISABLED);
-	        		usleep(1000);
-	        	}
-        	}	
+            for(int i=0;i<jsonTuner["list"].size();i++ ){
+                int rmx_no = std::stoi(jsonTuner["list"][i]["rmx_no"].asString());
+                int mxl_id = std::stoi(jsonTuner["list"][i]["mxl_id"].asString());
+                int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
+                if(connectI2Clines(target)){
+                    tuneMxl(std::stoi(jsonTuner["list"][i]["demod_id"].asString()),std::stoi(jsonTuner["list"][i]["lnb_id"].asString()),std::stoi(jsonTuner["list"][i]["dvb_standard"].asString()),std::stoi(jsonTuner["list"][i]["frequency"].asString()),std::stoi(jsonTuner["list"][i]["symbol_rate"].asString()),std::stoi(jsonTuner["list"][i]["modulation"].asString()),std::stoi(jsonTuner["list"][i]["fec"].asString()),std::stoi(jsonTuner["list"][i]["rolloff"].asString()),std::stoi(jsonTuner["list"][i]["pilots"].asString()),std::stoi(jsonTuner["list"][i]["spectrum"].asString()),std::stoi(jsonTuner["list"][i]["lo_frequency"].asString()),mxl_id,rmx_no,0);
+                    usleep(1000);
+                    setMpegMode(std::stoi(jsonTuner["list"][i]["demod_id"].asString()),1,MXL_HYDRA_MPEG_CLK_CONTINUOUS,MXL_HYDRA_MPEG_CLK_IN_PHASE,50,MXL_HYDRA_MPEG_CLK_PHASE_SHIFT_0_DEG,1,1,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_MODE_SERIAL_3_WIRE,MXL_HYDRA_MPEG_ERR_INDICATION_DISABLED);
+                    usleep(1000);
+                }
+            }   
         }
         
         Json::Value jsonIPTuner = db->getIPTunerDetails();
         if(jsonIPTuner["error"] == false){
-        	for(int i=0;i<jsonIPTuner["list"].size();i++ ){
-        		int rmx_no = std::stoi(jsonIPTuner["list"][i]["rmx_no"].asString());
-            	int control_fpga =ceil(double(rmx_no)/2);
-            	int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
-        		if(write32bCPU(0,0,target) != -1){
-	        		int channel_no = std::stoi(jsonIPTuner["list"][i]["input_channel"].asString());
-	        		int controller_of_rmx = (rmx_no % 2 == 0)?1:0;
-	        		int ch_no = ((controller_of_rmx)*8)+channel_no;
-	        		Json::Value json = callSetEthernetIn(ch_no,std::stoul(jsonIPTuner["list"][i]["ip_address"].asString()),std::stoi(jsonIPTuner["list"][i]["port"].asString()),std::stoi(jsonIPTuner["list"][i]["type"].asString()));
-	        		if(json["error"] == false)
-	        			std::cout<<"-------------------IP Input success------------------------------- "<<std::endl;
-	        		else
-	        			std::cout<<"--------------------IP Input FAILED-------------------------------- "<<std::endl;
-	        	}
-        		usleep(1000);
-        	}	
+            for(int i=0;i<jsonIPTuner["list"].size();i++ ){
+                int rmx_no = std::stoi(jsonIPTuner["list"][i]["rmx_no"].asString());
+                int control_fpga =ceil(double(rmx_no)/2);
+                int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
+                if(write32bCPU(0,0,target) != -1){
+                    int channel_no = std::stoi(jsonIPTuner["list"][i]["input_channel"].asString());
+                    int controller_of_rmx = (rmx_no % 2 == 0)?1:0;
+                    int ch_no = ((controller_of_rmx)*8)+channel_no;
+                    Json::Value json = callSetEthernetIn(ch_no,std::stoul(jsonIPTuner["list"][i]["ip_address"].asString()),std::stoi(jsonIPTuner["list"][i]["port"].asString()),std::stoi(jsonIPTuner["list"][i]["type"].asString()));
+                    if(json["error"] == false)
+                        std::cout<<"-------------------IP Input success------------------------------- "<<std::endl;
+                    else
+                        std::cout<<"--------------------IP Input FAILED-------------------------------- "<<std::endl;
+                }
+                usleep(1000);
+            }   
         }
         usleep(1000);
         //Setting Input tuner type for each input channels (RF or IP IN)
         for (int control_fpga = 1; control_fpga <= 3; ++control_fpga)
         {
-        	int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
-    		if(write32bCPU(0,0,target) != -1){
-    			int tuner_ch = db->getTunerChannelType(control_fpga);
-				if(write32bI2C(4,0,tuner_ch) == -1){
-		        	std::cout<<"Failed to configure MUX IN!"<<std::endl;
-		        }else{
-		        	std::cout<<"-------------------Success MUX IN!--------------------------------------"<<std::endl;
-		        }
-		    }
-		    usleep(1000);
+            int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1){
+                int tuner_ch = db->getTunerChannelType(control_fpga);
+                if(write32bI2C(4,0,tuner_ch) == -1){
+                    std::cout<<"Failed to configure MUX IN!"<<std::endl;
+                }else{
+                    std::cout<<"-------------------Success MUX IN!--------------------------------------"<<std::endl;
+                }
+            }
+            usleep(1000);
         }
 
         usleep(1000);
         Json::Value jsonIPOUT = db->getIPOutputChannels();
         if(jsonIPOUT["error"] == false){
-        	std::cout<<jsonIPOUT["list"].size()<<std::endl;
-	        for(int i=0;i<jsonIPOUT["list"].size();i++ ){
-	        	int rmx_no = std::stoi(jsonIPOUT["list"][i]["rmx_no"].asString());
-	        	int channel_no  = std::stoi(jsonIPOUT["list"][i]["output_channel"].asString());
-	        	int port  = std::stoi(jsonIPOUT["list"][i]["port"].asString());
-	        	int rmx_no_of_controller = (rmx_no % 2 == 0)?1:0;
-	        	int ch_no = ((rmx_no_of_controller)*8)+channel_no;
-	        	unsigned long int ip_address = std::stoul(jsonIPOUT["list"][i]["ip_address"].asString());
-            	int control_fpga =ceil(double(rmx_no)/2);
-            	int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
-        		if(write32bCPU(0,0,target) != -1){
-        			std::cout<<ch_no<<port<<ip_address;
-		        	Json::Value jsonipout = callSetEthernetOut(ip_address,port,ch_no);
-		        	if(jsonipout["error"] == false){
-		                 std::cout<<"IP OUT Success"<<std::endl;
-		        	}else{
-		        		std::cout<<"IP OUT FAILED"<<std::endl;
-		        	}
-		        }
-			}
-	    }
+            std::cout<<jsonIPOUT["list"].size()<<std::endl;
+            for(int i=0;i<jsonIPOUT["list"].size();i++ ){
+                int rmx_no = std::stoi(jsonIPOUT["list"][i]["rmx_no"].asString());
+                int channel_no  = std::stoi(jsonIPOUT["list"][i]["output_channel"].asString());
+                int port  = std::stoi(jsonIPOUT["list"][i]["port"].asString());
+                int rmx_no_of_controller = (rmx_no % 2 == 0)?1:0;
+                int ch_no = ((rmx_no_of_controller)*8)+channel_no;
+                unsigned long int ip_address = std::stoul(jsonIPOUT["list"][i]["ip_address"].asString());
+                int control_fpga =ceil(double(rmx_no)/2);
+                int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
+                if(write32bCPU(0,0,target) != -1){
+                    std::cout<<ch_no<<port<<ip_address;
+                    Json::Value jsonipout = callSetEthernetOut(ip_address,port,ch_no);
+                    if(jsonipout["error"] == false){
+                         std::cout<<"IP OUT Success"<<std::endl;
+                    }else{
+                        std::cout<<"IP OUT FAILED"<<std::endl;
+                    }
+                }
+            }
+        }
 
-	    usleep(1000);
+        usleep(1000);
         Json::Value jsonRfauth = db->getRFauthorizedRmx();
         int rmx_no =0;
         if(jsonRfauth["error"] == false){
-        	std::cout<<jsonRfauth["list"].size()<<std::endl;
-	        for(int i=0;i<jsonRfauth["list"].size();i++ ){
-	        	 rmx_no = std::stoi(jsonRfauth["list"][0].asString());
-			}
-	    }
-	    RFauthorization(rmx_no);
+            std::cout<<jsonRfauth["list"].size()<<std::endl;
+            for(int i=0;i<jsonRfauth["list"].size();i++ ){
+                 rmx_no = std::stoi(jsonRfauth["list"][0].asString());
+            }
+        }
+        RFauthorization(rmx_no);
 
         for (int rmx = 1; rmx <= RMX_COUNT; rmx++)
         {
-		    for(int input=0;input<4;input++){
-		        Json::Value iojson =callGetProgramList(input,rmx);
-		        if(iojson["error"] == false)
-		            std::cout<<"-----------Services has been restored from channel RMX "<<rmx<<">---------------->CH "<<input<<std::endl;
-		    }
-		}
-		usleep(1000);
+            for(int input=0;input<4;input++){
+                Json::Value iojson =callGetProgramList(input,rmx);
+                if(iojson["error"] == false)
+                    std::cout<<"-----------Services has been restored from channel RMX "<<rmx<<">---------------->CH "<<input<<std::endl;
+            }
+        }
+        usleep(1000);
         for (int i = 0; i <= RMX_COUNT; ++i)
         {
             for (int j = 0; j <= INPUT_COUNT; ++j)
@@ -11100,19 +11048,19 @@ private:
         }
         for (int rmx = 1; rmx <= RMX_COUNT; ++rmx)
         {
-        	Json::Value new_service_ids,old_service_ids;
-        	NewService_ids = db->getServiceIds(rmx);
-	        if(NewService_ids["error"]==false){
-	            for (int i = 0; i < NewService_ids["list"].size(); ++i)
-	            {
-	                new_service_ids[i] = NewService_ids["list"][i]["service_id"].asString();
-	                old_service_ids[i] = NewService_ids["list"][i]["channel_number"].asString();
-	            }   
-	            Json::Value json = callSetServiceID(old_service_ids,new_service_ids,rmx);
+            Json::Value new_service_ids,old_service_ids;
+            NewService_ids = db->getServiceIds(rmx);
+            if(NewService_ids["error"]==false){
+                for (int i = 0; i < NewService_ids["list"].size(); ++i)
+                {
+                    new_service_ids[i] = NewService_ids["list"][i]["service_id"].asString();
+                    old_service_ids[i] = NewService_ids["list"][i]["channel_number"].asString();
+                }   
+                Json::Value json = callSetServiceID(old_service_ids,new_service_ids,rmx);
                 if(json["error"]==false){
                     std::cout<<"------------------ Service ID's restored successfully ------------------"<<std::endl;
                 } 
-	        }
+            }
         }
         
         network_details = db->getNetworkDetails();
@@ -11141,10 +11089,10 @@ private:
         if(json_cetnter_frequency["error"] == false){
             for (int i = 0; i < json_cetnter_frequency["list"].size(); ++i)
             {
-            	Json::Value json = callsetCenterFrequency(json_cetnter_frequency["list"][i]["center_frequency"].asString(),json_cetnter_frequency["list"][i]["rmx_no"].asString());
-            	if(json["error"]==false){
-               	 	std::cout<<"------------------ Center Frequency has been restored --------------------- "<<std::endl;
-            	}	
+                Json::Value json = callsetCenterFrequency(json_cetnter_frequency["list"][i]["center_frequency"].asString(),json_cetnter_frequency["list"][i]["rmx_no"].asString());
+                if(json["error"]==false){
+                    std::cout<<"------------------ Center Frequency has been restored --------------------- "<<std::endl;
+                }   
             }
         }
         lcn_json = db->getLcnNumbers();
@@ -11313,7 +11261,7 @@ private:
         if(serv_provider_json["error"]==false){
             for (int i = 0; i < serv_provider_json["list"].size(); ++i)
             {
-                Json::Value json = callSetNewProvName(serv_provider_json["list"][i]["service_name"].asString(),serv_provider_json["list"][i]["service_number"].asString(),serv_provider_json["list"][i]["input_channel"].asString(),std::stoi(serv_provider_json["list"][i]["rmx_no"].asString()));
+                Json::Value json = callSetServiceProvider(serv_provider_json["list"][i]["service_name"].asString(),serv_provider_json["list"][i]["service_number"].asString(),serv_provider_json["list"][i]["input_channel"].asString(),std::stoi(serv_provider_json["list"][i]["rmx_no"].asString()));
                // std::cout<<"-------------------------"<<json["error"]<<std::endl;
                 if(json["error"]==false){
                     std::cout<<"------------------Provider names has been restored--------------------- "<<json["message"]<<std::endl;
@@ -11661,13 +11609,13 @@ private:
     }
     long unsigned int getHexToLongDec(std::string hex_str)
     {
-    	long unsigned int val;
+        long unsigned int val;
         // std::stringstream ss;
         // ss<< std::hex << dec_num;
         // std::string res (ss.str());
         std::stringstream ss;
-		ss << std::hex << hex_str;
-		ss >> val;
+        ss << std::hex << hex_str;
+        ss >> val;
         return val;
     }
     std::string hex_to_string(const std::string& input)

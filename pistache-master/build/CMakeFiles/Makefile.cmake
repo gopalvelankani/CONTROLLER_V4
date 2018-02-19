@@ -67,6 +67,7 @@ set(CMAKE_DEPEND_INFO_FILES
   "examples/CMakeFiles/http_server.dir/DependInfo.cmake"
   "examples/CMakeFiles/http_client.dir/DependInfo.cmake"
   "examples/CMakeFiles/rest_server.dir/DependInfo.cmake"
+  "examples/CMakeFiles/commandline.dir/DependInfo.cmake"
   "examples/CMakeFiles/custom_header.dir/DependInfo.cmake"
   "examples/CMakeFiles/hello_server.dir/DependInfo.cmake"
   "googletest-release-1.7.0/CMakeFiles/gtest_main.dir/DependInfo.cmake"

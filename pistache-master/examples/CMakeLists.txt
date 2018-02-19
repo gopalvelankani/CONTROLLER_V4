@@ -17,6 +17,8 @@ target_link_libraries(rest_server jsoncpp)
 target_link_libraries(rest_server hiredis)
 target_link_libraries(rest_server pthread)
 
+add_executable(commandline commandline.cc)
+
 find_package(RapidJSON)
 if (RapidJSON_FOUND)
 include_directories(${RapidJSON_INCLUDE_DIRS})

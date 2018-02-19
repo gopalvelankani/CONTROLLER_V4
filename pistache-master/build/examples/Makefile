@@ -78,6 +78,17 @@ edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
 
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
+
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
@@ -121,17 +132,6 @@ install/local: preinstall
 install/local/fast: install/local
 
 .PHONY : install/local/fast
-
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -211,6 +211,21 @@ rest_server/fast:
 .PHONY : rest_server/fast
 
 # Convenience name for target.
+examples/CMakeFiles/commandline.dir/rule:
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/CMakeFiles/commandline.dir/rule
+.PHONY : examples/CMakeFiles/commandline.dir/rule
+
+# Convenience name for target.
+commandline: examples/CMakeFiles/commandline.dir/rule
+
+.PHONY : commandline
+
+# fast build rule for target.
+commandline/fast:
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/commandline.dir/build.make examples/CMakeFiles/commandline.dir/build
+.PHONY : commandline/fast
+
+# Convenience name for target.
 examples/CMakeFiles/custom_header.dir/rule:
 	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 examples/CMakeFiles/custom_header.dir/rule
 .PHONY : examples/CMakeFiles/custom_header.dir/rule
@@ -239,6 +254,33 @@ hello_server: examples/CMakeFiles/hello_server.dir/rule
 hello_server/fast:
 	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/hello_server.dir/build.make examples/CMakeFiles/hello_server.dir/build
 .PHONY : hello_server/fast
+
+commandline.o: commandline.cc.o
+
+.PHONY : commandline.o
+
+# target to build an object file
+commandline.cc.o:
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/commandline.dir/build.make examples/CMakeFiles/commandline.dir/commandline.cc.o
+.PHONY : commandline.cc.o
+
+commandline.i: commandline.cc.i
+
+.PHONY : commandline.i
+
+# target to preprocess a source file
+commandline.cc.i:
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/commandline.dir/build.make examples/CMakeFiles/commandline.dir/commandline.cc.i
+.PHONY : commandline.cc.i
+
+commandline.s: commandline.cc.s
+
+.PHONY : commandline.s
+
+# target to generate assembly for a file
+commandline.cc.s:
+	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f examples/CMakeFiles/commandline.dir/build.make examples/CMakeFiles/commandline.dir/commandline.cc.s
+.PHONY : commandline.cc.s
 
 custom_header.o: custom_header.cc.o
 
@@ -383,16 +425,20 @@ help:
 	@echo "... depend"
 	@echo "... test"
 	@echo "... edit_cache"
+	@echo "... rebuild_cache"
 	@echo "... http_server"
 	@echo "... http_client"
 	@echo "... install"
 	@echo "... rest_server"
+	@echo "... commandline"
 	@echo "... list_install_components"
 	@echo "... custom_header"
 	@echo "... install/strip"
 	@echo "... hello_server"
 	@echo "... install/local"
-	@echo "... rebuild_cache"
+	@echo "... commandline.o"
+	@echo "... commandline.i"
+	@echo "... commandline.s"
 	@echo "... custom_header.o"
 	@echo "... custom_header.i"
 	@echo "... custom_header.s"

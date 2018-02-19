@@ -43,7 +43,7 @@ public:
 	int addfreeCAModePrograms(std::string programNumber,std::string input,std::string output,int rmx_no); 
 	int addHighPriorityServices(std::string program_number,std::string input,int rmx_no);
 	int addLockedPrograms(std::string program_number,std::string input,int rmx_no);
-	int addNewProviderName(std::string program_number,std::string NewName,int rmx_no);
+	int addNewProviderName(std::string program_number,std::string NewName,std::string rmx_no,std::string addFlag);
 	int addLcnProviderid(int provider_id,int rmx_no);
 	int deletefreeCAModePrograms();
 	int deleteLockedPrograms();

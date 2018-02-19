@@ -231,6 +231,19 @@ rest_server/fast:
 .PHONY : rest_server/fast
 
 #=============================================================================
+# Target rules for targets named commandline
+
+# Build rule for target.
+commandline: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 commandline
+.PHONY : commandline
+
+# fast build rule for target.
+commandline/fast:
+	$(MAKE) -f examples/CMakeFiles/commandline.dir/build.make examples/CMakeFiles/commandline.dir/build
+.PHONY : commandline/fast
+
+#=============================================================================
 # Target rules for targets named custom_header
 
 # Build rule for target.
@@ -391,6 +404,7 @@ help:
 	@echo "... http_server"
 	@echo "... http_client"
 	@echo "... rest_server"
+	@echo "... commandline"
 	@echo "... custom_header"
 	@echo "... hello_server"
 	@echo "... gtest_main"

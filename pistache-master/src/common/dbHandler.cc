@@ -212,9 +212,13 @@ using namespace std;
 		mysql_query (connect,query.c_str());
 		return mysql_affected_rows(connect);
 	}
-	int dbHandler :: addNewProviderName(std::string program_number,std::string NewName,int rmx_no) 
+	int dbHandler :: addNewProviderName(std::string service_number,std::string serviceName,std::string rmx_no,std::string addFlag) 
 	{
-		string query = "Insert into service_providers (service_number,provider_name,rmx_id) VALUES ('"+program_number+"','"+NewName+"','"+std::to_string(rmx_no)+"') ON DUPLICATE KEY UPDATE provider_name = '"+NewName+"'  ;";  
+		string query = "";
+		if(std::stoi(addFlag))
+			query = "Insert into service_providers (service_number,provider_name,rmx_id) VALUES ('"+service_number+"','"+serviceName+"','"+rmx_no+"') ON DUPLICATE KEY UPDATE provider_name = '"+serviceName+"';";  
+		else
+			query = "DELETE FROM service_providers WHERE service_number = '"+service_number+"' AND rmx_id = '"+rmx_no+"';";  
 		mysql_query (connect,query.c_str());
 		return mysql_affected_rows(connect);
 	}
