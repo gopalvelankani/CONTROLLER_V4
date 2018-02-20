@@ -175,7 +175,7 @@ int write32(unsigned char cCs, unsigned char addr, unsigned int *sData,int sData
         usleep(1000);
 }
 
-int read32bI2C(unsigned char cCs, unsigned char addr){
+unsigned long int read32bI2C(unsigned char cCs, unsigned char addr){
     unsigned int sData[0];
     //readI2C 0 addr_I2C I2C_CS cCs addr 4
     write32(cCs, addr,sData,sizeof(sData) / sizeof(sData[0]));
@@ -200,17 +200,17 @@ int write32bI2C(unsigned int cs,unsigned int address,unsigned long int data){
     write32(cs,address,sData,sizeof(sData) / sizeof(sData[0]));
 }
 
-unsigned long int read32bI2C(unsigned int cs,unsigned int address){
-     unsigned int sData[0];
-    //readI2C 0 addr_I2C I2C_CS cCs addr 4
-    write32(cs, address,sData,sizeof(sData) / sizeof(sData[0]));
-    write32bCPU(I2C_CS,8,0<<16|4);
-    unsigned int word0 = (addr_I2C|1)<<24 | address<<16;
-    write32bCPU(I2C_CS,4,word0);
-    write32bCPU(I2C_CS,8,(1<<18|1<<17|0<<16|4));
-    usleep(10000);
-    return read32bCPU(I2C_CS,4);
-}
+// unsigned long int read32bI2C(unsigned int cs,unsigned int address){
+//      unsigned int sData[0];
+//     //readI2C 0 addr_I2C I2C_CS cCs addr 4
+//     write32(cs, address,sData,sizeof(sData) / sizeof(sData[0]));
+//     write32bCPU(I2C_CS,8,0<<16|4);
+//     unsigned int word0 = (addr_I2C|1)<<24 | address<<16;
+//     write32bCPU(I2C_CS,4,word0);
+//     write32bCPU(I2C_CS,8,(1<<18|1<<17|0<<16|4));
+//     usleep(10000);
+//     return read32bCPU(I2C_CS,4);
+// }
 
 int selectInterface(unsigned int uart,unsigned int i2c,unsigned int spi){
     int target =((spi&0x3)<<8) | ((uart&0x7)<<5) | ((i2c&0xF)<<1) | (0&0x1);

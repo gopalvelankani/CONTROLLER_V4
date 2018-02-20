@@ -462,22 +462,27 @@
 				    msgBuf[6] = 0;
 				    msgBuf[7] = ETX;
 				}else{
-					std::string tmp=json["NewName"].asString();
-					uProg=(unsigned short)std::stoi(json["progNumber"].asString());
-					char y[1024];
-					strcpy(y, tmp.c_str());
-					char *NewName=y;
-					//std::cout<<strlen(NewName);
-					len = 2+strlen(NewName);
-					msgBuf[1] = (unsigned char) (len>>8);
-					msgBuf[2] = (unsigned char) len;
+					int addFlag  =json["addFlag"].asInt();
+					uProg=(unsigned short)std::stoi(json["serviceNumber"].asString());
+					
 					msgBuf[3] = CMD_CHANGE_PROV;
 				    msgBuf[4] = uProg>>8;
 					msgBuf[5] = (unsigned char)uProg;
-					for (int i=0; i<strlen(NewName); i++) {
-						msgBuf[6+i] = NewName[i];	
+					if(addFlag){
+						std::string providerName=json["providerName"].asString();
+						char tempbuff[1024];
+						strcpy(tempbuff, providerName.c_str());
+						char *NewName=tempbuff;
+						len = 2+strlen(NewName);
+						for (int i=0; i<strlen(NewName); i++) {
+							msgBuf[6+i] = NewName[i];	
+						}
+					}else{
+						len = 2;
 					}
-					msgBuf[4+len] = ETX;				
+					msgBuf[1] = (unsigned char) (len>>8);
+					msgBuf[2] = (unsigned char) len;
+					msgBuf[4+len] = ETX;						
 				}
 				break;
 			case 27:

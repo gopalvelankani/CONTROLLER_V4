@@ -110,7 +110,7 @@ public:
         // forkEMMChannels();
         // forkChannels();
         // forkCWthread();
-        // runBootupscript();
+        runBootupscript();
     }
     void start() {
         
@@ -10915,7 +10915,10 @@ private:
             for(int i=0;i<jsonAllegro["list"].size();i++ ){
                 int target =((0&0x3)<<8) | ((0&0x7)<<5) | ((((std::stoi(jsonAllegro["list"][i]["mxl_id"].asString()))+6)&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1){
-                    confAllegro8297(std::stoi(jsonAllegro["list"][i]["address"].asString()),std::stoi(jsonAllegro["list"][i]["enable1"].asString()),std::stoi(jsonAllegro["list"][i]["volt1"].asString()),std::stoi(jsonAllegro["list"][i]["enable2"].asString()),std::stoi(jsonAllegro["list"][i]["volt2"].asString()));
+                    int address = std::stoi(jsonAllegro["list"][i]["address"].asString());
+                    callReadAllegro(address);
+                    usleep(500000);
+                    confAllegro8297(address,std::stoi(jsonAllegro["list"][i]["enable1"].asString()),std::stoi(jsonAllegro["list"][i]["volt1"].asString()),std::stoi(jsonAllegro["list"][i]["enable2"].asString()),std::stoi(jsonAllegro["list"][i]["volt2"].asString()));
                     usleep(1000);
                 }
                 
