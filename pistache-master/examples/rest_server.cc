@@ -788,6 +788,7 @@ private:
             enable2 = 1;
             volt2 = voltage;
         }
+        std::cout<<address<<enable1<<volt1<<enable2<<volt2<<std::endl;
         mxlStatus = confAllegro8297(address,enable1,volt1,enable2,volt2);
         if(mxlStatus == 1){
             json["added"] = db->addConfAllegro(mxl_id, address,enable1,volt1,enable2,volt2);
