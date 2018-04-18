@@ -26,7 +26,9 @@ public:
 
 	int addChannelList(int input,int channel_number,int rmx_no);
 	int addActivatedPrograms(std::string input,std::string output,Json::Value program_number,int rmx_no,int incFlag,std::string prog_list_str);
+	int addEncryptedPrograms(std::string input,std::string output,Json::Value program_number,int rmx_no,int incFlag,std::string prog_list_str);
 	Json::Value getActivePrograms(int input,int output);
+	Json::Value getEncryptedPrograms(std::string program_number,std::string input,std::string output ,std::string rmx_no);
 	int addLcnNumbers(std::string program_number,std::string channel_number,std::string input,int rmx_no);
 	int addPmtAlarm(std::string program_number,std::string alarm,std::string input,int rmx_no);
 	int addFrequency(std::string center_frequency,std::string str_rmx_no);
@@ -56,10 +58,12 @@ public:
 	int deleteECM(int channel_id);
 	int deleteECMStream(int channel_id,int stream_id);
 
-	int addEMMchannelSetup(int channel_id, std::string client_id ,int data_id,int bw,int port,int stream_id);
-	int updateEMMchannelSetup(int channel_id, std::string client_id, int data_id, int bw,int port,int stream_id);
+	int addEMMchannelSetup(int channel_id, std::string client_id ,int data_id,int bw,int port,int stream_id,int emm_pid);
+	int updateEMMchannelSetup(int channel_id, std::string client_id, int data_id, int bw,int port,int stream_id,std::string emm_pid);
 	int deleteEMM(int channel_id);
-
+	Json::Value getEMMGChannels(std::string rmx_no,std::string output,std::string channel_id);
+	// Json::Value getEMMGChannels(std::string channel_id);
+	int enableEMM(std::string channel_id, std::string rmx_no,std::string output,int addFlag);
 	int scrambleService(int channel_id,int stream_id,int service_id);
 	int deScrambleService(int channel_id,int stream_id,int service_id);
 	
@@ -115,11 +119,17 @@ public:
 	int removeIPOutputChannels(int rmx_no, int out_channel);
 	Json::Value getIPOutputChannels();
 	int addIPInputChannels(int rmx_no, int input_channel, std::string ip_address,int port,int type);
+	int addSPTSIPInputChannels(std::string mux_id, std::string input_channel, std::string ip_address,std::string port,std::string type);
 	int getTunerChannelType(int contr_fpga,int rmx_no,int channel_no,int type);
 	int getTunerChannelType(int contr_fpga);
 	int addTunerChannelType(int rmx_no,int channel_no,int type);
 	Json::Value getIPTunerDetails();
 	int removeIPInputChannels(int rmx_no, int input_channel);
+	int removeSPTSIPInputChannels(std::string rmx_no,std::string input_channel);
+	Json::Value getSPTSIPTuners(int mux_in);
+	int addQAM(std::string rmx_no, std::string output_channel,std::string qam_id);	
+	Json::Value getQAM(int rmx_id);
+	Json::Value getSPTSControl();
 };
 // This is the content of the .h file, which is where the declarations go
 

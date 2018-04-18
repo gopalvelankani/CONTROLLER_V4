@@ -481,6 +481,11 @@ int write32bCPU(unsigned char ucCs, unsigned char ucUaddress, unsigned int uiDat
     tv.tv_usec = 500000;
     int socketHandle = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP/* or 0? */);
     setsockopt(socketHandle, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
+    int reuse_sockt=1;
+    if(setsockopt(socketHandle, SOL_SOCKET, SO_REUSEADDR, &reuse_sockt,sizeof(reuse_sockt)) == -1){
+      printf("Set socket option failed\n");
+          return 0; 
+    }
     if (socketHandle<0)
     {
         printf("could not make socket\n");
@@ -542,6 +547,11 @@ unsigned int read32bCPU(unsigned char ucCs, unsigned char ucUaddress)
     tv.tv_usec = 500000;
     int socketHandle = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP/* or 0? */);
     setsockopt(socketHandle, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
+    int reuse_sockt=1;
+    if(setsockopt(socketHandle, SOL_SOCKET, SO_REUSEADDR, &reuse_sockt,sizeof(reuse_sockt)) == -1){
+      printf("Set socket option failed\n");
+          return 0; 
+    }
     if (socketHandle<0)
     {
         printf("could not make socket\n");

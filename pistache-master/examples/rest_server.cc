@@ -53,6 +53,7 @@ using namespace Net;
 #define DVBCSA_MSB_KEY_ADDR 12
 #define DVBCSA_KEY_CONTR_ADDR 16
 #define FboardClk 135.0
+#define FDAC_VALUE 2048
 
 void printCookies(const Net::Http::Request& req) {
     auto cookies = req.cookies();
@@ -89,7 +90,7 @@ public:
     std::string supercas_id,ecm_ip,client_id;
     char hexmap[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
                            '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-    int DVBC_OUTPUT_CS[8] = {10,11,12,13,14,15,16,17};
+    int DVBC_OUTPUT_CS[8] = {11,12,13,14,15,16,17,18};
     int UPSAMPLER_OUTPUT_CS[8] = {19,20,21,22,23,24,25,26};
     int DVBCSA_OUTPUT_CS[8] = {3,4,5,6,7,8,9,10};
     StatsEndpoint(Net::Address addr)
@@ -293,6 +294,7 @@ private:
         Routes::Post(router, "/setEthernetOutOff", Routes::bind(&StatsEndpoint::setEthernetOutOff, this));
         Routes::Post(router, "/setEthernetIn", Routes::bind(&StatsEndpoint::setEthernetIn, this));
         Routes::Post(router, "/setEthernetInOff", Routes::bind(&StatsEndpoint::setEthernetInOff, this));
+        Routes::Post(router, "/setSPTSEthernetInOff", Routes::bind(&StatsEndpoint::setSPTSEthernetInOff, this));
         Routes::Post(router, "/getEthernetIn", Routes::bind(&StatsEndpoint::getEthernetIn, this));
         Routes::Post(router, "/setSPTSEthernetIn", Routes::bind(&StatsEndpoint::setSPTSEthernetIn, this));
         Routes::Post(router, "/setPCRBypass", Routes::bind(&StatsEndpoint::setPCRBypass, this));
@@ -1211,30 +1213,38 @@ private:
     /*****************************************************************************/
     void  setMxlTunerOff(const Rest::Request& request, Net::Http::ResponseWriter response){
         unsigned char RxBuffer[20]={0};
-        
+        bool input_error;
         int uLen;
         Json::Value json;
         Json::FastWriter fastWriter; 
         MXL_STATUS_E mxlStatus;       
-        std::string para[] = {"demod_id"};
+        std::string para[] = {"demod_id","mxl_id"};
         addToLog("setMxlTunerOff",request.body());
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){  
             std::string demod_id = getParameter(request.body(),"demod_id");
-            if(verifyInteger(demod_id,1,1,7)){      
-                mxlStatus = setTuneOff(std::stoi(demod_id));
-                if(mxlStatus==MXL_SUCCESS){
-                    json["status"]=1;
-                    json["message"]="Mxl tuner off successfull!";
-                    json["error"]=false;
-                }
-                else{
-                    json["status"]=0;
-                    json["message"]="Mxl tuner off failed!";
-                    json["error"]=true;
-                }
+            std::string mxl_id = getParameter(request.body(),"mxl_id");
+            (verifyInteger(demod_id,1,1,INPUT_COUNT) != 1 && verifyInteger(mxl_id,1,1,6,1) != 1)? input_error = true,json["demod_id"] = "Required integer between 0-7",json["mxl_id"] = "Required integer between 1-6" : ((verifyInteger(demod_id,1,1,INPUT_COUNT) != 1 && verifyInteger(mxl_id,1,1,6,1) == 1)? json["demod_id"] = "Required integer between 0-7",input_error = true :((verifyInteger(demod_id,1,1,INPUT_COUNT) == 1 && verifyInteger(mxl_id,1,1,6,1) != 1)? json["mxl_id"] = "Required integer between 1-6",input_error = true : input_error = false));	
+            if(!input_error){
+            	int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((std::stoi(mxl_id)+6)&0xF)<<1) | (0&0x1);
+        		if(connectI2Clines(target)){
+	                mxlStatus = setTuneOff(std::stoi(demod_id));
+	                if(mxlStatus==MXL_SUCCESS){
+	                    json["status"]=1;
+	                    json["message"]="Mxl tuner off successfull!";
+	                    json["error"]=false;
+	                }
+	                else{
+	                    json["status"]=0;
+	                    json["message"]="Mxl tuner off failed!";
+	                    json["error"]=true;
+	                }
+	            }else{
+	            	json["error"]= true;
+            		json["message"]= "Connection error!";
+	            }
             }else{
-                json["message"] = "Required Integer!";
+                json["message"] = "Invalid Input!";
                 json["error"] = true;
             }
         }else{
@@ -1426,6 +1436,18 @@ private:
             json["error"]= true;
             json["message"]= "Invalid remux id!";
         }
+
+         auto cookies = request.cookies();
+    // std::cout << "Cookies: [" << std::endl;
+    const std::string indent(4, ' ');
+    for (const auto& c: cookies) {
+        std::cout << indent << c.name << " = " << c.value << std::endl;
+    }
+    // std::cout << "]" << std::endl;
+    std::cout << request.body();
+
+        json["request"]=request.body();
+        json["response"]=response.body();
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
@@ -1614,6 +1636,8 @@ private:
             json["error"]= true;
             json["message"]= "Invalid remux id!";
         }
+        json["request"]=request.body();
+        json["response"]=response.body();
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
@@ -3415,7 +3439,7 @@ private:
             string stx=getDecToHex((int)RxBuffer[0]);
             string cmd = getDecToHex((int)RxBuffer[3]);
 
-            if (!uLen || std::stoi(stx) != STX || std::stoi(cmd) != 32) {
+            if (!uLen || std::stoi(stx) != STX || cmd != "32") {
                 json["error"]= true;
                 json["message"]= "STATUS COMMAND ERROR!";
                 addToLog("getProgramList","Error");
@@ -5421,6 +5445,18 @@ private:
             json["message"]= res;
         }
 
+            auto cookies = request.cookies();
+    std::cout << "Cookies: [" << std::endl;
+    const std::string indent(4, ' ');
+    for (const auto& c: cookies) {
+        std::cout << indent << c.name << " = " << c.value << std::endl;
+    }
+    std::cout << "]" << std::endl;
+    // std::cout << req.body();
+
+        json["response"]=response.body();
+        json["request"]=request.body();
+
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
@@ -5817,7 +5853,7 @@ private:
         Json::Reader reader;
         Json::FastWriter fastWriter;
 
-        std::string para[] = {"programNumber","channelNumber","input","rmx_no"};
+        std::string para[] = {"programNumber","channelNumber","input","rmx_no","output"};
         int error[ sizeof(para) / sizeof(para[0])];
         int error_range[ sizeof(para) / sizeof(para[0])];
         bool all_para_valid=true;
@@ -5828,11 +5864,13 @@ private:
             std::string programNumber = getParameter(request.body(),"programNumber"); 
             std::string channelNumber = getParameter(request.body(),"channelNumber"); 
             std::string input = getParameter(request.body(),"input"); 
+            std::string output = getParameter(request.body(),"output"); 
 
             error[0] = verifyInteger(programNumber);
             error[1] = verifyInteger(channelNumber);
             error[2] = verifyInteger(input,1,1,INPUT_COUNT);
             error[3] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[4] = verifyInteger(output,1,1,INPUT_COUNT);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
                if(error[i]!=0){
@@ -5843,7 +5881,7 @@ private:
                 json[para[i]]= (i == 2)? ("Require Integer between 0 - "+std::to_string(INPUT_COUNT)+"!").c_str() :((i==3)? "Require Integer between 1 to 6!" : "Require Integer between 1 to 65535!");
             }
             if(all_para_valid){
-                json = callSetLcn(programNumber,channelNumber,input,std::stoi(rmx_no));
+                json = callSetLcn(programNumber,channelNumber,input,std::stoi(rmx_no),output);
             }else{
                 json["error"]= true;
             }    
@@ -5855,13 +5893,13 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
-    Json::Value callSetLcn(std::string programNumber,std::string channelNumber,std::string input,int rmx_no){
+    Json::Value callSetLcn(std::string programNumber,std::string channelNumber,std::string input,int rmx_no,std::string output){
         unsigned char RxBuffer[6]={0};
         Json::Value json,paraJson;
         Json::Value root,root2; 
-        Json::Value iojson = callSetInputOutput(input,"0",rmx_no);
+        Json::Value iojson = callSetInputOutput(input,output,rmx_no);
         if(iojson["error"]==false){
-            Json::Value existing_lcn = db->getLcnNumbers(input,programNumber);
+            Json::Value existing_lcn = db->getLcnNumbers(output,programNumber);
             std::cout<<input<<"----------->>"<<programNumber;
             if(existing_lcn["error"]==false){
                 for (int i = 0; i < existing_lcn["list"].size(); ++i)
@@ -6116,6 +6154,8 @@ private:
                 Json::Value iojson=callSetInputOutput("0",output,std::stoi(rmx_no));
                 if(iojson["error"]==false){
                     json=callSetNITmode(mode,output,std::stoi(rmx_no));
+                    if(json["error"] == false)
+                    	db->addNitMode(mode,output,std::stoi(rmx_no)); 
                 }else{
                     json["error"]= true;
                     json["message"]= "Error while selecting output!";     
@@ -6150,7 +6190,7 @@ private:
                 json["status"] = RxBuffer[4];
                 json["error"]= false;
                 json["message"]= "set Nit Mode!!";    
-                db->addNitMode(mode,output,rmx_no);      
+                     
                 addToLog("setNitMode","Success");
             }
         }
@@ -7535,12 +7575,18 @@ private:
                 	Json::Value auth_outputs,emm_pids;
                 	// JSON_CA_System_id.append(std::stoi(CA_System_id));JSON_emm_pids.append(std::stoi(emm_pid));
                 	db->enableEMM(channel_id,rmx_no,output,std::stoi(addFlag));
-                	Json::Value JSON_emmgs = db->getEMMGChannels(rmx_no,output);
+                	Json::Value JSON_emmgs = db->getEMMGChannels(rmx_no,output,"-1");
+                    std::cout<<"-------------------------------------------------------------------------------";
                     if (JSON_emmgs["error"] == false)
                     {
                     	for (int i = 0; i < JSON_emmgs["ca_system_ids"].size(); ++i)
                     	{
-                    		JSON_CA_System_id.append(std::to_string(getHexToLongDec(JSON_emmgs["ca_system_ids"][i].asString())));
+
+                            std::string system_id = JSON_emmgs["ca_system_ids"][i].asString();
+
+                            system_id = system_id.substr(2,system_id.length()-6);
+                            std::cout<<system_id;
+                    		JSON_CA_System_id.append(std::to_string(getHexToLongDec(system_id)));
                     		auth_outputs.append("255");
                     		emm_pids.append(JSON_emmgs["emm_pids"][i].asString());
                     		/* code */
@@ -7559,6 +7605,7 @@ private:
 		        		json["error"]= false;
                 		json["message"]= "Successfully resetted!";    	
 		            }
+
                 }else{
                     json["error"]= true;
                 }
@@ -7587,6 +7634,7 @@ private:
     	// private_data_list.append(2);
     	// private_data_lists.append(private_data_list);
     	jsonMsg["private_data_list"] = private_data_lists;
+        // std::cout<<JSON_CA_System_id;
     	int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
         if(write32bCPU(0,0,target) != -1) { 
          Json::Value iojson = callSetInputOutput("0",output,rmx_no);
@@ -7618,6 +7666,38 @@ private:
         }
 
     	return json;
+    }
+
+    void updateCATCADescriptor(std::string channel_id){
+        for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
+        {
+            for (int output = 0; output <OUTPUT_COUNT; ++output)
+            {
+                Json::Value JSON_emmgs,JSON_CA_System_id,emm_pids,private_data_list,auth_outputs,json;
+                JSON_emmgs = db->getEMMGChannels(std::to_string(rmx_no),std::to_string(output),channel_id);
+                if (JSON_emmgs["error"] == false)
+                    {
+                        for (int i = 0; i < JSON_emmgs["ca_system_ids"].size(); ++i)
+                        {
+                            std::string CA_System_id = JSON_emmgs["ca_system_ids"][i].asString();
+                            std::string System_id = CA_System_id.substr(2,CA_System_id.length()-6);
+                            JSON_CA_System_id.append(std::to_string(getHexToLongDec(System_id)));
+                            auth_outputs.append("255");
+                            emm_pids.append(JSON_emmgs["emm_pids"][i].asString());
+                            // std::cout<<std::to_string(getHexToLongDec(System_id))<<std::endl;
+                        }
+                         std::cout<<JSON_CA_System_id<<std::endl;
+                        json = callsetCATCADescriptor(JSON_CA_System_id,JSON_emmgs["emm_pids"],private_data_list,rmx_no,std::to_string(output));
+                        Json::Value customPid = callsetCustomPids(emm_pids,auth_outputs,rmx_no,std::to_string(output));
+                        if(customPid["error"] == false){
+                            std::cout<< "----------------Successfully enabled EMM PID! -----------------------"<<std::endl;
+                        }
+                        else{
+                            std::cout<<"----------------Failed enabled EMM PID! -----------------------"<<std::endl;
+                        }
+                    }
+            }
+        }
     }
     /*****************************************************************************/
     /*  Commande 0x40   function setKeepProg                       
@@ -8521,6 +8601,11 @@ private:
                     if(json["error"] == false){
                         db->addIPInputChannels(rmx_no,std::stoi(channel_no),std::to_string(ip_addr),std::stoi(port),std::stoi(str_type));
                     }
+                    long int mux_out =  0; 
+                    if(write32bI2C(5,0,mux_out) == -1){
+                        json["error"]= true;
+                        json["message"]= "Failed MUX OUT!";
+                    }
                     json["tuner_ch"] = tuner_ch;
                     json["target"] = target;
                     json["control_fpga"] = control_fpga;
@@ -8664,9 +8749,9 @@ private:
                         json["message"]= "Failed MUX OUT!";
                     }
                     // json["mux_out"] =std::to_string(mux_out);
-                    // if(json["error"] == false){
-                    //     db->addIPInputChannels(rmx_no,std::stoi(channel_no),std::to_string(ip_addr),std::stoi(port),std::stoi(str_type));
-                    // }
+                    if(json["error"] == false){
+                        db->addSPTSIPInputChannels(str_rmx_no,channel_no,std::to_string(ip_addr),port,str_type);
+                    }
                     // json["tuner_ch"] = tuner_ch;
                     // json["target"] = target;
                     // json["control_fpga"] = control_fpga;
@@ -8799,7 +8884,7 @@ private:
                 
             std::string channel_no= getParameter(request.body(),"channel_no");
             std::string str_rmx_no = getParameter(request.body(),"rmx_no");
-            error[0] = verifyInteger(channel_no,0,0,8,1);
+            error[0] = verifyInteger(channel_no,0,0,31,1);
             error[1] = verifyInteger(str_rmx_no,1,1,RMX_COUNT,1);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
@@ -8894,28 +8979,141 @@ private:
                     json["message"]= "successfully assigned IP OUT!";
                     int controller_of_rmx = (rmx_no % 2 == 0)?1:0;
                     int ch_no = ((controller_of_rmx)*8)+std::stoi(channel_no);
-                    if(write32bI2C(6, 4,ch_no) == -1){
-                        json["error"]= true;
-                        json["message"]= "Fail to set channel_no!";
+                    json = callSetEthernetInOff(ch_no);
+                    // if(write32bI2C(6, 4,ch_no) == -1){
+                    //     json["error"]= true;
+                    //     json["message"]= "Fail to set channel_no!";
+                    // }
+                    // if(write32bI2C(6,8,0) == -1){
+                    //     json["error"]= true;
+                    //     json["message"]= "Fail to set IP address!";
+                    // }
+                    // if(write32bI2C(6,16, 1) == -1){
+                    //     json["error"]= true;
+                    //     json["message"]= "Ethernet out failed!";
+                    // }
+                    // // IGMP Channel Number
+                    // if(write32bI2C(2,32,ch_no) == -1){
+                    //     json["error"]= true;
+                    //     json["message"]= "Failed IGMP Channel Number!";
+                    // }
+                    // // IGMP multicast ip
+                    // if(write32bI2C(2,28,0) == -1){
+                    //     json["error"]= true;
+                    //     json["message"]= "Failed IGMP multicast ip!";
+                    // }
+                    
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Error while connection!";     
+                }
+                if(json["error"] == false){
+                    db->removeIPInputChannels(rmx_no,std::stoi(channel_no));
+                }
+            }
+        }else{
+            json["error"]= true;
+            json["message"]= res;
+        }
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
+    }
+    Json::Value callSetEthernetInOff(int ch_no){
+        Json::Value json;
+        json["error"] = false;
+        json["message"] = "IP input disabled!";
+        if(write32bI2C(6, 4,ch_no) == -1){
+            json["error"]= true;
+            json["message"]= "Fail to set channel_no!";
+        }
+        if(write32bI2C(6,8,0) == -1){
+            json["error"]= true;
+            json["message"]= "Fail to set IP address!";
+        }
+        if(write32bI2C(6,16, 1) == -1){
+            json["error"]= true;
+            json["message"]= "Ethernet out failed!";
+        }
+        // IGMP Channel Number
+        if(write32bI2C(2,32,ch_no) == -1){
+            json["error"]= true;
+            json["message"]= "Failed IGMP Channel Number!";
+        }
+        // IGMP multicast ip
+        if(write32bI2C(2,28,0) == -1){
+            json["error"]= true;
+            json["message"]= "Failed IGMP multicast ip!";
+        }
+        return json;
+    }
+
+    /*****************************************************************************/
+    /*  UDP Ip Stack Command    function setSPTSEthernetInOff                      */
+    /*****************************************************************************/
+    void  setSPTSEthernetInOff(const Rest::Request& request, Net::Http::ResponseWriter response){
+        unsigned char RxBuffer[20]={0};
+        
+        int uLen;
+        Json::Value json,jsonMsg;
+        Json::FastWriter fastWriter;        
+        std::string para[] = {"channel_no","rmx_no"};  
+        int error[ sizeof(para) / sizeof(para[0])];
+        bool all_para_valid=true;      
+        addToLog("setSPTSEthernetInOff",request.body());
+        std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
+        if(res=="0"){        
+                
+            std::string channel_no= getParameter(request.body(),"channel_no");
+            std::string str_rmx_no = getParameter(request.body(),"rmx_no");
+            error[0] = verifyInteger(channel_no,0,0,31,17);
+            error[1] = verifyInteger(str_rmx_no,1,1,3,1);
+            for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
+            {
+               if(error[i]!=0){
+                    continue;
+                }
+                all_para_valid=false;
+                json["error"]= true;
+                json[para[i]]= (i == 0)? "Require Integer between 17 to 31!" :"Required Integer between 1 to 3";
+            }
+            if(all_para_valid){
+                int rmx_no = std::stoi(str_rmx_no);
+               
+                int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((rmx_no-1)&0xF)<<1) | (0&0x1);
+                if(write32bCPU(0,0,target) != -1){
+                   
+                    //Multicast IP
+                    json["error"]= false;
+                    json["message"]= "successfully assigned IP OUT!";
+                    // int controller_of_rmx = (rmx_no % 2 == 0)?1:0;
+                    int ch_no =std::stoi(channel_no);
+                    json = callSetEthernetInOff(ch_no);
+                    json["ch_no"] = ch_no;
+                    if(json["error"] == false){
+                        db->removeSPTSIPInputChannels(str_rmx_no,channel_no);
                     }
-                    if(write32bI2C(6,8,0) == -1){
-                        json["error"]= true;
-                        json["message"]= "Fail to set IP address!";
-                    }
-                    if(write32bI2C(6,16, 1) == -1){
-                        json["error"]= true;
-                        json["message"]= "Ethernet out failed!";
-                    }
-                    // IGMP Channel Number
-                    if(write32bI2C(2,32,ch_no) == -1){
-                        json["error"]= true;
-                        json["message"]= "Failed IGMP Channel Number!";
-                    }
-                    // IGMP multicast ip
-                    if(write32bI2C(2,28,0) == -1){
-                        json["error"]= true;
-                        json["message"]= "Failed IGMP multicast ip!";
-                    }
+                    // if(write32bI2C(6, 4,ch_no) == -1){
+                    //     json["error"]= true;
+                    //     json["message"]= "Fail to set channel_no!";
+                    // }
+                    // if(write32bI2C(6,8,0) == -1){
+                    //     json["error"]= true;
+                    //     json["message"]= "Fail to set IP address!";
+                    // }
+                    // if(write32bI2C(6,16, 1) == -1){
+                    //     json["error"]= true;
+                    //     json["message"]= "Ethernet out failed!";
+                    // }
+                    // // IGMP Channel Number
+                    // if(write32bI2C(2,32,ch_no) == -1){
+                    //     json["error"]= true;
+                    //     json["message"]= "Failed IGMP Channel Number!";
+                    // }
+                    // // IGMP multicast ip
+                    // if(write32bI2C(2,28,0) == -1){
+                    //     json["error"]= true;
+                    //     json["message"]= "Failed IGMP multicast ip!";
+                    // }
                     
                 }else{
                     json["error"]= true;
@@ -9780,9 +9978,9 @@ private:
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
             std::string rmx_no =getParameter(request.body(),"rmx_no") ;
-            std::string data = getParameter(request.body(),"qam_no"); 
+            std::string qam_no = getParameter(request.body(),"qam_no"); 
             std::string output = getParameter(request.body(),"output"); 
-            error[0] = verifyInteger(data);
+            error[0] = verifyInteger(qam_no);
             error[1] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
             error[2] = verifyInteger(output,1,1,OUTPUT_COUNT);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
@@ -9797,8 +9995,11 @@ private:
             if(all_para_valid){
                 int target =((0&0x3)<<8) | (((std::stoi(rmx_no)-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1) {
-                    int value = ((std::stoi(data)&0xF)<<1) | (0&0x0);
+                    int value = ((std::stoi(qam_no)&0xF)<<1) | (0&0x0);
                     json = callSetCore(std::to_string(DVBC_OUTPUT_CS[std::stoi(output)]),std::to_string(QAM_ADDR),std::to_string(value),std::stoi(rmx_no));
+                    if(json["error"] == false){
+                    	db->addQAM(rmx_no,output,qam_no);
+                    }
                 }else{
                     json["error"]= true;
                     json["message"]= "Connection error!";
@@ -10594,7 +10795,7 @@ private:
             int frequency = std::stoi(center_frequency);
             int rmx_no = std::stoi(str_rmx_no) -1;
             int reg_addr = rmx_no * 4;//(4 is no of outputs)
-            long long int reg_value = round(4294967296 * frequency/2100);
+            long long int reg_value = round(4294967296 * frequency/FDAC_VALUE);
             json["frequency"]= reg_value;
             if(write32bI2C(8,reg_addr,reg_value) != -1){
                 json["error"]= false;
@@ -10633,7 +10834,7 @@ private:
                 while(center_frequency == 197){
                     usleep(1000);
                     value = read32bI2C(8,reg_addr);
-                    center_frequency = round((value*2048)/4294967296);  
+                    center_frequency = round((value*FDAC_VALUE)/4294967296);  
                 }
                 json["center_frequency"] =center_frequency;
                 json["value"] = value;
@@ -11403,13 +11604,13 @@ private:
     /*  Command    function addEmmgSetup                          */
     /*****************************************************************************/
     void addEmmgSetup(const Rest::Request& request, Net::Http::ResponseWriter response){
-        int data_id,port,bw,channel_id,stream_id;
-        std::string client_id,str_data_id,str_port,str_bw,str_channel_id,str_stream_id;
+        int data_id,port,bw,channel_id,stream_id,emm_pid;
+        std::string client_id,str_data_id,str_port,str_bw,str_channel_id,str_stream_id,str_emm_pid;
         Json::Value json;
         Json::Value jsonMsg;
         Json::FastWriter fastWriter;
 
-        std::string para[] = {"channel_id","client_id","data_id","bw","port","stream_id"};
+        std::string para[] = {"channel_id","client_id","data_id","bw","port","stream_id","emm_pid"};
         int error[ sizeof(para) / sizeof(para[0])];
         bool all_para_valid=true;
         addToLog("addEmmgSetup",request.body());
@@ -11421,12 +11622,14 @@ private:
             str_bw = getParameter(request.body(),"bw");
             str_port =getParameter(request.body(),"port");
             str_stream_id = getParameter(request.body(),"stream_id");
+            str_emm_pid = getParameter(request.body(),"emm_pid");
             error[0] = verifyInteger(str_channel_id);
             error[1] = 1;
             error[2] = verifyInteger(str_data_id);
             error[3] = verifyInteger(str_bw);
             error[4] = verifyInteger(str_port);
             error[5] = verifyInteger(str_stream_id);
+            error[6] = verifyInteger(str_emm_pid);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
                if(error[i]!=0){
@@ -11442,9 +11645,11 @@ private:
                 bw = std::stoi(str_bw);
                 port = std::stoi(str_port);
                 stream_id = std::stoi(str_stream_id);
-               if(db->addEMMchannelSetup(channel_id,client_id,data_id,bw,port,stream_id)){
+                emm_pid = std::stoi(str_emm_pid);
+               if(db->addEMMchannelSetup(channel_id,client_id,data_id,bw,port,stream_id,emm_pid)){
                 std::string currtime=getCurrentTime();
-                    emmgSetup(channel_id,stream_id,data_id,client_id,bw,port,currtime);
+                    emmgSetup(channel_id,stream_id,data_id,client_id,bw,port,currtime,emm_pid);
+                    updateCATCADescriptor(str_channel_id);
                     json["error"]= false;
                     json["message"]= "EMM added!";
                     addToLog("addEmmgSetup","Success");
@@ -11461,42 +11666,46 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
-     void emmgSetup(int channel_id,int stream_id, int data_id,std::string client_id,int bw,int port,std::string currtime,int isAdd=1){
-        reply = (redisReply *)redisCommand(context,"SELECT 3");
-        std::string query ="HMSET emm_channel_list:"+std::to_string(channel_id)+" channel_id "+std::to_string(channel_id)+" client_id "+client_id+" data_id "+std::to_string(data_id)+" port "+std::to_string(port)+" bw "+std::to_string(bw)+" stream_id "+std::to_string(stream_id)+" is_deleted 0";
+     void emmgSetup(int channel_id,int stream_id, int data_id,std::string client_id,int bw,int port,std::string currtime,int emm_pid){
+        reply = (redisReply *)redisCommand(context,"SELECT 6");
+        std::string query ="HMSET UI_Input channel_id "+std::to_string(channel_id)+" client_id "+client_id+" data_id "+std::to_string(data_id)+" port "+std::to_string(port)+" bandwidth "+std::to_string(bw)+" stream_id "+std::to_string(stream_id)+" PID "+std::to_string(emm_pid)+" is_deleted 0";
         reply = (redisReply *)redisCommand(context,query.c_str());
         // reply = (redisReply *)redisCommand(context,("GET emm_channel_counter:ch_"+std::to_string(channel_id)).c_str());
-        if(isAdd == 1){
-            this->channel_ids = channel_id;
-            this->client_id = client_id;
-            this->emm_port = port;
-            this->data_id = data_id;
-            this->emm_bw = emm_bw;
-            this->stream_id = stream_id;
-            int err = pthread_create(&thid, 0,&StatsEndpoint::spawnEMMChannel, this);
-            if (err != 0){
-                printf("\ncan't create thread :[%s]", strerror(err));
-            }else{  
-                printf("\n Thread created successfully\n");
-                reply = (redisReply *)redisCommand(context,("SET emm_channel_counter:ch_"+std::to_string(channel_id)+" 1").c_str());
-            }  
-        }else{
-            printf("\n Thread already exists\n");
-            reply = (redisReply *)redisCommand(context,("INCR emm_channel_counter:ch_"+std::to_string(channel_id)).c_str());
-        }
+        // if(isAdd == 1){
+        //     this->channel_ids = channel_id;
+        //     this->client_id = client_id;
+        //     this->emm_port = port;
+        //     this->data_id = data_id;
+        //     this->emm_bw = emm_bw;
+        //     this->stream_id = stream_id;
+        //     int err = pthread_create(&thid, 0,&StatsEndpoint::spawnEMMChannel, this);
+        //     if (err != 0){
+        //         printf("\ncan't create thread :[%s]", strerror(err));
+        //     }else{  
+        //         printf("\n Thread created successfully\n");
+        //         reply = (redisReply *)redisCommand(context,("SET emm_channel_counter:ch_"+std::to_string(channel_id)+" 1").c_str());
+        //     }  
+        // }else{
+        //     printf("\n Thread already exists\n");
+        //     reply = (redisReply *)redisCommand(context,("INCR emm_channel_counter:ch_"+std::to_string(channel_id)).c_str());
+        // }
         freeReplyObject(reply);
     }
     /*****************************************************************************/
     /*  Command    function updateEmmgSetup                          */
     /*****************************************************************************/
     void updateEmmgSetup(const Rest::Request& request, Net::Http::ResponseWriter response){
-        int data_id,port,bw,channel_id,stream_id;
-        std::string client_id,str_data_id,str_port,str_bw,str_channel_id,str_stream_id;
+        int data_id,port,bw,channel_id,stream_id,emm_pid;
+        std::string client_id,str_data_id,str_port,str_bw,str_channel_id,str_stream_id,str_emm_pid;
         Json::Value json;
         Json::Value jsonMsg;
         Json::FastWriter fastWriter;
 
-        std::string para[] = {"channel_id","client_id","data_id","bw","port","stream_id"};
+
+
+
+
+        std::string para[] = {"channel_id","client_id","data_id","bw","port","stream_id","emm_pid"};
         int error[ sizeof(para) / sizeof(para[0])];
         bool all_para_valid=true;
         addToLog("updateEmmgSetup",request.body());
@@ -11508,12 +11717,14 @@ private:
             str_bw = getParameter(request.body(),"bw");
             str_port =getParameter(request.body(),"port");
             str_stream_id = getParameter(request.body(),"stream_id");
+            str_emm_pid = getParameter(request.body(),"emm_pid");
             error[0] = verifyInteger(str_channel_id);
             error[1] = 1;
             error[2] = verifyInteger(str_data_id);
             error[3] = verifyInteger(str_bw);
             error[4] = verifyInteger(str_port);
             error[5] = verifyInteger(str_stream_id);
+            error[6] = verifyInteger(str_emm_pid);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
                if(error[i]!=0){
@@ -11529,9 +11740,10 @@ private:
                 bw = std::stoi(str_bw);
                 port = std::stoi(str_port);
                 stream_id = std::stoi(str_stream_id);
-                if(db->updateEMMchannelSetup(channel_id,client_id,data_id,bw,port,stream_id)){
+                emm_pid = std::stoi(str_emm_pid);
+                if(db->updateEMMchannelSetup(channel_id,client_id,data_id,bw,port,stream_id,str_emm_pid)){
                     std::string currtime=getCurrentTime();
-                    emmgSetup(channel_id,stream_id,data_id,client_id,bw,port,currtime,0);
+                    emmgSetup(channel_id,stream_id,data_id,client_id,bw,port,currtime,emm_pid);
                     json["error"]= false;
                     json["message"]= "EMM updated!";
                     addToLog("updateEmmgSetup","Success");
@@ -11568,6 +11780,7 @@ private:
             if(verifyInteger(str_channel_id)){
                 channel_id = std::stoi(str_channel_id);
                 if(db->isEMMExists(channel_id) && deleteEMMChannel(channel_id)){
+                    updateCATCADescriptor(str_channel_id);
                     json["error"]= false;
                     json["message"]= "EMM deleted!";
                     addToLog("deleteEMMSetup","Success");
@@ -11589,17 +11802,17 @@ private:
     }
     int deleteEMMChannel(int channel_id){
         int is_deleted = 0;
-        reply = (redisReply *)redisCommand(context,"SELECT 3");
-        reply = (redisReply *)redisCommand(context,("HGETALL emm_channel_list:"+std::to_string(channel_id)).c_str());
-        if(reply->elements>0){
-            std::string query ="HMSET emm_channel_list:"+std::to_string(channel_id)+" is_deleted 1";
+        reply = (redisReply *)redisCommand(context,"SELECT 6");
+        // reply = (redisReply *)redisCommand(context,("HGETALL UI_Input").c_str());
+        // if(reply->elements>0){
+            std::string query ="HMSET UI_Input is_deleted 1";
             reply = (redisReply *)redisCommand(context,query.c_str());
             if(db->deleteEMM(channel_id)){
                 is_deleted= 1;
                 std::cout<<"EMM DELETED"<<std::endl;
-                reply = (redisReply *)redisCommand(context,("INCR emm_channel_counter:ch_"+std::to_string(channel_id)).c_str());
-                reply = (redisReply *)redisCommand(context,("SET deleted_emm:ch_"+std::to_string(channel_id)+" 1").c_str());
-            }
+                // reply = (redisReply *)redisCommand(context,("INCR emm_channel_counter:ch_"+std::to_string(channel_id)).c_str());
+                // reply = (redisReply *)redisCommand(context,("SET deleted_emm:ch_"+std::to_string(channel_id)+" 1").c_str());
+            // }
         }
         freeReplyObject(reply);
         return is_deleted;
@@ -11851,25 +12064,25 @@ private:
     }
     void runBootupscript(){
         Json::Value json,NewService_names,NewService_ids,network_details,lcn_json,high_prior_ser,pmt_alarm_json,active_progs,locked_progs,freeca_progs,input_mode_json,fifo_flags,table_ver_json,table_timeout_json,dvb_output_json,psisi_interval,serv_provider_json,nit_mode;
-        printf("\n\n Downloding Mxl 1 \n");
-        downloadMxlFW(1,0);
-        usleep(100);
-        printf("\n\n Downloding Mxl 2 \n");
-        downloadMxlFW(2,0);
-        usleep(100);
-        printf("\n\n Downloding Mxl 3 \n");
-        downloadMxlFW(3,0);
-        usleep(100);
-        printf("\n\n Downloding Mxl 4 \n");
-        downloadMxlFW(4,0);
-        usleep(100);
-        printf("\n\n Downloding Mxl 5 \n");
-        downloadMxlFW(5,0);
-        usleep(100);
-        printf("\n\n Downloding Mxl 6 \n");
-        downloadMxlFW(6,0);
-        printf("\n\n MXL Downlod Completed! \n\n");
-        usleep(100);
+        // printf("\n\n Downloding Mxl 1 \n");
+        // downloadMxlFW(1,0);
+        // usleep(100);
+        // printf("\n\n Downloding Mxl 2 \n");
+        // downloadMxlFW(2,0);
+        // usleep(100);
+        // printf("\n\n Downloding Mxl 3 \n");
+        // downloadMxlFW(3,0);
+        // usleep(100);
+        // printf("\n\n Downloding Mxl 4 \n");
+        // downloadMxlFW(4,0);
+        // usleep(100);
+        // printf("\n\n Downloding Mxl 5 \n");
+        // downloadMxlFW(5,0);
+        // usleep(100);
+        // printf("\n\n Downloding Mxl 6 \n");
+        // downloadMxlFW(6,0);
+        // printf("\n\n MXL Downlod Completed! \n\n");
+        // usleep(100);
         Json::Value jsonAllegro = db->getConfAllegro();
         if(jsonAllegro["error"] == false){
             for(int i=0;i<jsonAllegro["list"].size();i++ ){
@@ -11934,7 +12147,35 @@ private:
             }
             usleep(1000);
         }
+        
+        for (int mux_id = 1; mux_id <= 3; ++mux_id)
+        {   
+            Json::Value jsonIPTuner = db->getSPTSIPTuners(mux_id);
+            int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((mux_id-1)&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1){
+                if(jsonIPTuner["error"] == false){
+                    for(int i=0;i<jsonIPTuner["list"].size();i++ ){
+                         Json::Value json = callSetEthernetIn(std::stoi(jsonIPTuner["list"][i]["channel_no"].asString()),std::stoul(jsonIPTuner["list"][i]["ip_address"].asString()),std::stoi(jsonIPTuner["list"][i]["port"].asString()),std::stoi(jsonIPTuner["list"][i]["type"].asString()));
+                        std::cout<<"-------------------SPTS IP IN!--------------------------------------"<<jsonIPTuner["list"][i]["ip_address"].asString()<<std::endl;
+                    }
+                }
+            }
+            usleep(1000);
+        }
 
+        Json::Value jsonSPTSControl = db->getSPTSControl();
+        if(jsonSPTSControl["error"] == false){
+            for(int i=0;i<jsonSPTSControl["list"].size();i++ ){
+                int mux_id = std::stoi(jsonSPTSControl["list"][i].asString());
+                int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((mux_id-1)&0xF)<<1) | (0&0x1);
+                if(write32bCPU(0,0,target) != -1){
+                    if(write32bI2C(5,0,65536) == -1){
+                        std::cout<<"-------------------Failed MUX OUT!"<<std::endl;
+                    }
+                    std::cout<<"-------------------SPTS IP(getSPTSControl)!--------------------------------------"<<jsonSPTSControl["list"][0].asString()<<std::endl;
+                }
+            }
+        }
         usleep(1000);
         Json::Value jsonIPOUT = db->getIPOutputChannels();
         if(jsonIPOUT["error"] == false){
@@ -12062,7 +12303,7 @@ private:
         if(lcn_json["error"]==false){
             for (int i = 0; i < lcn_json["list"].size(); ++i)
             {
-                Json::Value json = callSetLcn(lcn_json["list"][i]["program_number"].asString(),lcn_json["list"][i]["channel_number"].asString(),lcn_json["list"][i]["input_channel"].asString(),std::stoi(lcn_json["list"][i]["rmx_no"].asString()));
+                Json::Value json = callSetLcn(lcn_json["list"][i]["program_number"].asString(),lcn_json["list"][i]["channel_number"].asString(),"0",std::stoi(lcn_json["list"][i]["rmx_no"].asString()),lcn_json["list"][i]["input_channel"].asString());
                 if(json["error"]==false){
                     std::cout<<"------------------LCN Numbers has been restored--------------------- "<<std::endl;
                 }
@@ -12177,11 +12418,20 @@ private:
         if(nit_mode["error"]==false){
             for (int i = 0; i < nit_mode["list"].size(); ++i)
             {
-                Json::Value json = callSetNITmode(nit_mode["list"][i]["mode"].asString(),nit_mode["list"][i]["output"].asString(),std::stoi(nit_mode["list"][i]["rmx_no"].asString()));
-                //std::cout<<"-------------------------"<<json["message"]<<std::endl;
-                if(json["error"]==false){
-                    std::cout<<"------------------NIT mode has been restored for output--------------------- "<<nit_mode["list"][i]["output"]<<std::endl;
+            	 Json::Value iojson=callSetInputOutput("0",nit_mode["list"][i]["output"].asString(),std::stoi(nit_mode["list"][i]["rmx_no"].asString()));
+                if(iojson["error"]==false){
+                	if(std::stoi(nit_mode["list"][i]["mode"].asString()) != 1){
+						Json::Value json = callSetNITmode(nit_mode["list"][i]["mode"].asString(),nit_mode["list"][i]["output"].asString(),std::stoi(nit_mode["list"][i]["rmx_no"].asString()));
+		                //std::cout<<"-------------------------"<<json["message"]<<std::endl;
+			            if(json["error"]==false){
+		                    std::cout<<"------------------NIT mode has been restored for output--------------------- "<<nit_mode["list"][i]["output"]<<std::endl;
+		                }
+		            }
+				}else{
+                    json["error"]= true;
+                    json["message"]= "Error while selecting output!";     
                 }
+                
             }
         }
         table_timeout_json = db->getNITtableTimeout();
@@ -12231,33 +12481,36 @@ private:
                 }
             }
         }
+        updateCATCADescriptor("-1");
+        
 
         for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
         {
-        	for (int output = 0; output <OUTPUT_COUNT; ++output)
-        	{
-        		Json::Value JSON_emmgs,JSON_CA_System_id,emm_pids,private_data_list,auth_outputs;
-        		JSON_emmgs = db->getEMMGChannels(std::to_string(rmx_no),std::to_string(output));
-        		if (JSON_emmgs["error"] == false)
-                    {
-                    	for (int i = 0; i < JSON_emmgs["ca_system_ids"].size(); ++i)
-                    	{
-                    		JSON_CA_System_id.append(std::to_string(getHexToLongDec(JSON_emmgs["ca_system_ids"][i].asString())));
-                    		auth_outputs.append("255");
-                    		emm_pids.append(JSON_emmgs["emm_pids"][i].asString());
-                    		/* code */
-                    	}
-                    	json = callsetCATCADescriptor(JSON_CA_System_id,JSON_emmgs["emm_pids"],private_data_list,rmx_no,std::to_string(output));
-                    	Json::Value customPid = callsetCustomPids(emm_pids,auth_outputs,rmx_no,std::to_string(output));
-		               	if(customPid["error"] == false){
-		               		std::cout<< "----------------Successfully enabled EMM PID! -----------------------"<<std::endl;
-		               	}
-		               	else{
-		               		std::cout<<"----------------Failed enabled EMM PID! -----------------------"<<std::endl;
-		               	}
-		            }
-        	}
+        	Json::Value json_qam_ids = db->getQAM(rmx_no);
+        	std::cout<<json_qam_ids["error"].asString()<<std::endl;
+	        if(json_qam_ids["error"] == false){
+	    		int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+                if(write32bCPU(0,0,target) != -1) {
+                	for (int i = 0; i < json_qam_ids["list"].size(); ++i)
+                	{
+                		int qam_id =std::stoi(json_qam_ids["list"][i]["qam_id"].asString());
+                		if(qam_id != 2){
+		                	int output_channel = std::stoi(json_qam_ids["list"][i]["output_channel"].asString());
+		                    int value = ((qam_id&0xF)<<1) | (0&0x0);
+		                    json = callSetCore(std::to_string(DVBC_OUTPUT_CS[output_channel]),std::to_string(QAM_ADDR),std::to_string(value),rmx_no);
+		                    if(json["error"] == false)
+		                		std::cout<<"----------------QAM ADDED! -----------------------"<<std::endl;    	
+		                }
+
+                	}
+                	
+                }else{
+                    std::cout<<"----------------Error while connection! -----------------------"<<std::endl;
+                }    	
+	        }
         }
+       
+        
         std::cout<<"----------------END OF EMMG INITIALIZATION! -----------------------"<<std::endl;
 
         std::cout<<"-------------------------Provider names END-------------------------------"<<std::endl;

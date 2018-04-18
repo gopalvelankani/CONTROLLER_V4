@@ -27,8 +27,13 @@
 		struct timeval tv;
 		tv.tv_sec = 0;  /* 0.3 Secs Timeout */
 		tv.tv_usec = 500000;
+		int reuse_sockt=1;
 		SOCKET_TYPE socketHandle = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP/* or 0? */);
 		setsockopt(socketHandle, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
+		if(setsockopt(socketHandle, SOL_SOCKET, SO_REUSEADDR, &reuse_sockt,sizeof(reuse_sockt)) == -1){
+			std::cerr << "Set socket option failed\n";
+	        return 0;	
+		}
 	    if (SOCKET_INVALID(socketHandle))
 	    {
 	        std::cerr << "could not make socket\n";
@@ -43,7 +48,7 @@
 		clientAddress.sin_addr.s_addr = htonl(INADDR_ANY);
 	    clientAddress.sin_port = htons(port);
 		if(bind(socketHandle,(struct sockaddr*)&clientAddress,sizeof(clientAddress)) == -1){
-			std ::cout << "bind failed";
+			std ::cout << "bind failed\n";
 			return 0;
 		}
 
@@ -675,6 +680,151 @@
 					msgBuf[4+len] = ETX;
 				}
 				break;
+			case 45:
+				if(readWriteMode==0){
+					len = 0;
+				    msgBuf[1] = (unsigned char) (len>>8);
+				    msgBuf[2] = (unsigned char) len;
+				    msgBuf[3] = CMD_ENCRYPT_PROG_STATE;
+				    msgBuf[4] = ETX;
+				}else{
+					
+					unsigned short length=json["programNumbers"].size();
+					len = 2*length+length;
+					std::cout<<length<<std::endl;
+					msgBuf[0] = STX;
+					msgBuf[1] = (unsigned char) (len>>8);
+					msgBuf[2] = (unsigned char) len;
+					msgBuf[3] = CMD_ENCRYPT_PROG_STATE;
+					std::cout << json["programNumbers"] <<std::endl;
+					std::cout<<json["keyids"]<<std::endl;
+					for(int i=0;i<json["programNumbers"].size();i++){
+		    			unsigned short oPno = (unsigned short)std::stoi(json["programNumbers"][i].asString());
+		    			msgBuf[4 + i*3] = (oPno&0xFF00)>>8;
+						msgBuf[5 + i*3] = (oPno&0xFF);
+						unsigned short nPno = (unsigned short)std::stoi(json["keyids"][i].asString());
+		    			msgBuf[6 + i*3] = nPno;
+					}
+					msgBuf[4+length*3] = ETX;
+				}
+			    break;
+			case 46:
+				if(readWriteMode==0){
+					len = 0;
+				    msgBuf[1] = (unsigned char) (len>>8);
+				    msgBuf[2] = (unsigned char) len;
+				    msgBuf[3] = CMD_INIT_CSA;
+				    msgBuf[4] = ETX;
+				}else{
+					
+					len = 2;
+				    msgBuf[1] = (unsigned char) (len>>8);
+				    msgBuf[2] = (unsigned char) len;
+				    msgBuf[3] = CMD_INIT_CSA;
+				    msgBuf[4] = 1;
+				    msgBuf[5] = 3;
+				    msgBuf[6] = ETX;
+				}
+			    break;
+			case 47:
+				if(readWriteMode==0){
+					std::cout<<"auth_bit"<<json["auth_bit"]<<json["parity"]<<std::endl;
+					len = 2;
+				    msgBuf[1] = (unsigned char) (len>>8);
+				    msgBuf[2] = (unsigned char) len;
+				    msgBuf[3] = CMD_SET_CSA;
+				    msgBuf[4] = (unsigned char)std::stoi(json["auth_bit"].asString());
+				    msgBuf[5] = (unsigned char)std::stoi(json["parity"].asString());
+				    msgBuf[6] = ETX;
+				}else{
+					std::cout<<"auth_bit"<<json["auth_bit"]<<json["parity"]<<std::endl;
+					int auth=std::stoi(json["auth_bit"].asString());
+					int parity=std::stoi(json["parity"].asString());
+					len = 2;
+				    msgBuf[1] = (unsigned char) (len>>8);
+				    msgBuf[2] = (unsigned char) len;
+				    msgBuf[3] = CMD_SET_CSA;
+				    msgBuf[4] = 1;
+				    msgBuf[5] = 4;
+				    msgBuf[6] = ETX;
+				}
+			    break;
+			case 48:
+				if(readWriteMode==0){
+					len = 0;
+				    msgBuf[1] = (unsigned char) (len>>8);
+				    msgBuf[2] = (unsigned char) len;
+				    msgBuf[3] = CMD_SET_PID;
+				    msgBuf[4] = ETX;
+				}else{
+					
+					unsigned short length=json["Pids"].size();
+					len = 2*length+length;
+					std::cout<<length<<std::endl;
+					msgBuf[0] = STX;
+					msgBuf[1] = (unsigned char) (len>>8);
+					msgBuf[2] = (unsigned char) len;
+					msgBuf[3] = CMD_SET_PID;
+					std::cout << json["Pids"] <<std::endl;
+					std::cout<<json["AuthOutputs"]<<std::endl;
+					for(int i=0;i<json["Pids"].size();i++){
+		    			unsigned short oPno = (unsigned short)std::stoi(json["Pids"][i].asString());
+		    			msgBuf[4 + i*3] = (oPno&0xFF00)>>8;
+						msgBuf[5 + i*3] = (oPno&0xFF);
+						unsigned short nPno = (unsigned short)std::stoi(json["AuthOutputs"][i].asString());
+		    			msgBuf[6 + i*3] = nPno;
+					}
+					msgBuf[4+length*3] = ETX;
+				}
+			    break;
+			case 49:
+				if(readWriteMode==0){
+					len = 0;
+				    msgBuf[1] = (unsigned char) (len>>8);
+				    msgBuf[2] = (unsigned char) len;
+				    msgBuf[3] = 0x49;
+				    msgBuf[4] = ETX;
+				}else{
+					len = 0;
+					
+				    msgBuf[3] = 0x49;
+					Json::Value CA_System_ids = json["CA_System_ids"];
+					Json::Value emm_pids = json["emm_pids"];
+					Json::Value private_data_list = json["private_data_list"];
+					int private_data_count =0;
+					int noof_CAS = CA_System_ids.size();
+					if(noof_CAS>0)
+					{
+						for(int i=0;i<noof_CAS;i++)
+						{
+
+							int ca_system_id =std::stoi(CA_System_ids[i].asString());
+							int ca_pid =std::stoi(emm_pids[i].asString());
+							// std::cout<<4+i*(private_data_list[1].size()+6)<<std::endl;
+							// std::cout<<ca_system_id<<std::endl;
+							msgBuf[4+i*(private_data_count+6)] = 0x09;
+							msgBuf[5+i*(private_data_count+6)] = 4+private_data_list[i].size();
+							msgBuf[6+i*(private_data_count+6)] = ca_system_id>>8;
+							msgBuf[7+i*(private_data_count+6)] = ca_system_id&0x00FF;
+							msgBuf[8+i*(private_data_count+6)] = (ca_pid>>8)|0xE0;
+							msgBuf[9+i*(private_data_count+6)] = ca_pid&0x00FF;
+							private_data_count = private_data_list[i].size();
+							for (int j = 0; j <private_data_list[i].size() ; ++j)
+							{
+								msgBuf[(10+i*(private_data_count+6))+j] = private_data_list[i][j].asInt();
+								/* code */
+							}
+							len+=6+private_data_count;
+						}
+					}else{
+						len = 1;
+						msgBuf[4] = 0x00;
+					}
+					msgBuf[1] = (unsigned char) (len>>8);
+				    msgBuf[2] = (unsigned char) len;
+					msgBuf[len+4] = ETX;
+				}
+			    break;
 			case 53:
 				msgBuf[3] = CMD_STATUS_RD_STATUS;
 			    msgBuf[4] = ETX;
@@ -806,7 +956,8 @@
 				}
 				fclose(fin);
 			}
-			std::cout << "done\n";
+			std::cout << "RMX Command "+std::to_string(msgBuf[3])+" ";
+			std::cout << "done\n\n";
 		}else{
 			count =-1;
 		}

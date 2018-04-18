@@ -49,6 +49,11 @@
 #define CMD_GET_STAT_PID		0x39
 #define CMD_SET_ASPECT_RATIO	0x3A
 #define CMD_FILT_PROG_STATE		0x40
+#define CMD_FILT_PROG_STATE		0x40
+#define CMD_ENCRYPT_PROG_STATE		0x45
+#define CMD_INIT_CSA		        0x46
+#define CMD_SET_CSA		        0x47
+#define CMD_SET_PID		        0x48
 #define CMD_SET_FILT			0x41
 #define CMD_STATUS_FILT			0x42
 #define CMD_GET_FILTER			0x43
