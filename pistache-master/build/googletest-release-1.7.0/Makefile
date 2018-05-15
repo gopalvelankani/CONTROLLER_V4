@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master
+CMAKE_SOURCE_DIR = /home/user/Videos/CONTROLLER_V4/pistache-master
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build
+CMAKE_BINARY_DIR = /home/user/Videos/CONTROLLER_V4/pistache-master/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -111,17 +111,6 @@ install/local/fast: install/local
 
 .PHONY : install/local/fast
 
-# Special rule for the target install/strip
-install/strip: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip
-
-# Special rule for the target install/strip
-install/strip/fast: install/strip
-
-.PHONY : install/strip/fast
-
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -135,14 +124,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/googletest-release-1.7.0/CMakeFiles/progress.marks
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 googletest-release-1.7.0/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles 0
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles /home/user/Videos/CONTROLLER_V4/pistache-master/build/googletest-release-1.7.0/CMakeFiles/progress.marks
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 googletest-release-1.7.0/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 googletest-release-1.7.0/clean
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 googletest-release-1.7.0/clean
 .PHONY : clean
 
 # The main clean target
@@ -152,22 +141,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 googletest-release-1.7.0/preinstall
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 googletest-release-1.7.0/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 googletest-release-1.7.0/preinstall
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 googletest-release-1.7.0/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 googletest-release-1.7.0/CMakeFiles/gtest_main.dir/rule:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 googletest-release-1.7.0/CMakeFiles/gtest_main.dir/rule
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 googletest-release-1.7.0/CMakeFiles/gtest_main.dir/rule
 .PHONY : googletest-release-1.7.0/CMakeFiles/gtest_main.dir/rule
 
 # Convenience name for target.
@@ -177,12 +166,12 @@ gtest_main: googletest-release-1.7.0/CMakeFiles/gtest_main.dir/rule
 
 # fast build rule for target.
 gtest_main/fast:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f googletest-release-1.7.0/CMakeFiles/gtest_main.dir/build.make googletest-release-1.7.0/CMakeFiles/gtest_main.dir/build
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f googletest-release-1.7.0/CMakeFiles/gtest_main.dir/build.make googletest-release-1.7.0/CMakeFiles/gtest_main.dir/build
 .PHONY : gtest_main/fast
 
 # Convenience name for target.
 googletest-release-1.7.0/CMakeFiles/gtest.dir/rule:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 googletest-release-1.7.0/CMakeFiles/gtest.dir/rule
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 googletest-release-1.7.0/CMakeFiles/gtest.dir/rule
 .PHONY : googletest-release-1.7.0/CMakeFiles/gtest.dir/rule
 
 # Convenience name for target.
@@ -192,7 +181,7 @@ gtest: googletest-release-1.7.0/CMakeFiles/gtest.dir/rule
 
 # fast build rule for target.
 gtest/fast:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f googletest-release-1.7.0/CMakeFiles/gtest.dir/build.make googletest-release-1.7.0/CMakeFiles/gtest.dir/build
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f googletest-release-1.7.0/CMakeFiles/gtest.dir/build.make googletest-release-1.7.0/CMakeFiles/gtest.dir/build
 .PHONY : gtest/fast
 
 src/gtest-all.o: src/gtest-all.cc.o
@@ -201,7 +190,7 @@ src/gtest-all.o: src/gtest-all.cc.o
 
 # target to build an object file
 src/gtest-all.cc.o:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f googletest-release-1.7.0/CMakeFiles/gtest.dir/build.make googletest-release-1.7.0/CMakeFiles/gtest.dir/src/gtest-all.cc.o
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f googletest-release-1.7.0/CMakeFiles/gtest.dir/build.make googletest-release-1.7.0/CMakeFiles/gtest.dir/src/gtest-all.cc.o
 .PHONY : src/gtest-all.cc.o
 
 src/gtest-all.i: src/gtest-all.cc.i
@@ -210,7 +199,7 @@ src/gtest-all.i: src/gtest-all.cc.i
 
 # target to preprocess a source file
 src/gtest-all.cc.i:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f googletest-release-1.7.0/CMakeFiles/gtest.dir/build.make googletest-release-1.7.0/CMakeFiles/gtest.dir/src/gtest-all.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f googletest-release-1.7.0/CMakeFiles/gtest.dir/build.make googletest-release-1.7.0/CMakeFiles/gtest.dir/src/gtest-all.cc.i
 .PHONY : src/gtest-all.cc.i
 
 src/gtest-all.s: src/gtest-all.cc.s
@@ -219,7 +208,7 @@ src/gtest-all.s: src/gtest-all.cc.s
 
 # target to generate assembly for a file
 src/gtest-all.cc.s:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f googletest-release-1.7.0/CMakeFiles/gtest.dir/build.make googletest-release-1.7.0/CMakeFiles/gtest.dir/src/gtest-all.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f googletest-release-1.7.0/CMakeFiles/gtest.dir/build.make googletest-release-1.7.0/CMakeFiles/gtest.dir/src/gtest-all.cc.s
 .PHONY : src/gtest-all.cc.s
 
 src/gtest_main.o: src/gtest_main.cc.o
@@ -228,7 +217,7 @@ src/gtest_main.o: src/gtest_main.cc.o
 
 # target to build an object file
 src/gtest_main.cc.o:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f googletest-release-1.7.0/CMakeFiles/gtest_main.dir/build.make googletest-release-1.7.0/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f googletest-release-1.7.0/CMakeFiles/gtest_main.dir/build.make googletest-release-1.7.0/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o
 .PHONY : src/gtest_main.cc.o
 
 src/gtest_main.i: src/gtest_main.cc.i
@@ -237,7 +226,7 @@ src/gtest_main.i: src/gtest_main.cc.i
 
 # target to preprocess a source file
 src/gtest_main.cc.i:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f googletest-release-1.7.0/CMakeFiles/gtest_main.dir/build.make googletest-release-1.7.0/CMakeFiles/gtest_main.dir/src/gtest_main.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f googletest-release-1.7.0/CMakeFiles/gtest_main.dir/build.make googletest-release-1.7.0/CMakeFiles/gtest_main.dir/src/gtest_main.cc.i
 .PHONY : src/gtest_main.cc.i
 
 src/gtest_main.s: src/gtest_main.cc.s
@@ -246,7 +235,7 @@ src/gtest_main.s: src/gtest_main.cc.s
 
 # target to generate assembly for a file
 src/gtest_main.cc.s:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f googletest-release-1.7.0/CMakeFiles/gtest_main.dir/build.make googletest-release-1.7.0/CMakeFiles/gtest_main.dir/src/gtest_main.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f googletest-release-1.7.0/CMakeFiles/gtest_main.dir/build.make googletest-release-1.7.0/CMakeFiles/gtest_main.dir/src/gtest_main.cc.s
 .PHONY : src/gtest_main.cc.s
 
 # Help Target
@@ -260,7 +249,6 @@ help:
 	@echo "... list_install_components"
 	@echo "... install"
 	@echo "... install/local"
-	@echo "... install/strip"
 	@echo "... gtest_main"
 	@echo "... rebuild_cache"
 	@echo "... gtest"
@@ -281,6 +269,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

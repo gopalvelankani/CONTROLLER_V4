@@ -542,11 +542,11 @@ stream.h
 
 ../include/typeid.h
 
-/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/tests/mime_test.cc
+/home/user/Videos/CONTROLLER_V4/pistache-master/tests/mime_test.cc
 gtest/gtest.h
-/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/tests/gtest/gtest.h
+/home/user/Videos/CONTROLLER_V4/pistache-master/tests/gtest/gtest.h
 mime.h
-/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/tests/mime.h
+/home/user/Videos/CONTROLLER_V4/pistache-master/tests/mime.h
 http.h
-/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/tests/http.h
+/home/user/Videos/CONTROLLER_V4/pistache-master/tests/http.h
 

@@ -6,5 +6,5 @@ CXX_FLAGS =  -std=c++11    -std=c++11 -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexc
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/include -I/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src -I/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/googletest-release-1.7.0/include -I/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/googletest-release-1.7.0 
+CXX_INCLUDES = -I/home/user/Videos/CONTROLLER_V4/pistache-master/include -I/home/user/Videos/CONTROLLER_V4/pistache-master/src -I/home/user/Videos/CONTROLLER_V4/pistache-master/googletest-release-1.7.0/include -I/home/user/Videos/CONTROLLER_V4/pistache-master/googletest-release-1.7.0 
 

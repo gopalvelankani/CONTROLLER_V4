@@ -37,6 +37,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/net.dir/common/MxLWare_HYDRA_BERTApi.c.o"
   "libnet.pdb"
   "libnet.so"
+  "libnet.pdb"
+  "CMakeFiles/CMakeRelink.dir/libnet.so"
 )
 
 # Per-language clean rules from dependency scanning.

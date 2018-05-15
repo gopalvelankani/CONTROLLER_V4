@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master
+CMAKE_SOURCE_DIR = /home/user/Videos/CONTROLLER_V4/pistache-master
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build
+CMAKE_BINARY_DIR = /home/user/Videos/CONTROLLER_V4/pistache-master/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -89,6 +89,16 @@ edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
 
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+
+.PHONY : list_install_components/fast
+
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
@@ -100,27 +110,6 @@ install/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
 	/usr/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
-
-# Special rule for the target list_install_components
-list_install_components:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
-.PHONY : list_install_components
-
-# Special rule for the target list_install_components
-list_install_components/fast: list_install_components
-
-.PHONY : list_install_components/fast
-
-# Special rule for the target install/strip
-install/strip: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip
-
-# Special rule for the target install/strip
-install/strip/fast: install/strip
-
-.PHONY : install/strip/fast
 
 # Special rule for the target install/local
 install/local: preinstall
@@ -135,14 +124,14 @@ install/local/fast: install/local
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/tests/CMakeFiles/progress.marks
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles 0
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles /home/user/Videos/CONTROLLER_V4/pistache-master/build/tests/CMakeFiles/progress.marks
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/clean
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/clean
 .PHONY : clean
 
 # The main clean target
@@ -152,22 +141,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/preinstall
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/preinstall
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 tests/CMakeFiles/run_mime_test.dir/rule:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/CMakeFiles/run_mime_test.dir/rule
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/CMakeFiles/run_mime_test.dir/rule
 .PHONY : tests/CMakeFiles/run_mime_test.dir/rule
 
 # Convenience name for target.
@@ -177,12 +166,12 @@ run_mime_test: tests/CMakeFiles/run_mime_test.dir/rule
 
 # fast build rule for target.
 run_mime_test/fast:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_mime_test.dir/build.make tests/CMakeFiles/run_mime_test.dir/build
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_mime_test.dir/build.make tests/CMakeFiles/run_mime_test.dir/build
 .PHONY : run_mime_test/fast
 
 # Convenience name for target.
 tests/CMakeFiles/run_headers_test.dir/rule:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/CMakeFiles/run_headers_test.dir/rule
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/CMakeFiles/run_headers_test.dir/rule
 .PHONY : tests/CMakeFiles/run_headers_test.dir/rule
 
 # Convenience name for target.
@@ -192,12 +181,12 @@ run_headers_test: tests/CMakeFiles/run_headers_test.dir/rule
 
 # fast build rule for target.
 run_headers_test/fast:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_headers_test.dir/build.make tests/CMakeFiles/run_headers_test.dir/build
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_headers_test.dir/build.make tests/CMakeFiles/run_headers_test.dir/build
 .PHONY : run_headers_test/fast
 
 # Convenience name for target.
 tests/CMakeFiles/run_async_test.dir/rule:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/CMakeFiles/run_async_test.dir/rule
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/CMakeFiles/run_async_test.dir/rule
 .PHONY : tests/CMakeFiles/run_async_test.dir/rule
 
 # Convenience name for target.
@@ -207,12 +196,12 @@ run_async_test: tests/CMakeFiles/run_async_test.dir/rule
 
 # fast build rule for target.
 run_async_test/fast:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_async_test.dir/build.make tests/CMakeFiles/run_async_test.dir/build
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_async_test.dir/build.make tests/CMakeFiles/run_async_test.dir/build
 .PHONY : run_async_test/fast
 
 # Convenience name for target.
 tests/CMakeFiles/run_typeid_test.dir/rule:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/CMakeFiles/run_typeid_test.dir/rule
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/CMakeFiles/run_typeid_test.dir/rule
 .PHONY : tests/CMakeFiles/run_typeid_test.dir/rule
 
 # Convenience name for target.
@@ -222,12 +211,12 @@ run_typeid_test: tests/CMakeFiles/run_typeid_test.dir/rule
 
 # fast build rule for target.
 run_typeid_test/fast:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_typeid_test.dir/build.make tests/CMakeFiles/run_typeid_test.dir/build
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_typeid_test.dir/build.make tests/CMakeFiles/run_typeid_test.dir/build
 .PHONY : run_typeid_test/fast
 
 # Convenience name for target.
 tests/CMakeFiles/run_router_test.dir/rule:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/CMakeFiles/run_router_test.dir/rule
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/CMakeFiles/run_router_test.dir/rule
 .PHONY : tests/CMakeFiles/run_router_test.dir/rule
 
 # Convenience name for target.
@@ -237,12 +226,12 @@ run_router_test: tests/CMakeFiles/run_router_test.dir/rule
 
 # fast build rule for target.
 run_router_test/fast:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_router_test.dir/build.make tests/CMakeFiles/run_router_test.dir/build
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_router_test.dir/build.make tests/CMakeFiles/run_router_test.dir/build
 .PHONY : run_router_test/fast
 
 # Convenience name for target.
 tests/CMakeFiles/run_cookie_test.dir/rule:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/CMakeFiles/run_cookie_test.dir/rule
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/CMakeFiles/run_cookie_test.dir/rule
 .PHONY : tests/CMakeFiles/run_cookie_test.dir/rule
 
 # Convenience name for target.
@@ -252,12 +241,12 @@ run_cookie_test: tests/CMakeFiles/run_cookie_test.dir/rule
 
 # fast build rule for target.
 run_cookie_test/fast:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_cookie_test.dir/build.make tests/CMakeFiles/run_cookie_test.dir/build
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_cookie_test.dir/build.make tests/CMakeFiles/run_cookie_test.dir/build
 .PHONY : run_cookie_test/fast
 
 # Convenience name for target.
 tests/CMakeFiles/run_view_test.dir/rule:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/CMakeFiles/run_view_test.dir/rule
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f CMakeFiles/Makefile2 tests/CMakeFiles/run_view_test.dir/rule
 .PHONY : tests/CMakeFiles/run_view_test.dir/rule
 
 # Convenience name for target.
@@ -267,7 +256,7 @@ run_view_test: tests/CMakeFiles/run_view_test.dir/rule
 
 # fast build rule for target.
 run_view_test/fast:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_view_test.dir/build.make tests/CMakeFiles/run_view_test.dir/build
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_view_test.dir/build.make tests/CMakeFiles/run_view_test.dir/build
 .PHONY : run_view_test/fast
 
 async_test.o: async_test.cc.o
@@ -276,7 +265,7 @@ async_test.o: async_test.cc.o
 
 # target to build an object file
 async_test.cc.o:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_async_test.dir/build.make tests/CMakeFiles/run_async_test.dir/async_test.cc.o
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_async_test.dir/build.make tests/CMakeFiles/run_async_test.dir/async_test.cc.o
 .PHONY : async_test.cc.o
 
 async_test.i: async_test.cc.i
@@ -285,7 +274,7 @@ async_test.i: async_test.cc.i
 
 # target to preprocess a source file
 async_test.cc.i:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_async_test.dir/build.make tests/CMakeFiles/run_async_test.dir/async_test.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_async_test.dir/build.make tests/CMakeFiles/run_async_test.dir/async_test.cc.i
 .PHONY : async_test.cc.i
 
 async_test.s: async_test.cc.s
@@ -294,7 +283,7 @@ async_test.s: async_test.cc.s
 
 # target to generate assembly for a file
 async_test.cc.s:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_async_test.dir/build.make tests/CMakeFiles/run_async_test.dir/async_test.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_async_test.dir/build.make tests/CMakeFiles/run_async_test.dir/async_test.cc.s
 .PHONY : async_test.cc.s
 
 cookie_test.o: cookie_test.cc.o
@@ -303,7 +292,7 @@ cookie_test.o: cookie_test.cc.o
 
 # target to build an object file
 cookie_test.cc.o:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_cookie_test.dir/build.make tests/CMakeFiles/run_cookie_test.dir/cookie_test.cc.o
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_cookie_test.dir/build.make tests/CMakeFiles/run_cookie_test.dir/cookie_test.cc.o
 .PHONY : cookie_test.cc.o
 
 cookie_test.i: cookie_test.cc.i
@@ -312,7 +301,7 @@ cookie_test.i: cookie_test.cc.i
 
 # target to preprocess a source file
 cookie_test.cc.i:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_cookie_test.dir/build.make tests/CMakeFiles/run_cookie_test.dir/cookie_test.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_cookie_test.dir/build.make tests/CMakeFiles/run_cookie_test.dir/cookie_test.cc.i
 .PHONY : cookie_test.cc.i
 
 cookie_test.s: cookie_test.cc.s
@@ -321,7 +310,7 @@ cookie_test.s: cookie_test.cc.s
 
 # target to generate assembly for a file
 cookie_test.cc.s:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_cookie_test.dir/build.make tests/CMakeFiles/run_cookie_test.dir/cookie_test.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_cookie_test.dir/build.make tests/CMakeFiles/run_cookie_test.dir/cookie_test.cc.s
 .PHONY : cookie_test.cc.s
 
 headers_test.o: headers_test.cc.o
@@ -330,7 +319,7 @@ headers_test.o: headers_test.cc.o
 
 # target to build an object file
 headers_test.cc.o:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_headers_test.dir/build.make tests/CMakeFiles/run_headers_test.dir/headers_test.cc.o
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_headers_test.dir/build.make tests/CMakeFiles/run_headers_test.dir/headers_test.cc.o
 .PHONY : headers_test.cc.o
 
 headers_test.i: headers_test.cc.i
@@ -339,7 +328,7 @@ headers_test.i: headers_test.cc.i
 
 # target to preprocess a source file
 headers_test.cc.i:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_headers_test.dir/build.make tests/CMakeFiles/run_headers_test.dir/headers_test.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_headers_test.dir/build.make tests/CMakeFiles/run_headers_test.dir/headers_test.cc.i
 .PHONY : headers_test.cc.i
 
 headers_test.s: headers_test.cc.s
@@ -348,7 +337,7 @@ headers_test.s: headers_test.cc.s
 
 # target to generate assembly for a file
 headers_test.cc.s:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_headers_test.dir/build.make tests/CMakeFiles/run_headers_test.dir/headers_test.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_headers_test.dir/build.make tests/CMakeFiles/run_headers_test.dir/headers_test.cc.s
 .PHONY : headers_test.cc.s
 
 mime_test.o: mime_test.cc.o
@@ -357,7 +346,7 @@ mime_test.o: mime_test.cc.o
 
 # target to build an object file
 mime_test.cc.o:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_mime_test.dir/build.make tests/CMakeFiles/run_mime_test.dir/mime_test.cc.o
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_mime_test.dir/build.make tests/CMakeFiles/run_mime_test.dir/mime_test.cc.o
 .PHONY : mime_test.cc.o
 
 mime_test.i: mime_test.cc.i
@@ -366,7 +355,7 @@ mime_test.i: mime_test.cc.i
 
 # target to preprocess a source file
 mime_test.cc.i:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_mime_test.dir/build.make tests/CMakeFiles/run_mime_test.dir/mime_test.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_mime_test.dir/build.make tests/CMakeFiles/run_mime_test.dir/mime_test.cc.i
 .PHONY : mime_test.cc.i
 
 mime_test.s: mime_test.cc.s
@@ -375,7 +364,7 @@ mime_test.s: mime_test.cc.s
 
 # target to generate assembly for a file
 mime_test.cc.s:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_mime_test.dir/build.make tests/CMakeFiles/run_mime_test.dir/mime_test.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_mime_test.dir/build.make tests/CMakeFiles/run_mime_test.dir/mime_test.cc.s
 .PHONY : mime_test.cc.s
 
 router_test.o: router_test.cc.o
@@ -384,7 +373,7 @@ router_test.o: router_test.cc.o
 
 # target to build an object file
 router_test.cc.o:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_router_test.dir/build.make tests/CMakeFiles/run_router_test.dir/router_test.cc.o
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_router_test.dir/build.make tests/CMakeFiles/run_router_test.dir/router_test.cc.o
 .PHONY : router_test.cc.o
 
 router_test.i: router_test.cc.i
@@ -393,7 +382,7 @@ router_test.i: router_test.cc.i
 
 # target to preprocess a source file
 router_test.cc.i:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_router_test.dir/build.make tests/CMakeFiles/run_router_test.dir/router_test.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_router_test.dir/build.make tests/CMakeFiles/run_router_test.dir/router_test.cc.i
 .PHONY : router_test.cc.i
 
 router_test.s: router_test.cc.s
@@ -402,7 +391,7 @@ router_test.s: router_test.cc.s
 
 # target to generate assembly for a file
 router_test.cc.s:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_router_test.dir/build.make tests/CMakeFiles/run_router_test.dir/router_test.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_router_test.dir/build.make tests/CMakeFiles/run_router_test.dir/router_test.cc.s
 .PHONY : router_test.cc.s
 
 typeid_test.o: typeid_test.cc.o
@@ -411,7 +400,7 @@ typeid_test.o: typeid_test.cc.o
 
 # target to build an object file
 typeid_test.cc.o:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_typeid_test.dir/build.make tests/CMakeFiles/run_typeid_test.dir/typeid_test.cc.o
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_typeid_test.dir/build.make tests/CMakeFiles/run_typeid_test.dir/typeid_test.cc.o
 .PHONY : typeid_test.cc.o
 
 typeid_test.i: typeid_test.cc.i
@@ -420,7 +409,7 @@ typeid_test.i: typeid_test.cc.i
 
 # target to preprocess a source file
 typeid_test.cc.i:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_typeid_test.dir/build.make tests/CMakeFiles/run_typeid_test.dir/typeid_test.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_typeid_test.dir/build.make tests/CMakeFiles/run_typeid_test.dir/typeid_test.cc.i
 .PHONY : typeid_test.cc.i
 
 typeid_test.s: typeid_test.cc.s
@@ -429,7 +418,7 @@ typeid_test.s: typeid_test.cc.s
 
 # target to generate assembly for a file
 typeid_test.cc.s:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_typeid_test.dir/build.make tests/CMakeFiles/run_typeid_test.dir/typeid_test.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_typeid_test.dir/build.make tests/CMakeFiles/run_typeid_test.dir/typeid_test.cc.s
 .PHONY : typeid_test.cc.s
 
 view_test.o: view_test.cc.o
@@ -438,7 +427,7 @@ view_test.o: view_test.cc.o
 
 # target to build an object file
 view_test.cc.o:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_view_test.dir/build.make tests/CMakeFiles/run_view_test.dir/view_test.cc.o
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_view_test.dir/build.make tests/CMakeFiles/run_view_test.dir/view_test.cc.o
 .PHONY : view_test.cc.o
 
 view_test.i: view_test.cc.i
@@ -447,7 +436,7 @@ view_test.i: view_test.cc.i
 
 # target to preprocess a source file
 view_test.cc.i:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_view_test.dir/build.make tests/CMakeFiles/run_view_test.dir/view_test.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_view_test.dir/build.make tests/CMakeFiles/run_view_test.dir/view_test.cc.i
 .PHONY : view_test.cc.i
 
 view_test.s: view_test.cc.s
@@ -456,7 +445,7 @@ view_test.s: view_test.cc.s
 
 # target to generate assembly for a file
 view_test.cc.s:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_view_test.dir/build.make tests/CMakeFiles/run_view_test.dir/view_test.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(MAKE) -f tests/CMakeFiles/run_view_test.dir/build.make tests/CMakeFiles/run_view_test.dir/view_test.cc.s
 .PHONY : view_test.cc.s
 
 # Help Target
@@ -469,14 +458,13 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... run_mime_test"
+	@echo "... list_install_components"
 	@echo "... install"
 	@echo "... run_headers_test"
 	@echo "... run_async_test"
 	@echo "... run_typeid_test"
 	@echo "... run_router_test"
 	@echo "... run_cookie_test"
-	@echo "... list_install_components"
-	@echo "... install/strip"
 	@echo "... install/local"
 	@echo "... run_view_test"
 	@echo "... async_test.o"
@@ -511,6 +499,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

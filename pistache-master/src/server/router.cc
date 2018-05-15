@@ -33,7 +33,9 @@ Request::hasParam(std::string name) const {
 
 TypedParam
 Request::param(std::string name) const {
+    std::cout<<name;
     auto it = std::find_if(params_.begin(), params_.end(), [&](const TypedParam& param) {
+
             return param.name() == name;
     });
 
@@ -222,7 +224,7 @@ RouterHandler::onRequest(
 {
     auto resp = response.clone();
     auto result = router.route(req, std::move(resp));
-
+    // std::cout<<req.body()<<std::endl;
     /* @Feature: add support for a custom NotFound handler */
     if (result == Router::Status::NotFound)
         response.send(Http::Code::Not_Found, "Could not find a matching route");

@@ -326,9 +326,9 @@ tuple
 functional
 -
 
-/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/tests/headers_test.cc
+/home/user/Videos/CONTROLLER_V4/pistache-master/tests/headers_test.cc
 gtest/gtest.h
-/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/tests/gtest/gtest.h
+/home/user/Videos/CONTROLLER_V4/pistache-master/tests/gtest/gtest.h
 http_headers.h
-/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/tests/http_headers.h
+/home/user/Videos/CONTROLLER_V4/pistache-master/tests/http_headers.h
 

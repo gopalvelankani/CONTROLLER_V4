@@ -1,4 +1,4 @@
-# Install script for directory: /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/googletest-release-1.7.0
+# Install script for directory: /home/user/Videos/CONTROLLER_V4/pistache-master/googletest-release-1.7.0
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

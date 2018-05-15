@@ -26,12 +26,14 @@ public:
 
 	int addChannelList(int input,int channel_number,int rmx_no);
 	int addActivatedPrograms(std::string input,std::string output,Json::Value program_number,int rmx_no,int incFlag,std::string prog_list_str);
-	int addEncryptedPrograms(std::string input,std::string output,Json::Value program_number,int rmx_no,int incFlag,std::string prog_list_str);
+	int addEncryptedPrograms(std::string input,std::string output,Json::Value program_number,int rmx_no,int incFlag,std::string prog_list_str,Json::Value keyIndex);
 	Json::Value getActivePrograms(int input,int output);
 	Json::Value getEncryptedPrograms(std::string program_number,std::string input,std::string output ,std::string rmx_no);
-	int addLcnNumbers(std::string program_number,std::string channel_number,std::string input,int rmx_no);
+	int addLcnNumbers(std::string program_number,std::string channel_number,std::string input,int rmx_no,int addFlag);
 	int addPmtAlarm(std::string program_number,std::string alarm,std::string input,int rmx_no);
-	int addFrequency(std::string center_frequency,std::string str_rmx_no);
+	int addFrequency(std::string center_frequency,std::string str_rmx_no,unsigned int* frequencies);
+	int addSymbolRate(std::string symbol_rate,std::string str_rmx_no,std::string output,std::string rolloff);
+	Json::Value getSymbolRates();
 	int addChannelname(int channel_number,std::string channel_name,int rmx_no,int addOrDel);
 	int flushServiceNames();
 	int addServiceId(int channel_number,int service_id,int rmx_no,int addFlag);
@@ -41,6 +43,7 @@ public:
 	int addTableTimeout(std::string table,std::string timeout,int rmx_no);
 	int addNetworkDetails(std::string output,std::string transportid,std::string networkid,std::string originalnwid,int rmx_no);
 	Json::Value getNetworkDetails();
+	Json::Value getNetworkDetailsForNIT();
 	int addNitMode(std::string mode,std::string output,int rmx_no);
 	int addfreeCAModePrograms(std::string programNumber,std::string input,std::string output,int rmx_no); 
 	int addHighPriorityServices(std::string program_number,std::string input,int rmx_no);
@@ -53,8 +56,8 @@ public:
 	
 	int addECMChannelSetup(int channel_id,std::string supercas_id ,std::string ip,int port);
 	int updateECMChannelSetup(int channel_id,std::string supercas_id ,std::string ip,int port,int old_channel_id);
-	int addECMStreamSetup(int stream_id,int ecm_id,int channel_id,std::string access_criteria,int cp_number,std::string timestamp);
-	int updateECMStreamSetup(int stream_id,int ecm_id,int channel_id,std::string access_criteria,int cp_number,std::string timestamp);
+	int addECMStreamSetup(int stream_id,int ecm_id,int channel_id,std::string access_criteria,int cp_number ,std::string ecm_pid,std::string timestamp);
+	int updateECMStreamSetup(int stream_id,int ecm_id,int channel_id,std::string access_criteria,int cp_number,std::string ecm_pid,std::string timestamp);
 	int deleteECM(int channel_id);
 	int deleteECMStream(int channel_id,int stream_id);
 
@@ -62,11 +65,16 @@ public:
 	int updateEMMchannelSetup(int channel_id, std::string client_id, int data_id, int bw,int port,int stream_id,std::string emm_pid);
 	int deleteEMM(int channel_id);
 	Json::Value getEMMGChannels(std::string rmx_no,std::string output,std::string channel_id);
+	Json::Value getECMDescriptors(std::string rmx_no,std::string input);
 	// Json::Value getEMMGChannels(std::string channel_id);
 	int enableEMM(std::string channel_id, std::string rmx_no,std::string output,int addFlag);
+	int enableECM(std::string channel_id,std::string stream_id,std::string service_pid,std::string programNumber, std::string rmx_no,std::string output,std::string input,int addFlag);
 	int scrambleService(int channel_id,int stream_id,int service_id);
 	int deScrambleService(int channel_id,int stream_id,int service_id);
-	
+	int generateECMPID(std::string rmx_no,std::string output,std::string channel_id,std::string stream_id,std::string programNumber);
+	unsigned long int getScramblingIndex(std::string rmx_no,std::string output);
+	int updateCWIndex(std::string rmx_no,std::string output,std::string programNumber,long int index,int indexValue,int addFlag);
+
 	int addInputMode(std::string SPTS,std::string PMT,std::string SID,std::string RISE,std::string MASTER,std::string INSELECT,std::string BITRATE,std::string input,int rmx_no);
 	int createAlarmFlags(std::string mode,std::string level1,std::string level2,std::string level3,std::string level4,int rmx_no);
 	int addDVBspiOutputMode(std::string output,std::string bit_rate,std::string falling,std::string mode,int rmx_no);  
@@ -88,6 +96,7 @@ public:
 	Json::Value getPmtalarm(std::string input,std::string program_number );
 	Json::Value getPmtalarm();
 	Json::Value getActivePrograms(std::string program_number,std::string input,std::string output ,std::string rmx_no);
+	Json::Value getActivePrograms(std::string output ,std::string rmx_no);
 	Json::Value getActivePrograms();
 	Json::Value getLockedPids(std::string input,std::string program_number);
 	Json::Value getLockedPids();
@@ -130,6 +139,23 @@ public:
 	int addQAM(std::string rmx_no, std::string output_channel,std::string qam_id);	
 	Json::Value getQAM(int rmx_id);
 	Json::Value getSPTSControl();
+	int addCustomPid(std::string rmx_no, std::string output,std::string pid, int addFlag);
+	Json::Value getCustomPids(std::string rmx_no);
+	int setIndexSetUnset(int index, int indexValue,int flag);
+	long int getCWKeyIndex(std::string rmx_no,std::string input,std::string output,std::string programNumber);
+	int addEncryptedService(std::string rmx_no,std::string input,std::string output,std::string programNumber,long int key_index, int includeflag);
+	Json::Value getEnabledEMCStreams(std::string channel_id,std::string stream_id);
+	Json::Value getECMChannelDetails(std::string hex_ca_system_id,std::string service_pid,std::string ecm_pid,std::string rmx_no,std::string  output);
+	int isServiceEncrypted(std::string programNumber,std::string rmx_no,std::string output,std::string input);
+	int getLCNNumber(std::string input ,std::string rmx_no ,std::string service_id);
+	int addNITDetails(int version,std::string network_name,std::string network_id);
+	Json::Value getNITDetails();
+	int isNetworkExists();
+	Json::Value getNITHostMode();
+	Json::Value getLcnIds(std::string output,std::string rmx_no);
+	int addLcnIds(std::string service_id,std::string lcn_id,std::string input, std::string output,std::string rmx_no);
+	int isLcnIdExists(std::string lcn_id);
+	Json::Value getNetworkId(std::string rmx_no,std::string output);
 };
 // This is the content of the .h file, which is where the declarations go
 

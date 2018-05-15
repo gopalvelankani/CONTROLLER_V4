@@ -100,13 +100,13 @@ using namespace std;
 		
 		return mysql_affected_rows(connect);
 	}
-	int dbHandler :: addEncryptedPrograms(std::string input,std::string output,Json::Value program_numbers,int rmx_no,int includeflag,std::string prog_list_str) 
+	int dbHandler :: addEncryptedPrograms(std::string input,std::string output,Json::Value program_numbers,int rmx_no,int includeflag,std::string prog_list_str,Json::Value keyIndex) 
 	{
 		std::string query="";
 		if(includeflag){
-			query = "Insert into encrypted_service_list (in_channel,out_channel,channel_num,rmx_id) VALUES ";
+			query = "Insert into encrypted_service_list (in_channel,out_channel,channel_num,rmx_id,key_index) VALUES ";
 			for (int i = 0; i < program_numbers.size(); ++i)
-				query = query+"('"+input+"','"+output+"','"+program_numbers[i].asString()+"','"+std::to_string(rmx_no)+"'),";  	
+				query = query+"('"+input+"','"+output+"','"+program_numbers[i].asString()+"','"+std::to_string(rmx_no)+"','"+keyIndex[i].asString()+"'),";  	
 			query = query.substr(0,query.length()-1);
 			query =query+" ON DUPLICATE KEY UPDATE channel_num = channel_num;";
 		}
@@ -120,13 +120,27 @@ using namespace std;
 		return mysql_affected_rows(connect);
 	}
 	
-	int dbHandler :: addFrequency(std::string center_frequency,std::string str_rmx_no) 
+	int dbHandler :: addFrequency(std::string center_frequency,std::string str_rmx_no,unsigned int* uiFrequencies) 
 	{
+		
 		string query = "Insert into Ifrequency (rmx_id,ifrequency) VALUES ('"+str_rmx_no+"','"+center_frequency+"') ON DUPLICATE KEY UPDATE ifrequency = '"+center_frequency+"';";  
 		mysql_query (connect,query.c_str());
-		return mysql_affected_rows(connect);
+		int affctd= mysql_affected_rows(connect);
+		
+		for (int output = 0; output < 8; ++output)
+		{
+			unsigned int uiFerq = *(uiFrequencies++);
+			// std::cout<<uiFerq<<endl;
+			query = "UPDATE output SET frequency = '"+std::to_string(uiFerq)+"' WHERE rmx_id = '"+str_rmx_no+"' AND output_channel = '"+std::to_string(output)+"'";
+			mysql_query (connect,query.c_str());	
+		}
+		return affctd;
 	}
-
+	int dbHandler :: addSymbolRate(std::string symbol_rate,std::string str_rmx_no,std::string output,std::string rolloff){
+		std::string query = "UPDATE output SET symbol_rate = '"+symbol_rate+"',roll_off = '"+rolloff+"' WHERE rmx_id = '"+str_rmx_no+"' AND output_channel = '"+output+"'";
+		mysql_query (connect,query.c_str());
+		return mysql_affected_rows(connect);
+		}
 	int dbHandler :: addChannelname(int channel_number,std::string channel_name,int rmx_no,int addOrDel)
 	{
 		string query="";
@@ -170,9 +184,14 @@ using namespace std;
 	}
 	int dbHandler :: addTablesVersion(std::string pat_ver,std::string pat_isenable,std::string sdt_ver,std::string sdt_isenable,std::string nit_ver,std::string nit_isenable,std::string output,int rmx_no)
 	{
-		string query = "Insert into table_versions(output,pat_ver,pat_isenable,sdt_ver,sdt_isenable,nit_ver,nit_isenable,rmx_id) VALUES ('"+output+"','"+pat_ver+"','"+pat_isenable+"','"+sdt_ver+"','"+sdt_isenable+"','"+nit_ver+"','"+nit_isenable+"','"+std::to_string(rmx_no)+"') ON DUPLICATE KEY UPDATE pat_ver = '"+pat_ver+"',pat_isenable = '"+pat_isenable+"',sdt_ver = '"+sdt_ver+"',sdt_isenable = '"+sdt_isenable+"',nit_ver = '"+nit_ver+"',nit_isenable = '"+nit_isenable+"';";
-		// std::cout<<"--->"<<query;
+		string query = "";
+
+		if(rmx_no != -1)
+			query = "Insert into table_versions(output,pat_ver,pat_isenable,sdt_ver,sdt_isenable,nit_ver,nit_isenable,rmx_id) VALUES ('"+output+"','"+pat_ver+"','"+pat_isenable+"','"+sdt_ver+"','"+sdt_isenable+"','"+nit_ver+"','"+nit_isenable+"','"+std::to_string(rmx_no)+"') ON DUPLICATE KEY UPDATE pat_ver = '"+pat_ver+"',pat_isenable = '"+pat_isenable+"',sdt_ver = '"+sdt_ver+"',sdt_isenable = '"+sdt_isenable+"',nit_ver = '"+nit_ver+"',nit_isenable = '"+nit_isenable+"';";
+		else
+			query = "UPDATE table_versions SET pat_ver = '"+pat_ver+"',pat_isenable = '"+pat_isenable+"',sdt_ver = '"+sdt_ver+"',sdt_isenable = '"+sdt_isenable+"',nit_ver = '"+nit_ver+"',nit_isenable = '"+nit_isenable+"';";
 		mysql_query (connect,query.c_str());
+		std::cout<<"------------------------------------->"<<query<<endl;
 		return mysql_affected_rows(connect);
 	}
 	
@@ -180,13 +199,18 @@ using namespace std;
 	{
 		string query = "UPDATE output SET nit_mode = '"+mode+"' WHERE output_channel = '"+output+"' AND rmx_id = '"+std::to_string(rmx_no)+"';";  
 		mysql_query (connect,query.c_str());
-		std::cout<<query<<std::endl;
+		// std::cout<<query<<std::endl;
 		return mysql_affected_rows(connect);
 	}
 
-	int dbHandler :: addLcnNumbers(std::string program_number,std::string channel_number,std::string input,int rmx_no)
+	int dbHandler :: addLcnNumbers(std::string program_number,std::string channel_number,std::string input,int rmx_no,int addFlag)
 	{
-			string query = "Insert into lcn (program_number,channel_number,input,rmx_id) VALUES ('"+program_number+"','"+channel_number+"','"+input+"','"+std::to_string(rmx_no)+"') ON DUPLICATE KEY UPDATE channel_number = '"+channel_number+"';";  
+			string query ="";
+			if(addFlag)
+				query = "UPDATE channel_list SET lcn_id = '"+channel_number+"' WHERE input_channel = '"+input+"' AND channel_number = '"+program_number+"' AND rmx_id = '"+std::to_string(rmx_no)+"'";
+			else  
+				query = "UPDATE channel_list SET lcn_id = '-1' WHERE input_channel = '"+input+"' AND channel_number = '"+program_number+"' AND rmx_id = '"+std::to_string(rmx_no)+"'";  
+			std::cout<<query<<std::endl;
 			mysql_query (connect,query.c_str());
 			return mysql_affected_rows(connect);
 	}
@@ -265,7 +289,13 @@ using namespace std;
 		return mysql_affected_rows(connect);
 	}
 	int dbHandler :: addPsiSiInterval(std::string patint,std::string sdtint,std::string nitint,std::string output,int rmx_no){
-		string query = "Insert into psi_si_interval (output,pat_int,sdt_int,nit_int,rmx_id) VALUES ('"+output+"','"+patint+"','"+sdtint+"','"+nitint+"','"+std::to_string(rmx_no)+"') ON DUPLICATE KEY UPDATE pat_int='"+patint+"',sdt_int='"+sdtint+"',nit_int='"+nitint+"';";  
+		string query ="";
+		if(rmx_no != -1){
+		 query = "Insert into psi_si_interval (output,pat_int,sdt_int,nit_int,rmx_id) VALUES ('"+output+"','"+patint+"','"+sdtint+"','"+nitint+"','"+std::to_string(rmx_no)+"') ON DUPLICATE KEY UPDATE pat_int='"+patint+"',sdt_int='"+sdtint+"',nit_int='"+nitint+"';";  
+		}
+		else{
+			query = "UPDATE psi_si_interval SET pat_int='"+patint+"',sdt_int='"+sdtint+"',nit_int='"+nitint+"';";  
+		}
 		mysql_query (connect,query.c_str());
 		return mysql_affected_rows(connect);
 	}
@@ -330,7 +360,7 @@ using namespace std;
 	}
 	int dbHandler :: removeSPTSIPInputChannels(std::string rmx_no,std::string channel_no){
 		string query = "UPDATE spts_ip_inputs SET is_enable = 0 WHERE mux_id = '"+rmx_no+"' AND channel_no = '"+channel_no+"';";  
-		std::cout<<query<<std::endl;
+		// std::cout<<query<<std::endl;
 		mysql_query (connect,query.c_str());
 		return mysql_affected_rows(connect);		
 	}
@@ -345,6 +375,18 @@ using namespace std;
 		mysql_query (connect,query.c_str());
 		return mysql_affected_rows(connect);		
 	}
+	int dbHandler :: addCustomPid(std::string rmx_no, std::string output,std::string pid, int addFlag){
+		string query = "";
+		if(addFlag){
+			query = "INSERT INTO `custom_pids` ( `rmx_no`, `output_channel`, `pid`) VALUES ('"+rmx_no+"', '"+output+"', '"+pid+"');";
+		}else{
+			query = "DELETE FROM custom_pids WHERE pid = '"+pid+"'AND rmx_no = '"+rmx_no+"' AND output_channel = '"+output+"';";  
+		}
+		// std::cout<<query<<std::endl;
+		mysql_query (connect,query.c_str());
+		return mysql_affected_rows(connect);		
+	}
+
 	int dbHandler :: deleteLockedPrograms() 
 	{
 		string query = "delete from locked_programs;";  
@@ -381,15 +423,15 @@ using namespace std;
 		mysql_query (connect,query.c_str());
 	 	return mysql_affected_rows(connect);
 	}
-	int dbHandler :: addECMStreamSetup(int stream_id,int ecm_id,int channel_id,std::string access_criteria,int cp_number,std::string timestamp) 
+	int dbHandler :: addECMStreamSetup(int stream_id,int ecm_id,int channel_id,std::string access_criteria,int cp_number,std::string ecm_pid,std::string timestamp) 
 	{
-		string query = "Insert into ecm_stream (stream_id,ecm_id,channel_id,access_criteria,cp_number,timestamp) VALUES ('"+std::to_string(stream_id)+"','"+std::to_string(ecm_id)+"','"+std::to_string(channel_id)+"','"+access_criteria+"','"+std::to_string(cp_number)+"','"+timestamp+"') ON DUPLICATE KEY UPDATE stream_id = '"+std::to_string(stream_id)+"',ecm_id = '"+std::to_string(ecm_id)+"',channel_id = '"+std::to_string(channel_id)+"', access_criteria = '"+access_criteria+"', cp_number = '"+std::to_string(cp_number)+"', timestamp = '"+timestamp+"';";  
+		string query = "Insert into ecm_stream (stream_id,ecm_id,channel_id,access_criteria,cp_number,ecm_pid,timestamp) VALUES ('"+std::to_string(stream_id)+"','"+std::to_string(ecm_id)+"','"+std::to_string(channel_id)+"','"+access_criteria+"','"+std::to_string(cp_number)+"','"+ecm_pid+"','"+timestamp+"') ON DUPLICATE KEY UPDATE stream_id = '"+std::to_string(stream_id)+"',ecm_id = '"+std::to_string(ecm_id)+"',channel_id = '"+std::to_string(channel_id)+"', access_criteria = '"+access_criteria+"', cp_number = '"+std::to_string(cp_number)+"', ecm_pid = '"+ecm_pid+"', timestamp = '"+timestamp+"';";  
 		mysql_query (connect,query.c_str());
 	 	return mysql_affected_rows(connect);
 	}
-	int dbHandler :: updateECMStreamSetup(int stream_id,int ecm_id,int channel_id,std::string access_criteria,int cp_number,std::string timestamp) 
+	int dbHandler :: updateECMStreamSetup(int stream_id,int ecm_id,int channel_id,std::string access_criteria,int cp_number,std::string ecm_pid,std::string timestamp) 
 	{
-		string query = "UPDATE ecm_stream SET ecm_id = '"+std::to_string(ecm_id)+"', access_criteria = '"+access_criteria+"', cp_number = '"+std::to_string(cp_number)+"', timestamp = '"+timestamp+"' WHERE channel_id = '"+std::to_string(channel_id)+"' AND stream_id = '"+std::to_string(stream_id)+"';";  
+		string query = "UPDATE ecm_stream SET ecm_id = '"+std::to_string(ecm_id)+"', access_criteria = '"+access_criteria+"', cp_number = '"+std::to_string(cp_number)+"', timestamp = '"+timestamp+"' WHERE channel_id = '"+std::to_string(channel_id)+"' AND stream_id = '"+std::to_string(stream_id)+"' AND ecm_pid = '"+ecm_pid+"';";  
 		// std::cout<<query<<std::endl;
 		mysql_query (connect,query.c_str());
 	 	return mysql_affected_rows(connect);
@@ -403,7 +445,6 @@ using namespace std;
 	}
 	int dbHandler :: enableEMM(std::string channel_id,std::string rmx_no,std::string output,int addFlag){
 		string query = "";
-		// std::cout<<"HELLO "<<addFlag<<std::endl;
 		if(addFlag){
 			query = "Insert into emmg_descriptor(channel_id,rmx_no,output) VALUES ('"+channel_id+"','"+rmx_no+"','"+output+"') ON DUPLICATE KEY UPDATE is_enable = 1;";  
 		}
@@ -413,6 +454,19 @@ using namespace std;
 		// std::cout<<query<<std::endl;
 		mysql_query (connect,query.c_str());
 	 	return mysql_affected_rows(connect);
+	}
+	int dbHandler :: enableECM(std::string channel_id,std::string stream_id,std::string service_pid,std::string programNumber, std::string rmx_no,std::string output,std::string input,int addFlag){
+		string query = "";
+		if(addFlag){
+			query = "Insert into ecm_descriptor(channel_id,stream_id,service_pid,service_no,rmx_id,output,input) VALUES ('"+channel_id+"','"+stream_id+"','"+service_pid+"','"+programNumber+"','"+rmx_no+"','"+output+"','"+input+"') ON DUPLICATE KEY UPDATE service_pid = '"+service_pid+"';";  
+		}
+		else{
+			query = "DELETE FROM ecm_descriptor WHERE channel_id = '"+channel_id+"' AND stream_id = '"+stream_id+"' AND service_no = '"+programNumber+"' AND rmx_id = '"+rmx_no+"' AND output = '"+output+"' AND output = '"+input+"';";  
+		}
+		// std::cout<<query<<std::endl;
+		mysql_query (connect,query.c_str());
+	 	return mysql_affected_rows(connect);
+
 	}
 	int dbHandler :: updateEMMchannelSetup(int channel_id, std::string client_id ,int data_id,int bw,int port,int stream_id,std::string emm_pid) 
 	{
@@ -478,12 +532,14 @@ using namespace std;
 	{
 		// string query = "UPDATE ecm_stream set is_enable = 0 where channel_id = '"+std::to_string(channel_id)+"' AND stream_id = '"+std::to_string(stream_id)+"';";
 		string query = "Delete From ecm_stream where channel_id = '"+std::to_string(channel_id)+"' AND stream_id = '"+std::to_string(stream_id)+"';";
+		// std::cout<<query<<std::endl;
 		int resp = mysql_query (connect,query.c_str());
  		return mysql_affected_rows(connect);
 	}
 	int dbHandler :: isECMStreamExists(int channel_id,int stream_id)
 	{
 		string query = "select count(*) from ecm_stream where channel_id = '"+std::to_string(channel_id)+"' AND stream_id = '"+std::to_string(stream_id)+"';";
+		// std::cout<<query<<std::endl;
 		mysql_query (connect,query.c_str());
 		res_set = mysql_store_result(connect);
 		if(mysql_num_rows(res_set))
@@ -791,6 +847,7 @@ using namespace std;
 		Json::Value jsonList;
 		std::string query;
 		query="SELECT DISTINCT a.channel_num FROM active_service_list a,channel_list c WHERE c.channel_number = a.channel_num AND a.in_channel = '"+input+"' AND a.out_channel = '"+output+"' AND a.rmx_id = '"+rmx_no+"' AND a.channel_num NOT IN ("+program_numbers+");";
+
 		mysql_query (connect,query.c_str());
 		unsigned int i =0;
 		res_set = mysql_store_result(connect);
@@ -814,7 +871,7 @@ using namespace std;
 		}else{ 		
 			jsonArray["error"] = true;
 		}
-		// std::cout<<query;
+		
 	 	return jsonArray;
 	}
 	Json::Value dbHandler :: getEncryptedPrograms(std::string program_numbers,std::string input,std::string output,std::string rmx_no){
@@ -822,7 +879,9 @@ using namespace std;
 		MYSQL_ROW row;
 		Json::Value jsonList;
 		std::string query;
-		query="SELECT DISTINCT a.channel_num FROM encrypted_service_list a,channel_list c WHERE c.channel_number = a.channel_num AND a.in_channel = '"+input+"' AND a.out_channel = '"+output+"' AND a.rmx_id = '"+rmx_no+"' AND a.channel_num NOT IN ("+program_numbers+");";
+		// query="SELECT DISTINCT a.channel_num,a.key_index FROM encrypted_service_list a,channel_list c WHERE c.channel_number = a.channel_num AND a.in_channel = '"+input+"' AND a.out_channel = '"+output+"' AND a.rmx_id = '"+rmx_no+"' AND a.channel_num NOT IN ("+program_numbers+");";
+		query="SELECT DISTINCT a.channel_num,a.key_index FROM encrypted_service_list a,channel_list c WHERE c.channel_number = a.channel_num AND a.in_channel = '"+input+"' AND a.rmx_id = '"+rmx_no+"' AND a.channel_num NOT IN ("+program_numbers+");";
+		std::cout<<query<<std::endl;
 		mysql_query (connect,query.c_str());
 		unsigned int i =0;
 		res_set = mysql_store_result(connect);
@@ -835,8 +894,10 @@ using namespace std;
 				while (((row= mysql_fetch_row(res_set)) !=NULL ))
 				{ 
 					Json::Value jsonObj;
-					jsonList.append(row[i]);
-					// jsonList.append(jsonObj);
+					jsonObj["service_no"] = row[i];
+					jsonObj["key_index"] = row[i+1];
+					jsonList.append(jsonObj);
+					std::cout<<jsonObj<<endl;
 				}
 				// jsonList["program_number"]=jsonList;
 			}else{	
@@ -881,6 +942,61 @@ using namespace std;
 			jsonArray["error"] = true;
 		}
 	 	return jsonArray;
+	}
+	Json::Value dbHandler :: getActivePrograms(std::string output ,std::string rmx_no){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+		std::string query;
+		query="SELECT a.channel_num,in_channel FROM active_service_list a WHERE a.rmx_id = '"+rmx_no+"' AND a.out_channel = '"+output+"';";
+		// std::cout<<query<<endl;
+		mysql_query (connect,query.c_str());
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		if(res_set){
+			unsigned int numrows = mysql_num_rows(res_set);
+			if(numrows>0)
+			{
+				jsonArray["error"] = false;
+				while (((row= mysql_fetch_row(res_set)) !=NULL ))
+				{ 
+					Json::Value jsonObj;
+					jsonObj["service_id"]=row[i];
+					jsonObj["input"]=row[i+1];
+					jsonList.append(jsonObj);
+				}
+			}else{	
+				jsonArray["error"] = true;
+			}
+			jsonArray["list"]=jsonList;
+		}else{ 		
+			jsonArray["error"] = true;
+		}
+	 	return jsonArray;
+	}
+	int dbHandler :: getLCNNumber(std::string input ,std::string rmx_no ,std::string service_id){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+		std::string query;
+		int lcn_id = 0;
+		query="SELECT lcn_id FROM channel_list WHERE rmx_id = '"+rmx_no+"' AND input_channel = '"+input+"' AND channel_number = '"+service_id+"';";
+		// std::cout<<query<<endl;
+		mysql_query (connect,query.c_str());
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		if(res_set){
+			unsigned int numrows = mysql_num_rows(res_set);
+			if(numrows>0)
+			{
+				while (((row= mysql_fetch_row(res_set)) !=NULL ))
+				{ 
+					std::string lcn = row[i]; 
+					lcn_id = std::stoi(lcn);
+				}
+			}
+		}
+	 	return lcn_id;
 	}
 	Json::Value dbHandler :: getCenterFrequency()
 	{
@@ -978,6 +1094,44 @@ using namespace std;
 	 	return jsonArray;
 	}
 	
+	Json::Value dbHandler :: getNetworkDetailsForNIT(){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+		
+		std::string query="SELECT n.output,n.ts_id,n.network_id,n.original_netw_id,n.network_name,n.rmx_id,o.qam_id,o.frequency,o.symbol_rate FROM network_details n,output o,(SELECT DISTINCT `out_channel`,`rmx_id` FROM `active_service_list`) alist WHERE n.output = output_channel AND n.rmx_id = o.rmx_id AND alist.out_channel = o.output_channel AND alist.rmx_id = o.rmx_id ORDER BY o.frequency";
+		mysql_query (connect,query.c_str());
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		if(res_set){
+			unsigned int numrows = mysql_num_rows(res_set);
+			if(numrows>0)
+			{
+				jsonArray["error"] = false;
+				while (((row= mysql_fetch_row(res_set)) !=NULL ))
+				{ 
+					Json::Value jsonObj;
+					jsonObj["output"]=row[i];
+					jsonObj["ts_id"]=row[i+1];
+					jsonObj["network_id"]=row[i+2];
+					jsonObj["original_netw_id"]=row[i+3];
+					jsonObj["network_name"]=row[i+4];
+					jsonObj["rmx_no"]=row[i+5];
+					jsonObj["modulation"]=row[i+6];
+					jsonObj["frequency"]=row[i+7];
+					jsonObj["symbol_rate"]=row[i+8];
+					jsonList.append(jsonObj);
+				}
+			}else{	
+				jsonArray["error"] = true;
+			}
+			jsonArray["list"]=jsonList;
+		}else{ 		
+			jsonArray["error"] = true;
+		}
+	 	return jsonArray;
+		
+	}
 	Json::Value dbHandler :: getFreeCAModePrograms(){
 		MYSQL_RES *res_set;
 		MYSQL_ROW row;
@@ -1171,7 +1325,7 @@ using namespace std;
 		Json::Value jsonList;
 		std::string query;
 
-		query="SELECT DISTINCT n.program_number, n.channel_number,n.input FROM lcn n,channel_list c WHERE c.channel_number = n.program_number AND n.input = '"+input+"' AND n.program_number != '"+program_number+"';";
+		query="SELECT DISTINCT channel_number, lcn_id FROM channel_list WHERE input_channel = '"+input+"' AND channel_number != '"+program_number+"' AND lcn_id != '-1';";
 		mysql_query (connect,query.c_str());
 		unsigned int i =0;
 		res_set = mysql_store_result(connect);
@@ -1185,7 +1339,6 @@ using namespace std;
 					Json::Value jsonObj;
 					jsonObj["program_number"]=row[i];
 					jsonObj["channel_number"]=row[i+1];
-					jsonObj["input_channel"]=row[i+2];
 					jsonList.append(jsonObj);
 				}
 			}else{	
@@ -1205,7 +1358,7 @@ using namespace std;
 		MYSQL_ROW row;
 		Json::Value jsonList;
 		std::string query;
-		query="SELECT DISTINCT n.program_number, n.channel_number,n.input,n.rmx_id FROM lcn n,channel_list c WHERE c.channel_number = n.program_number AND n.rmx_id = c.rmx_id group by n.program_number;";
+		query="SELECT DISTINCT `channel_number`,`lcn_id`,`input_channel`,`rmx_id` FROM channel_list WHERE lcn_id != '-1';";
 		
 		mysql_query (connect,query.c_str());
 		unsigned int i =0;
@@ -1392,7 +1545,7 @@ using namespace std;
 		MYSQL_RES *res_set;
 		MYSQL_ROW row;
 		Json::Value jsonList;
-		mysql_query (connect,"select * from ecm_stream;");
+		mysql_query (connect,"select stream_id,channel_id,ecm_id,access_criteria,cp_number,timestamp,ecm_pid from ecm_stream;");
 		unsigned int i =0;
 		res_set = mysql_store_result(connect);
 		if(res_set){
@@ -1409,6 +1562,7 @@ using namespace std;
 					jsonObj["access_criteria"]=row[i+3];
 					jsonObj["cp_number"]=row[i+4];
 					jsonObj["timestamp"]=row[i+5];
+					jsonObj["ecm_pid"]=row[i+6];
 					jsonList.append(jsonObj);
 				}
 			}else{	
@@ -1553,7 +1707,41 @@ using namespace std;
 		}
 	 	return jsonArray;
 	}
-
+	Json::Value dbHandler :: getECMDescriptors(std::string rmx_no,std::string input){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonArray;
+		std::string query = "SELECT supercas_id,service_pid,ecm_pid FROM ecm_descriptor ed,ecmg e,ecm_stream es WHERE ed.channel_id = es.channel_id AND ed.stream_id = es.stream_id AND es.channel_id = e.channel_id AND ed.rmx_id = '"+rmx_no+"' AND ed.input = '"+input+"'";	
+		
+		mysql_query (connect,query.c_str());
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		unsigned int numrows = mysql_num_rows(res_set);
+		if(numrows>0)
+		{
+			jsonArray["error"] = false;
+			jsonArray["message"] = "Records found!";
+			Json::Value jsonList,ca_system_id,service_pid,ecm_pids;
+			while (((row= mysql_fetch_row(res_set)) !=NULL ))
+			{ 
+				// Json::Value jsonObj;
+				// jsonObj["ca_system_id"]=row[i];
+				ca_system_id.append(row[i]);
+				// jsonObj["emm_pid"]=row[i+1];
+				service_pid.append(row[i+1]);
+				// jsonList.append(jsonObj);
+				ecm_pids.append(row[i+2]);
+			}
+			jsonArray["ca_system_ids"]=ca_system_id;
+			jsonArray["service_pids"]=service_pid;
+			jsonArray["ecm_pids"]=ecm_pids;
+		}else{
+			jsonArray["error"] = true;
+			jsonArray["message"] = "No records found!";
+		}
+	 	return jsonArray;
+	}
+	
 	// Json::Value dbHandler :: getEMMGChannels(std::string channel_id ){
 	// 	MYSQL_RES *res_set;
 	// 	MYSQL_ROW row;
@@ -1767,7 +1955,7 @@ int dbHandler :: getTunerChannelType(int control_fpga,int rmx_no,int channel_no,
 		std::string query="(SELECT  tuner_type FROM  `input` WHERE  `rmx_id` =  '"+std::to_string(rmx_no1)+"' ) UNION ALL (SELECT tuner_type FROM  `input` WHERE  `rmx_id` = '"+std::to_string(rmx_no2)+"');";
 		mysql_query (connect,query.c_str());
 		unsigned int i =0;
-		std::cout<<query<<std::endl;
+		// std::cout<<query<<std::endl;
 		res_set = mysql_store_result(connect);
 		if(res_set){
 			unsigned int numrows = mysql_num_rows(res_set);
@@ -1951,4 +2139,548 @@ Json::Value dbHandler :: getIPTunerDetails(){
 		}
 		return jsonArray;
 	}
-	
+	Json::Value dbHandler :: getCustomPids(std::string rmx_no){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+
+		std::string query="SELECT pid,output_auth FROM custom_pids where rmx_no = '"+rmx_no+"';";
+		mysql_query (connect,query.c_str());
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		if(res_set){
+			unsigned int numrows = mysql_num_rows(res_set);
+			if(numrows>0)
+			{
+				Json::Value json_pids,json_output_auth;
+				jsonArray["error"] = false;
+				while (((row= mysql_fetch_row(res_set)) !=NULL ))
+				{ 
+					json_pids.append(row[i]);
+					json_output_auth.append(row[i+1]);
+				}
+				jsonArray["pids"] = json_pids;
+				jsonArray["output_auths"] = json_output_auth;
+			}else{	
+				jsonArray["error"] = true;
+				jsonArray["message"] = "NO record found!";
+			}
+		}else{ 		
+			jsonArray["error"] = true;
+			jsonArray["message"] = "ERROR!";
+		}
+		return jsonArray;
+	}
+
+	// Json::Value dbHandler :: getCustomPids(){
+	// MYSQL_RES *res_set;
+	// MYSQL_RES *res_set1;
+	// MYSQL_RES *res_set2;
+	// MYSQL_ROW row;
+	// Json::Value jsonList;
+
+	// std::string query="SELECT pid,output_auth FROM custom_pids where rmx_no = '"+rmx_no+"' AND output_channel = '"+output+"';";
+	// mysql_query (connect,query.c_str());
+	// unsigned int i =0;
+	// res_set = mysql_store_result(connect);
+
+	// query="SELECT pid,output_auth FROM custom_pids where rmx_no = '"+rmx_no+"' AND output_channel = '"+output+"';";
+	// mysql_query (connect,query.c_str());
+	// unsigned int i =0;
+	// res_set1 = mysql_store_result(connect);
+
+	// query="SELECT pid,output_auth FROM custom_pids where rmx_no = '"+rmx_no+"' AND output_channel = '"+output+"';";
+	// mysql_query (connect,query.c_str());
+	// unsigned int i =0;
+	// res_set1 = mysql_store_result(connect);
+
+	// if(res_set){
+	// 	unsigned int numrows = mysql_num_rows(res_set);
+	// 	if(numrows>0)
+	// 	{
+	// 		Json::Value json_pids,json_output_auth;
+	// 		jsonArray["error"] = false;
+	// 		while (((row= mysql_fetch_row(res_set)) !=NULL ))
+	// 		{ 
+	// 			json_pids.append(row[i]);
+	// 			json_output_auth.append(row[i+1]);
+	// 		}
+	// 		jsonArray["pids"] = json_pids;
+	// 		jsonArray["output_auths"] = json_output_auth;
+	// 	}else{	
+	// 		jsonArray["error"] = true;
+	// 		jsonArray["message"] = "NO record found!";
+	// 	}
+	// }else{ 		
+	// 	jsonArray["error"] = true;
+	// 	jsonArray["message"] = "ERROR!";
+	// }
+	// return jsonArray;
+	// }
+	int dbHandler :: generateECMPID(std::string rmx_no,std::string output,std::string channel_id,std::string stream_id,std::string programNumber){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+		std::string query;
+		std::string ecm_pid;
+
+		query="SELECT ecm_pid FROM ecm_descriptor WHERE rmx_id = '"+rmx_no+"' AND output = '"+output+"' AND channel_id = '"+channel_id+"' AND stream_id = '"+stream_id+"' AND service_no = '"+programNumber+"';";
+		// std::cout<<query<<std::endl;
+		mysql_query (connect,query.c_str());
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		if(res_set){
+			unsigned int numrows = mysql_num_rows(res_set);
+			if(numrows>0)
+			{
+				while (((row= mysql_fetch_row(res_set)) !=NULL ))
+				{ 
+					ecm_pid=row[i];
+				}
+			}else{	
+				ecm_pid = "-1";
+			}
+		}else{ 		
+			ecm_pid = "-1";
+		}
+	 	
+	 	if(ecm_pid != "-1"){
+	 		return std::stoi(ecm_pid);
+	 	}else{
+	 		
+	 		return 1001;
+	 	}
+	}
+	unsigned long int dbHandler :: getScramblingIndex(std::string rmx_no,std::string output){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+		std::string query;
+		std::string indexValue;
+
+		query="SELECT indexValue FROM output WHERE rmx_id = '"+rmx_no+"' AND output_channel = '"+output+"';";
+		// std::cout<<query<<std::endl;
+		mysql_query (connect,query.c_str());
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		if(res_set){
+			unsigned int numrows = mysql_num_rows(res_set);
+			if(numrows>0)
+			{
+				while (((row= mysql_fetch_row(res_set)) !=NULL ))
+				{ 
+					indexValue=row[i];
+				}
+			}else{	
+				indexValue = "-1";
+			}
+		}else{ 		
+			indexValue = "-1";
+		}
+	 	
+	 	if(indexValue != "-1"){
+	 		return std::stoul(indexValue);
+	 	}else{
+	 		
+	 		return 0;
+	 	}
+	}
+	int dbHandler :: updateCWIndex(std::string rmx_no,std::string output,std::string programNumber,long int index,int indexValue,int addFlag){
+		std::string query;
+		unsigned int indx_value;
+		if(std::stoi(rmx_no)%2 == 0)
+    		indx_value = setIndexSetUnset(index-128,indexValue,addFlag);
+    	else
+    		indx_value = setIndexSetUnset(index,indexValue,addFlag);
+		query="UPDATE output SET indexValue = '"+std::to_string(indx_value)+"' WHERE rmx_id = '"+rmx_no+"' AND output_channel = '"+output+"';";
+		std::cout<<query<<endl;
+		mysql_query (connect,query.c_str());
+	    return mysql_affected_rows(connect);	    	
+	}
+
+	int dbHandler :: setIndexSetUnset(int index, int indexValue,int flag){
+		if(flag)
+			return  indexValue | 1UL << index;
+		else
+			return indexValue & (~(1UL << index));
+	}
+	long int dbHandler :: getCWKeyIndex(std::string rmx_no,std::string input,std::string output,std::string programNumber){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+		std::string query;
+		long int cw_index;
+
+		query="SELECT key_index FROM encrypted_service_list WHERE rmx_id = '"+rmx_no+"' AND in_channel = '"+input+"' AND out_channel = '"+output+"' AND channel_num = '"+programNumber+"';";
+		// std::cout<<query<<std::endl;
+		mysql_query (connect,query.c_str());
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		if(res_set){
+			unsigned int numrows = mysql_num_rows(res_set);
+			if(numrows>0)
+			{
+				while (((row= mysql_fetch_row(res_set)) !=NULL ))
+				{ 
+					cw_index=std::stoul(row[i]);
+				}
+				return cw_index;
+			}else{	
+				return -1;
+			}
+		}else{ 		
+			return -1;
+		}
+	}
+	int dbHandler :: addEncryptedService(std::string rmx_no,std::string input,std::string output,std::string programNumber,long int key_index, int includeflag){
+			std::string query="";
+			if(includeflag){
+				query = "Insert into encrypted_service_list (in_channel,out_channel,channel_num,rmx_id,key_index) VALUES ('"+input+"','"+output+"','"+programNumber+"','"+rmx_no+"','"+std::to_string(key_index)+"')  ON DUPLICATE KEY UPDATE channel_num = channel_num;";  	
+			}
+			else{
+				query = "DELETE FROM encrypted_service_list WHERE in_channel = '"+input+"' AND out_channel = '"+output+"' AND channel_num = '"+ programNumber+"' AND rmx_id = '"+rmx_no+"';";  
+			}
+			// std::cout<<"addActivatedPrograms--------------------------\n"<<query;
+			std::cout<<"\n"<<query;
+			mysql_query (connect,query.c_str());
+			return mysql_affected_rows(connect);
+		
+	}
+	int dbHandler :: isServiceEncrypted(std::string programNumber,std::string rmx_no,std::string output,std::string input){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+		std::string query;
+		long int cw_index;
+
+		query="SELECT COUNT(*) FROM encrypted_service_list WHERE rmx_id = '"+rmx_no+"' AND in_channel = '"+input+"' AND out_channel = '"+output+"' AND channel_num = '"+programNumber+"';";
+		// std::cout<<query<<std::endl;
+		mysql_query (connect,query.c_str());
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		if(res_set){
+			unsigned int numrows = mysql_num_rows(res_set);
+			if(numrows>0)
+			{
+				while (((row= mysql_fetch_row(res_set)) !=NULL ))
+				{ 
+					cw_index=std::stoul(row[i]);
+				}
+				return cw_index;
+			}else{	
+				return -1;
+			}
+		}else{ 		
+			return -1;
+		}
+	}
+Json::Value dbHandler :: getEnabledEMCStreams(std::string channel_id,std::string stream_id){
+	MYSQL_RES *res_set;
+	MYSQL_ROW row;
+	Json::Value jsonArray;
+	std::string query = "SELECT supercas_id,service_pid,ecm_pid,ed.rmx_id,ed.output,es.access_criteria,ed.output FROM ecm_descriptor ed,ecmg e,ecm_stream es WHERE ed.channel_id = es.channel_id AND ed.stream_id = es.stream_id AND es.channel_id = e.channel_id AND ed.stream_id = '"+stream_id+"' AND ed.channel_id = '"+channel_id+"'";
+	// std::cout<<query<<endl;
+	mysql_query (connect,query.c_str());
+	unsigned int i =0;
+	res_set = mysql_store_result(connect);
+	unsigned int numrows = mysql_num_rows(res_set);
+	if(numrows>0)
+	{
+		jsonArray["error"] = false;
+		jsonArray["message"] = "Records found!";
+		Json::Value jsonList,ca_system_id,service_pid,ecm_pids,rmx_nos,output_channel,access_criteria,input_channel;
+		while (((row= mysql_fetch_row(res_set)) !=NULL ))
+		{ 
+			ca_system_id.append(row[i]);
+			service_pid.append(row[i+1]);
+			ecm_pids.append(row[i+2]);
+			rmx_nos.append(row[i+3]);
+			output_channel.append(row[i+4]);
+			access_criteria.append(row[i+5]);
+			input_channel.append(row[i+6]);
+		}
+		jsonArray["ca_system_ids"]=ca_system_id;
+		jsonArray["service_pids"]=service_pid;
+		jsonArray["ecm_pids"]=ecm_pids;
+		jsonArray["rmx_nos"]=rmx_nos;
+		jsonArray["output_channel"]=output_channel;
+		jsonArray["input_channel"]=input_channel;
+		jsonArray["access_criteria"]=access_criteria;
+	}else{
+		jsonArray["error"] = true;
+		jsonArray["message"] = "No records found!";
+	}
+ 	return jsonArray;
+}
+Json::Value dbHandler :: getECMChannelDetails(std::string ca_system_id,std::string service_pid,std::string ecm_pid,std::string rmx_no,std::string  output){
+	MYSQL_RES *res_set;
+	MYSQL_ROW row;
+	Json::Value jsonArray;
+	std::string query = "SELECT ed.channel_id,ed.stream_id FROM ecm_descriptor ed,ecmg e,ecm_stream es WHERE e.channel_id = es.channel_id AND e.supercas_id = '"+ca_system_id+"' AND es.channel_id = ed.channel_id AND ed.stream_id = es.stream_id AND es.ecm_pid = '"+ecm_pid+"' AND ed.service_pid = '"+service_pid+"' AND ed.rmx_id = '"+rmx_no+"' AND ed.output = '"+output+"'";
+	// std::cout<<query<<endl;
+	mysql_query (connect,query.c_str());
+	unsigned int i =0;
+	res_set = mysql_store_result(connect);
+	unsigned int numrows = mysql_num_rows(res_set);
+	if(numrows>0)
+	{
+		jsonArray["error"] = false;
+		jsonArray["message"] = "Records found!";
+		Json::Value jsonList,ca_system_id,service_pid,ecm_pids,rmx_nos,output_channel,access_criteria;
+		while (((row= mysql_fetch_row(res_set)) !=NULL ))
+		{ 
+			jsonArray["channel_id"] = row[i];
+			jsonArray["stream_id"] = row[i+1];
+		}
+	}else{
+		jsonArray["error"] = true;
+		jsonArray["message"] = "No records found!";
+	}
+ 	return jsonArray;
+}
+
+Json::Value dbHandler :: getSymbolRates(){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		int nit_mode=-1;
+		Json::Value jsonList;
+		std::string query="select output_channel,rmx_id,symbol_rate,roll_off from output;";
+		mysql_query (connect,query.c_str());
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		if(res_set){
+			unsigned int numrows = mysql_num_rows(res_set);
+			if(numrows>0)
+			{
+				jsonArray["error"] = false;
+				while (((row= mysql_fetch_row(res_set)) !=NULL ))
+				{ 
+					// nit_mode=std::stoi(row[i]);
+					Json::Value jsonObj;
+					jsonObj["output"]=row[i];
+					jsonObj["rmx_no"]=row[i+1];
+					jsonObj["symbol_rate"]=row[i+2];
+					jsonObj["roll_off"]=row[i+3];
+					jsonList.append(jsonObj);
+				}
+			}else{	
+				jsonArray["error"] = true;
+			}
+			jsonArray["list"]=jsonList;
+		}else{ 		
+			jsonArray["error"] = true;
+		}
+	 	return jsonArray;
+}
+
+int dbHandler :: addNITDetails(int version,std::string network_name,std::string network_id){
+	string query = "";
+	if(isNetworkExists() == 0)
+		query = "INSERT INTO `NIT_version` ( `network_id`, `network_name`, `nit_version`) VALUES ('"+network_id+"', '"+network_name+"', '"+std::to_string(version)+"');";
+	else
+		query="UPDATE NIT_version SET network_id='"+network_id+"',network_name = '"+network_name+"',nit_version = '"+std::to_string(version)+"';";
+		
+	// std::cout<<query<<std::endl;
+	mysql_query (connect,query.c_str());
+	return mysql_affected_rows(connect);		
+}
+
+int dbHandler :: isNetworkExists(){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+		std::string query;
+		query="SELECT COUNT(*) FROM NIT_version;";
+		// std::cout<<query<<std::endl;
+		mysql_query (connect,query.c_str());
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		if(mysql_num_rows(res_set))
+		{
+			row= mysql_fetch_row(res_set);
+		 	return atoi(row[0]);
+	 	}else{
+	 		return 0;
+	 	}
+	}
+Json::Value dbHandler :: getNITDetails(){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+
+		std::string query="SELECT network_id,network_name,nit_version FROM NIT_version;";
+		mysql_query (connect,query.c_str());
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		if(res_set){
+			unsigned int numrows = mysql_num_rows(res_set);
+			if(numrows>0)
+			{
+				jsonArray["error"] = false;
+				while (((row= mysql_fetch_row(res_set)) !=NULL ))
+				{ 
+					jsonArray["network_id"]=row[i];
+					jsonArray["network_name"]=row[i+1];
+					jsonArray["nit_version"]=row[i+2];
+				}
+			}else{	
+				jsonArray["error"] = true;
+				jsonArray["message"] = "NO record found!";
+			}
+		}else{ 		
+			jsonArray["error"] = true;
+			jsonArray["message"] = "ERROR!";
+		}
+		return jsonArray;
+	}
+
+Json::Value  dbHandler :: getNITHostMode() 
+	{
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		int nit_mode=-1;
+		Json::Value jsonList;
+		std::string query="select output_channel,rmx_id from output WHERE nit_mode = 2;";
+		mysql_query (connect,query.c_str());
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		if(res_set){
+			unsigned int numrows = mysql_num_rows(res_set);
+			if(numrows>0)
+			{
+				jsonArray["error"] = false;
+				while (((row= mysql_fetch_row(res_set)) !=NULL ))
+				{ 
+					Json::Value jsonObj;
+					jsonObj["output"]=row[i];
+					jsonObj["rmx_no"]=row[i+1];
+					jsonList.append(jsonObj);
+				}
+			}else{	
+				jsonArray["error"] = true;
+			}
+			jsonArray["list"]=jsonList;
+		}else{ 		
+			jsonArray["error"] = true;
+		}
+	 	return jsonArray;
+	}
+
+Json::Value dbHandler :: getLcnIds(std::string output,std::string rmx_no){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+		std::string query;
+		query="SELECT a.in_channel,a.channel_num,a.lcn_id FROM active_service_list a WHERE a.rmx_id = '"+rmx_no+"' AND a.out_channel = '"+output+"' AND a.lcn_id != -1;";
+		// std::cout<<query<<endl;
+		mysql_query (connect,query.c_str());
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		if(res_set){
+			unsigned int numrows = mysql_num_rows(res_set);
+			if(numrows>0)
+			{
+				jsonArray["error"] = false;
+				while (((row= mysql_fetch_row(res_set)) !=NULL ))
+				{ 
+					Json::Value jsonObj;
+					jsonObj["input"]=row[i];
+					jsonObj["service_id"]=row[i+1];
+					jsonObj["lcn_id"]=row[i+2];
+					jsonList.append(jsonObj);
+				}
+			}else{	
+				jsonArray["error"] = true;
+			}
+			jsonArray["list"]=jsonList;
+		}else{ 		
+			jsonArray["error"] = true;
+		}
+	 	return jsonArray;
+	}
+
+
+int dbHandler :: addLcnIds(std::string service_id,std::string lcn_id,std::string input, std::string output,std::string rmx_no){
+	string query ="";
+	query = "UPDATE active_service_list SET lcn_id ='"+lcn_id+"' WHERE rmx_id = '"+rmx_no+"' AND in_channel = '"+input+"' AND out_channel = '"+output+"' AND channel_num = '"+service_id+"';";
+		
+	// std::cout<<query<<std::endl;
+	mysql_query (connect,query.c_str());
+	if(mysql_affected_rows(connect)){
+		return 1;
+	}else{
+		query = "SELECT COUNT(*) FROM active_service_list WHERE lcn_id ='"+lcn_id+"' AND rmx_id = '"+rmx_no+"' AND in_channel = '"+input+"' AND out_channel = '"+output+"' AND channel_num = '"+service_id+"';";
+		mysql_query (connect,query.c_str());
+		res_set = mysql_store_result(connect);
+		if(mysql_num_rows(res_set))
+		{
+			row= mysql_fetch_row(res_set);
+		 	return atoi(row[0]);
+	 	}else{
+	 		return 0;
+	 	}
+	}		
+}
+
+int dbHandler :: isLcnIdExists(std::string lcn_id){
+	string query = "SELECT COUNT(*) FROM active_service_list WHERE lcn_id ='"+lcn_id+"';";
+	mysql_query (connect,query.c_str());
+	res_set = mysql_store_result(connect);
+	if(mysql_num_rows(res_set))
+	{
+		row= mysql_fetch_row(res_set);
+	 	return atoi(row[0]);
+ 	}else{
+ 		return 0;
+ 	}
+}
+
+
+Json::Value dbHandler :: getNetworkId(std::string rmx_no,std::string output){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+		std::string query;
+		std::string indexValue;
+
+		query="SELECT network_id,original_netw_id FROM network_details WHERE rmx_id = '"+rmx_no+"' AND output = '"+output+"';";
+		std::cout<<query<<std::endl;
+		mysql_query (connect,query.c_str());
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		if(res_set){
+			unsigned int numrows = mysql_num_rows(res_set);
+			if(numrows>0)
+			{
+				jsonArray["error"] = false;
+				while (((row= mysql_fetch_row(res_set)) !=NULL ))
+				{ 
+					jsonArray["network_id"]=row[i];
+					jsonArray["original_netw_id"]=row[i+1];
+				}
+			}else{	
+				jsonArray["error"] = true;
+			}
+			jsonArray["list"]=jsonList;
+		}else{ 		
+			jsonArray["error"] = true;
+		}
+	 	return jsonArray;
+	}
+
+
+
+
+
+
+
+
+// int rmx_no = 6;
+// 		int frequency = 462;
+// 		for (int i = 0; i < 8; ++i)
+// 		{
+// 			std::string query="UPDATE output SET frequency='"+std::to_string(frequency)+"',symbol_rate = '6400'  WHERE output_channel = '"+std::to_string(i)+"' AND rmx_id = '"+std::to_string(rmx_no)+"';";
+// 			mysql_query (connect,query.c_str());
+// 			frequency = frequency+8;
+// 			std::cout<<query<<endl;
+// 		}

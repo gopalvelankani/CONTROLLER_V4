@@ -200,6 +200,7 @@
 		    		msgBuf[1] = (unsigned char) (len>>8);
 		    		msgBuf[2] = (unsigned char) len;
 		    		msgBuf[3] = CMD_INIT_NIT_CHAN;
+		    		std::cout<<json["uProg"]<<std::endl;
 		    		unsigned short  progList[1024],chanList[1024];
 					for(int i=0;i<uNum;i++){
 		    			unsigned short pno 	= 	(unsigned short)std::stoi(json["uProg"][i].asString());
@@ -687,17 +688,19 @@
 				    msgBuf[2] = (unsigned char) len;
 				    msgBuf[3] = CMD_ENCRYPT_PROG_STATE;
 				    msgBuf[4] = ETX;
+				    std::cout<<"------------------------READ ENCRY -------------"<<std::endl;
 				}else{
 					
 					unsigned short length=json["programNumbers"].size();
-					len = 2*length+length;
+					if(length>0)
+						len = 2*length+length;
+					else
+						len = 1;
 					std::cout<<length<<std::endl;
 					msgBuf[0] = STX;
 					msgBuf[1] = (unsigned char) (len>>8);
 					msgBuf[2] = (unsigned char) len;
 					msgBuf[3] = CMD_ENCRYPT_PROG_STATE;
-					std::cout << json["programNumbers"] <<std::endl;
-					std::cout<<json["keyids"]<<std::endl;
 					for(int i=0;i<json["programNumbers"].size();i++){
 		    			unsigned short oPno = (unsigned short)std::stoi(json["programNumbers"][i].asString());
 		    			msgBuf[4 + i*3] = (oPno&0xFF00)>>8;
@@ -705,9 +708,14 @@
 						unsigned short nPno = (unsigned short)std::stoi(json["keyids"][i].asString());
 		    			msgBuf[6 + i*3] = nPno;
 					}
-					msgBuf[4+length*3] = ETX;
+					if(length>0)
+						msgBuf[4+length*3] = ETX;
+					else{
+						msgBuf[4] = 0x00;
+						msgBuf[5] = ETX;
+					}
 				}
-			    break;
+				break;
 			case 46:
 				if(readWriteMode==0){
 					len = 0;
@@ -722,7 +730,7 @@
 				    msgBuf[2] = (unsigned char) len;
 				    msgBuf[3] = CMD_INIT_CSA;
 				    msgBuf[4] = 1;
-				    msgBuf[5] = 3;
+				    msgBuf[5] = 2;
 				    msgBuf[6] = ETX;
 				}
 			    break;
@@ -744,8 +752,8 @@
 				    msgBuf[1] = (unsigned char) (len>>8);
 				    msgBuf[2] = (unsigned char) len;
 				    msgBuf[3] = CMD_SET_CSA;
-				    msgBuf[4] = 1;
-				    msgBuf[5] = 4;
+				    msgBuf[4] = auth;
+				    msgBuf[5] = parity;
 				    msgBuf[6] = ETX;
 				}
 			    break;
@@ -765,8 +773,8 @@
 					msgBuf[1] = (unsigned char) (len>>8);
 					msgBuf[2] = (unsigned char) len;
 					msgBuf[3] = CMD_SET_PID;
-					std::cout << json["Pids"] <<std::endl;
-					std::cout<<json["AuthOutputs"]<<std::endl;
+					// std::cout << json["Pids"] <<std::endl;
+					// std::cout<<json["AuthOutputs"]<<std::endl;
 					for(int i=0;i<json["Pids"].size();i++){
 		    			unsigned short oPno = (unsigned short)std::stoi(json["Pids"][i].asString());
 		    			msgBuf[4 + i*3] = (oPno&0xFF00)>>8;
@@ -815,6 +823,58 @@
 								/* code */
 							}
 							len+=6+private_data_count;
+						}
+					}else{
+						len = 1;
+						msgBuf[4] = 0x00;
+					}
+					msgBuf[1] = (unsigned char) (len>>8);
+				    msgBuf[2] = (unsigned char) len;
+					msgBuf[len+4] = ETX;
+				}
+			    break;
+			case 50:
+				if(readWriteMode==0){
+					len = 0;
+				    msgBuf[1] = (unsigned char) (len>>8);
+				    msgBuf[2] = (unsigned char) len;
+				    msgBuf[3] = 0x4A;
+				    msgBuf[4] = ETX;
+				}else{
+					len = 0;
+					
+				    msgBuf[3] = 0x4A;
+				    Json::Value elementry_pids = json["elementry_pids"];
+					Json::Value CA_System_ids = json["CA_System_ids"];
+					Json::Value ecm_pids = json["ecm_pids"];
+					Json::Value private_data_list = json["private_data_list"];
+					int private_data_count =0;
+					int noof_CAS = CA_System_ids.size();
+					if(noof_CAS>0)
+					{
+						for(int i=0;i<noof_CAS;i++)
+						{
+
+							int ca_system_id =std::stoi(CA_System_ids[i].asString());
+							int ca_pid =std::stoi(ecm_pids[i].asString());
+							int elementry_pid = std::stoi(elementry_pids[i].asString());
+							// std::cout<<4+i*(private_data_list[1].size()+6)<<std::endl;
+							// std::cout<<ca_system_id<<std::endl;
+							msgBuf[4+i*(private_data_count+8)] = elementry_pid>>8|0xE0;
+							msgBuf[5+i*(private_data_count+8)] = elementry_pid&0x00FF;
+							msgBuf[6+i*(private_data_count+8)] = 0x09;
+							msgBuf[7+i*(private_data_count+8)] = 4+private_data_list[i].size();
+							msgBuf[8+i*(private_data_count+8)] = ca_system_id>>8;
+							msgBuf[9+i*(private_data_count+8)] = ca_system_id&0x00FF;
+							msgBuf[10+i*(private_data_count+8)] = (ca_pid>>8)|0xE0;
+							msgBuf[11+i*(private_data_count+8)] = ca_pid&0x00FF;
+							private_data_count = private_data_list[i].size();
+							for (int j = 0; j <private_data_list[i].size() ; ++j)
+							{
+								msgBuf[(12+i*(private_data_count+6))+j] = private_data_list[i][j].asInt();
+								/* code */
+							}
+							len+=8+private_data_count;
 						}
 					}else{
 						len = 1;
@@ -965,7 +1025,76 @@
 		shutdown(socketHandle,2);
 	    return count;
 	}
+int Callcommand :: updateNITTable(unsigned char *ucSectiobData, unsigned short usPayloadLen,unsigned short usPointer,unsigned short usSectionNo)
+{
+    struct sockaddr_in serverAddress,
+        clientAddress;
+    unsigned short port = 4660;
+    unsigned char msgBuf[300];
+    unsigned char RxBuffer[105]={0};
 
+    unsigned short FIFOSIZE;
+    unsigned char PRESENCE_SFN;
+    double clk;
+
+
+    unsigned short len=0;
+    struct timeval tv;
+
+    tv.tv_sec = 0;  /* 0.5 Secs Timeout */
+    tv.tv_usec = 300000;
+    int socketHandle = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP/* or 0? */);
+    setsockopt(socketHandle, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
+      if (socketHandle<0)
+      {
+          printf("could not make socket\n");
+          return 0;
+      }
+      memset(&serverAddress, 0, sizeof(serverAddress));
+      memset(&clientAddress, 0, sizeof(clientAddress));
+      serverAddress.sin_family = AF_INET;
+      serverAddress.sin_port = htons(port);
+      serverAddress.sin_addr.s_addr = inet_addr("192.168.1.20");
+
+      clientAddress.sin_family = AF_INET;
+      clientAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+      clientAddress.sin_port = htons(port);
+
+    if(bind(socketHandle,(struct sockaddr*)&clientAddress,sizeof(clientAddress))<0){
+     printf("bind failed\n");
+    }
+    len = usPayloadLen+2;
+    msgBuf[0] = 0x02;
+	msgBuf[1] = (unsigned char) (len>>8);
+	msgBuf[2] = (unsigned char) len;
+	msgBuf[3] = 0x12;
+	unsigned int uiSecPointer = (0xF0 | usSectionNo); 
+	msgBuf[4] = (unsigned char) (usSectionNo<<4) | (usPointer>>8);;
+	msgBuf[5] = (unsigned char) usPointer&0xFF;
+ 	int i=0;
+	for(i=0;i<usPayloadLen;i++ ){
+		unsigned char ucSectiobData1 = *ucSectiobData++; 
+		// printf("%x:",ucSectiobData1);
+        msgBuf[6+i] = ucSectiobData1;
+	}
+    len = usPayloadLen+6;
+	msgBuf[len] = 0x03;
+	
+	printf("\n-------------------usPointer --- %d SECTION -------->>%d -- >> %d \n",usPointer,usSectionNo,uiSecPointer);
+	len++;
+    int x=0;
+    unsigned int count;
+    while (x == 0)
+    {
+          int n = sendto(socketHandle,msgBuf, len, 0,(struct sockaddr*)&serverAddress, sizeof(serverAddress));
+
+          int serv_addr_size = sizeof(clientAddress);
+          count=recvfrom(socketHandle,RxBuffer,32, 0, (struct sockaddr*)&clientAddress,(socklen_t*) &serv_addr_size);
+          x=1;
+    }
+      close(socketHandle);
+      return count;
+ }
 int Callcommand :: leftShifting(int val,int noofbit,int isenable){
         val=val<<noofbit;
         return val | isenable;

@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 12, 2018 at 03:25 PM
+-- Generation Time: Apr 26, 2018 at 10:56 AM
 -- Server version: 5.6.33-0ubuntu0.14.04.1
 -- PHP Version: 5.5.9-1ubuntu4.22
 
@@ -35,6 +35,14 @@ CREATE TABLE IF NOT EXISTS `active_service_list` (
   UNIQUE KEY `ioc` (`in_channel`,`out_channel`,`channel_num`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `active_service_list`
+--
+
+INSERT INTO `active_service_list` (`in_channel`, `out_channel`, `channel_num`, `rmx_id`) VALUES
+(0, 0, 4401, 1),
+(0, 0, 4435, 1);
+
 -- --------------------------------------------------------
 
 --
@@ -63,6 +71,261 @@ CREATE TABLE IF NOT EXISTS `channel_list` (
   `rmx_id` int(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`rmx_id`,`input_channel`,`channel_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `channel_list`
+--
+
+INSERT INTO `channel_list` (`input_channel`, `channel_number`, `rmx_id`) VALUES
+(0, 1, 1),
+(0, 2, 1),
+(0, 3, 1),
+(0, 4, 1),
+(0, 5, 1),
+(0, 6, 1),
+(0, 7, 1),
+(0, 8, 1),
+(0, 9, 1),
+(0, 10, 1),
+(0, 11, 1),
+(0, 12, 1),
+(0, 13, 1),
+(0, 14, 1),
+(0, 4401, 1),
+(0, 4402, 1),
+(0, 4411, 1),
+(0, 4412, 1),
+(0, 4413, 1),
+(0, 4414, 1),
+(0, 4415, 1),
+(0, 4416, 1),
+(0, 4422, 1),
+(0, 4430, 1),
+(0, 4435, 1),
+(0, 4440, 1),
+(1, 1, 1),
+(1, 2, 1),
+(1, 3, 1),
+(1, 4, 1),
+(1, 5, 1),
+(1, 6, 1),
+(1, 7, 1),
+(1, 8, 1),
+(1, 9, 1),
+(1, 10, 1),
+(1, 11, 1),
+(1, 12, 1),
+(1, 13, 1),
+(1, 14, 1),
+(2, 100, 1),
+(2, 200, 1),
+(2, 400, 1),
+(2, 600, 1),
+(2, 700, 1),
+(2, 800, 1),
+(2, 900, 1),
+(2, 1000, 1),
+(2, 1100, 1),
+(2, 1200, 1),
+(2, 1300, 1),
+(2, 1400, 1),
+(2, 1500, 1),
+(2, 2300, 1),
+(2, 2400, 1),
+(2, 2500, 1),
+(3, 1, 1),
+(3, 2, 1),
+(3, 3, 1),
+(3, 4, 1),
+(3, 5, 1),
+(3, 11, 1),
+(3, 12, 1),
+(3, 13, 1),
+(3, 14, 1),
+(3, 15, 1),
+(3, 16, 1),
+(3, 17, 1),
+(3, 18, 1),
+(3, 19, 1),
+(3, 20, 1),
+(0, 1, 2),
+(0, 2, 2),
+(0, 3, 2),
+(0, 4, 2),
+(0, 5, 2),
+(0, 6, 2),
+(0, 7, 2),
+(0, 8, 2),
+(0, 9, 2),
+(0, 10, 2),
+(0, 11, 2),
+(0, 12, 2),
+(0, 13, 2),
+(0, 14, 2),
+(1, 1, 2),
+(1, 2, 2),
+(1, 3, 2),
+(1, 4, 2),
+(1, 5, 2),
+(1, 6, 2),
+(1, 7, 2),
+(1, 8, 2),
+(1, 9, 2),
+(1, 10, 2),
+(1, 11, 2),
+(1, 12, 2),
+(1, 13, 2),
+(1, 14, 2),
+(2, 100, 2),
+(2, 200, 2),
+(2, 400, 2),
+(2, 600, 2),
+(2, 700, 2),
+(2, 800, 2),
+(2, 900, 2),
+(2, 1000, 2),
+(2, 1100, 2),
+(2, 1200, 2),
+(2, 1300, 2),
+(2, 1400, 2),
+(2, 1500, 2),
+(2, 2300, 2),
+(2, 2400, 2),
+(2, 2500, 2),
+(3, 100, 2),
+(3, 200, 2),
+(3, 400, 2),
+(3, 600, 2),
+(3, 700, 2),
+(3, 800, 2),
+(3, 900, 2),
+(3, 1000, 2),
+(3, 1100, 2),
+(3, 1200, 2),
+(3, 1300, 2),
+(3, 1400, 2),
+(3, 1500, 2),
+(3, 2300, 2),
+(3, 2400, 2),
+(3, 2500, 2),
+(0, 1, 3),
+(0, 2, 3),
+(0, 3, 3),
+(0, 4, 3),
+(0, 5, 3),
+(0, 6, 3),
+(0, 7, 3),
+(0, 8, 3),
+(0, 9, 3),
+(0, 10, 3),
+(0, 11, 3),
+(0, 12, 3),
+(0, 13, 3),
+(0, 14, 3),
+(1, 1, 3),
+(1, 2, 3),
+(1, 3, 3),
+(1, 4, 3),
+(1, 5, 3),
+(1, 6, 3),
+(1, 7, 3),
+(1, 8, 3),
+(1, 9, 3),
+(1, 10, 3),
+(1, 11, 3),
+(1, 12, 3),
+(1, 13, 3),
+(1, 14, 3),
+(2, 1, 3),
+(2, 2, 3),
+(2, 3, 3),
+(2, 4, 3),
+(2, 5, 3),
+(2, 6, 3),
+(2, 7, 3),
+(2, 8, 3),
+(2, 9, 3),
+(2, 10, 3),
+(2, 11, 3),
+(2, 12, 3),
+(2, 13, 3),
+(2, 14, 3),
+(3, 100, 3),
+(3, 200, 3),
+(3, 400, 3),
+(3, 600, 3),
+(3, 700, 3),
+(3, 800, 3),
+(3, 900, 3),
+(3, 1000, 3),
+(3, 1100, 3),
+(3, 1200, 3),
+(3, 1300, 3),
+(3, 1400, 3),
+(3, 1500, 3),
+(3, 2300, 3),
+(3, 2400, 3),
+(3, 2500, 3),
+(0, 1, 4),
+(0, 2, 4),
+(0, 3, 4),
+(0, 4, 4),
+(0, 5, 4),
+(0, 6, 4),
+(0, 7, 4),
+(0, 8, 4),
+(0, 9, 4),
+(0, 10, 4),
+(0, 11, 4),
+(0, 12, 4),
+(0, 13, 4),
+(0, 14, 4),
+(1, 1, 4),
+(1, 2, 4),
+(1, 3, 4),
+(1, 4, 4),
+(1, 5, 4),
+(1, 6, 4),
+(1, 7, 4),
+(1, 8, 4),
+(1, 9, 4),
+(1, 10, 4),
+(1, 11, 4),
+(1, 12, 4),
+(1, 13, 4),
+(1, 14, 4),
+(2, 100, 4),
+(2, 200, 4),
+(2, 400, 4),
+(2, 600, 4),
+(2, 700, 4),
+(2, 800, 4),
+(2, 900, 4),
+(2, 1000, 4),
+(2, 1100, 4),
+(2, 1200, 4),
+(2, 1300, 4),
+(2, 1400, 4),
+(2, 1500, 4),
+(2, 2300, 4),
+(2, 2400, 4),
+(2, 2500, 4),
+(3, 100, 4),
+(3, 200, 4),
+(3, 400, 4),
+(3, 600, 4),
+(3, 700, 4),
+(3, 800, 4),
+(3, 900, 4),
+(3, 1000, 4),
+(3, 1100, 4),
+(3, 1200, 4),
+(3, 1300, 4),
+(3, 1400, 4),
+(3, 1500, 4),
+(3, 2300, 4),
+(3, 2400, 4),
+(3, 2500, 4);
 
 -- --------------------------------------------------------
 
@@ -112,6 +375,21 @@ CREATE TABLE IF NOT EXISTS `create_alarm_flags` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `custom_pids`
+--
+
+CREATE TABLE IF NOT EXISTS `custom_pids` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `rmx_no` int(1) NOT NULL,
+  `output_channel` int(1) NOT NULL,
+  `pid` varchar(200) NOT NULL,
+  `output_auth` int(10) NOT NULL DEFAULT '255',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `dvb_spi_output`
 --
 
@@ -139,6 +417,37 @@ CREATE TABLE IF NOT EXISTS `ecmg` (
   PRIMARY KEY (`channel_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `ecmg`
+--
+
+INSERT INTO `ecmg` (`channel_id`, `supercas_id`, `ip`, `port`, `is_enable`) VALUES
+(1, '0x27a00000', '192.168.1.20', 5001, 1),
+(2, '0x27b00000', '192.168.1.21', 5002, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ecm_descriptor`
+--
+
+CREATE TABLE IF NOT EXISTS `ecm_descriptor` (
+  `service_no` int(11) NOT NULL,
+  `output` int(11) NOT NULL,
+  `rmx_id` int(11) NOT NULL,
+  `channel_id` int(11) NOT NULL,
+  `stream_id` int(11) NOT NULL,
+  `service_pid` int(11) NOT NULL,
+  PRIMARY KEY (`service_no`,`output`,`rmx_id`,`channel_id`,`stream_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `ecm_descriptor`
+--
+
+INSERT INTO `ecm_descriptor` (`service_no`, `output`, `rmx_id`, `channel_id`, `stream_id`, `service_pid`) VALUES
+(4401, 0, 1, 1, 1, 3520);
+
 -- --------------------------------------------------------
 
 --
@@ -152,9 +461,18 @@ CREATE TABLE IF NOT EXISTS `ecm_stream` (
   `access_criteria` varchar(10) NOT NULL,
   `cp_number` int(10) NOT NULL,
   `timestamp` varchar(10) NOT NULL,
+  `ecm_pid` int(11) NOT NULL,
+  `cw_index` int(11) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`stream_id`,`channel_id`),
   KEY `channel_id` (`channel_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `ecm_stream`
+--
+
+INSERT INTO `ecm_stream` (`stream_id`, `channel_id`, `ecm_id`, `access_criteria`, `cp_number`, `timestamp`, `ecm_pid`, `cw_index`) VALUES
+(1, 1, 1, '4401', 10, '1524715350', 1234, 3);
 
 -- --------------------------------------------------------
 
@@ -170,7 +488,22 @@ CREATE TABLE IF NOT EXISTS `emmg` (
   `port` int(10) NOT NULL,
   `stream_id` int(10) NOT NULL,
   `is_enable` int(2) NOT NULL DEFAULT '1',
+  `emm_pid` int(11) NOT NULL,
   PRIMARY KEY (`channel_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `emmg_descriptor`
+--
+
+CREATE TABLE IF NOT EXISTS `emmg_descriptor` (
+  `channel_id` int(11) NOT NULL,
+  `rmx_no` int(11) NOT NULL,
+  `output` int(11) NOT NULL,
+  `is_enable` int(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`channel_id`,`rmx_no`,`output`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -209,13 +542,6 @@ CREATE TABLE IF NOT EXISTS `freeCA_mode_programs` (
   `rmx_id` int(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`program_number`,`input_channel`,`output_channel`,`rmx_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `freeCA_mode_programs`
---
-
-INSERT INTO `freeCA_mode_programs` (`program_number`, `input_channel`, `output_channel`, `rmx_id`) VALUES
-(7, 0, 3, 1);
 
 -- --------------------------------------------------------
 
@@ -267,6 +593,18 @@ CREATE TABLE IF NOT EXISTS `Ifrequency` (
   PRIMARY KEY (`rmx_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `Ifrequency`
+--
+
+INSERT INTO `Ifrequency` (`rmx_id`, `ifrequency`) VALUES
+(1, 142),
+(2, 206),
+(3, 270),
+(4, 334),
+(5, 398),
+(6, 462);
+
 -- --------------------------------------------------------
 
 --
@@ -291,13 +629,13 @@ INSERT INTO `input` (`input_channel`, `rmx_id`, `tuner_type`) VALUES
 (0, 4, 0),
 (0, 5, 0),
 (0, 6, 0),
-(1, 1, 1),
+(1, 1, 0),
 (1, 2, 0),
 (1, 3, 0),
 (1, 4, 0),
 (1, 5, 0),
 (1, 6, 0),
-(2, 1, 1),
+(2, 1, 0),
 (2, 2, 0),
 (2, 3, 0),
 (2, 4, 0),
@@ -309,9 +647,9 @@ INSERT INTO `input` (`input_channel`, `rmx_id`, `tuner_type`) VALUES
 (3, 4, 0),
 (3, 5, 0),
 (3, 6, 0),
-(4, 1, 1),
+(4, 1, 0),
 (4, 2, 0),
-(4, 3, 1),
+(4, 3, 0),
 (4, 4, 0),
 (4, 5, 0),
 (4, 6, 0),
@@ -369,6 +707,13 @@ CREATE TABLE IF NOT EXISTS `ip_input_channels` (
   PRIMARY KEY (`rmx_no`,`input_channel`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `ip_input_channels`
+--
+
+INSERT INTO `ip_input_channels` (`rmx_no`, `input_channel`, `ip_address`, `port`, `type`, `is_enable`) VALUES
+(1, 1, '4025483550', 10050, 1, 1);
+
 -- --------------------------------------------------------
 
 --
@@ -383,6 +728,13 @@ CREATE TABLE IF NOT EXISTS `ip_output_channels` (
   `is_enable` int(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`rmx_no`,`output_channel`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `ip_output_channels`
+--
+
+INSERT INTO `ip_output_channels` (`rmx_no`, `output_channel`, `ip_address`, `port`, `is_enable`) VALUES
+(1, 1, '4025483521', 10001, 1);
 
 -- --------------------------------------------------------
 
@@ -426,6 +778,27 @@ CREATE TABLE IF NOT EXISTS `locked_programs` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `mux_15_1`
+--
+
+CREATE TABLE IF NOT EXISTS `mux_15_1` (
+  `mux_id` int(1) NOT NULL,
+  `is_enable` int(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`mux_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `mux_15_1`
+--
+
+INSERT INTO `mux_15_1` (`mux_id`, `is_enable`) VALUES
+(1, 0),
+(2, 0),
+(3, 0);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `network_details`
 --
 
@@ -456,19 +829,6 @@ CREATE TABLE IF NOT EXISTS `new_service_namelist` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nit_mode`
---
-
-CREATE TABLE IF NOT EXISTS `nit_mode` (
-  `output` int(1) NOT NULL,
-  `mode` int(11) NOT NULL,
-  `rmx_id` int(1) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`rmx_id`,`output`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `NIT_table_timeout`
 --
 
@@ -488,6 +848,9 @@ CREATE TABLE IF NOT EXISTS `NIT_table_timeout` (
 CREATE TABLE IF NOT EXISTS `output` (
   `output_channel` int(2) NOT NULL,
   `rmx_id` int(1) NOT NULL DEFAULT '1',
+  `qam_id` int(1) NOT NULL DEFAULT '2',
+  `nit_mode` int(1) NOT NULL DEFAULT '1',
+  `indexValue` int(11) NOT NULL,
   PRIMARY KEY (`output_channel`,`rmx_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -495,31 +858,55 @@ CREATE TABLE IF NOT EXISTS `output` (
 -- Dumping data for table `output`
 --
 
-INSERT INTO `output` (`output_channel`, `rmx_id`) VALUES
-(0, 1),
-(0, 2),
-(0, 3),
-(0, 4),
-(0, 5),
-(0, 6),
-(1, 1),
-(1, 2),
-(1, 3),
-(1, 4),
-(1, 5),
-(1, 6),
-(2, 1),
-(2, 2),
-(2, 3),
-(2, 4),
-(2, 5),
-(2, 6),
-(3, 1),
-(3, 2),
-(3, 3),
-(3, 4),
-(3, 5),
-(3, 6);
+INSERT INTO `output` (`output_channel`, `rmx_id`, `qam_id`, `nit_mode`, `indexValue`) VALUES
+(0, 1, 2, 1, 15),
+(0, 2, 2, 1, 0),
+(0, 3, 2, 1, 0),
+(0, 4, 2, 1, 0),
+(0, 5, 2, 1, 0),
+(0, 6, 2, 1, 0),
+(1, 1, 2, 1, 0),
+(1, 2, 2, 1, 0),
+(1, 3, 2, 1, 0),
+(1, 4, 2, 1, 0),
+(1, 5, 2, 1, 0),
+(1, 6, 2, 1, 0),
+(2, 1, 2, 1, 0),
+(2, 2, 2, 1, 0),
+(2, 3, 2, 1, 0),
+(2, 4, 2, 1, 0),
+(2, 5, 2, 1, 0),
+(2, 6, 2, 1, 0),
+(3, 1, 2, 1, 0),
+(3, 2, 2, 1, 0),
+(3, 3, 2, 1, 0),
+(3, 4, 2, 1, 0),
+(3, 5, 2, 1, 0),
+(3, 6, 2, 1, 0),
+(4, 1, 2, 1, 0),
+(4, 2, 2, 1, 0),
+(4, 3, 2, 1, 0),
+(4, 4, 2, 1, 0),
+(4, 5, 2, 1, 0),
+(4, 6, 2, 1, 0),
+(5, 1, 2, 1, 0),
+(5, 2, 2, 1, 0),
+(5, 3, 2, 1, 0),
+(5, 4, 2, 1, 0),
+(5, 5, 2, 1, 0),
+(5, 6, 2, 1, 0),
+(6, 1, 2, 1, 0),
+(6, 2, 2, 1, 0),
+(6, 3, 2, 1, 0),
+(6, 4, 2, 1, 0),
+(6, 5, 2, 1, 0),
+(6, 6, 2, 1, 0),
+(7, 1, 2, 1, 0),
+(7, 2, 2, 1, 0),
+(7, 3, 2, 1, 0),
+(7, 4, 2, 1, 0),
+(7, 5, 2, 1, 0),
+(7, 6, 2, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -570,8 +957,48 @@ INSERT INTO `rf_authorization` (`rmx_no`, `enable`) VALUES
 (1, 1),
 (2, 1),
 (3, 1),
+(4, 1),
 (5, 1),
 (6, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `rmx_mux_out`
+--
+
+CREATE TABLE IF NOT EXISTS `rmx_mux_out` (
+  `bit` int(11) NOT NULL,
+  `value` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `rmx_mux_out`
+--
+
+INSERT INTO `rmx_mux_out` (`bit`, `value`) VALUES
+(0, 0),
+(1, 0),
+(2, 0),
+(3, 0),
+(4, 0),
+(5, 0),
+(6, 0),
+(7, 0),
+(8, 0),
+(9, 0),
+(10, 0),
+(11, 0),
+(12, 0),
+(13, 0),
+(14, 0),
+(15, 0),
+(16, 0),
+(17, 0),
+(18, 0),
+(19, 0),
+(20, 0),
+(21, 0);
 
 -- --------------------------------------------------------
 
@@ -587,6 +1014,58 @@ CREATE TABLE IF NOT EXISTS `rmx_registers` (
   PRIMARY KEY (`rmx_id`,`cs`,`address`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `rmx_registers`
+--
+
+INSERT INTO `rmx_registers` (`rmx_id`, `cs`, `address`, `data`) VALUES
+(1, 2, 0, 0),
+(1, 11, 12, 4),
+(1, 12, 12, 4),
+(1, 13, 12, 4),
+(1, 14, 12, 4),
+(1, 15, 12, 4),
+(1, 16, 12, 4),
+(1, 17, 12, 4),
+(1, 18, 12, 4),
+(2, 2, 0, 4),
+(3, 2, 0, 1),
+(3, 11, 12, 4),
+(3, 12, 12, 4),
+(3, 13, 12, 4),
+(3, 14, 12, 4),
+(3, 15, 12, 4),
+(3, 16, 12, 4),
+(3, 17, 12, 4),
+(3, 18, 12, 4),
+(4, 2, 0, 5),
+(4, 11, 12, 4),
+(4, 12, 12, 4),
+(4, 13, 12, 4),
+(4, 14, 12, 4),
+(4, 15, 12, 4),
+(4, 16, 12, 4),
+(4, 17, 12, 4),
+(4, 18, 12, 4),
+(5, 2, 0, 2),
+(5, 11, 12, 4),
+(5, 12, 12, 4),
+(5, 13, 12, 4),
+(5, 14, 12, 4),
+(5, 15, 12, 4),
+(5, 16, 12, 4),
+(5, 17, 12, 4),
+(5, 18, 12, 4),
+(6, 2, 0, 6),
+(6, 11, 12, 4),
+(6, 12, 12, 4),
+(6, 13, 12, 4),
+(6, 14, 12, 4),
+(6, 15, 12, 4),
+(6, 16, 12, 4),
+(6, 17, 12, 4),
+(6, 18, 12, 4);
+
 -- --------------------------------------------------------
 
 --
@@ -598,6 +1077,22 @@ CREATE TABLE IF NOT EXISTS `service_providers` (
   `provider_name` varchar(256) NOT NULL,
   `rmx_id` int(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`rmx_id`,`service_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `spts_ip_inputs`
+--
+
+CREATE TABLE IF NOT EXISTS `spts_ip_inputs` (
+  `mux_id` int(1) NOT NULL,
+  `channel_no` int(2) NOT NULL,
+  `ip_address` varchar(11) NOT NULL,
+  `port` int(10) NOT NULL,
+  `type` int(1) NOT NULL,
+  `is_enable` int(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`channel_no`,`mux_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------

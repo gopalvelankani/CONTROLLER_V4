@@ -91,6 +91,7 @@ class Callcommand{
     Callcommand();
 	Callcommand(std::string path);
 	int callCommand(int cmd,unsigned char* RxBuffer,int rx_len,int msgBLen,Json::Value json,int readWriteMode =0);
+	int updateNITTable(unsigned char *ucSectiobData,unsigned short usPayloadLen,unsigned short usPointer,unsigned short usSectionNo);
 	int leftShifting(int val,int noofbit,int isenable);
 	std::string hexStr(unsigned char *data, int len);
 	long string2long(const std::string &str, int base = 10);

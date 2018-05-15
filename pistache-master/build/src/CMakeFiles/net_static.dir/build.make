@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master
+CMAKE_SOURCE_DIR = /home/user/Videos/CONTROLLER_V4/pistache-master
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build
+CMAKE_BINARY_DIR = /home/user/Videos/CONTROLLER_V4/pistache-master/build
 
 # Include any dependencies generated for this target.
 include src/CMakeFiles/net_static.dir/depend.make
@@ -59,16 +59,16 @@ include src/CMakeFiles/net_static.dir/flags.make
 
 src/CMakeFiles/net_static.dir/common/dbHandler.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/dbHandler.cc.o: ../src/common/dbHandler.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object src/CMakeFiles/net_static.dir/common/dbHandler.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/dbHandler.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/dbHandler.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object src/CMakeFiles/net_static.dir/common/dbHandler.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/dbHandler.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/dbHandler.cc
 
 src/CMakeFiles/net_static.dir/common/dbHandler.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/dbHandler.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/dbHandler.cc > CMakeFiles/net_static.dir/common/dbHandler.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/dbHandler.cc > CMakeFiles/net_static.dir/common/dbHandler.cc.i
 
 src/CMakeFiles/net_static.dir/common/dbHandler.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/dbHandler.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/dbHandler.cc -o CMakeFiles/net_static.dir/common/dbHandler.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/dbHandler.cc -o CMakeFiles/net_static.dir/common/dbHandler.cc.s
 
 src/CMakeFiles/net_static.dir/common/dbHandler.cc.o.requires:
 
@@ -83,16 +83,16 @@ src/CMakeFiles/net_static.dir/common/dbHandler.cc.o.provides.build: src/CMakeFil
 
 src/CMakeFiles/net_static.dir/common/config.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/config.cc.o: ../src/common/config.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object src/CMakeFiles/net_static.dir/common/config.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/config.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/config.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object src/CMakeFiles/net_static.dir/common/config.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/config.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/config.cc
 
 src/CMakeFiles/net_static.dir/common/config.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/config.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/config.cc > CMakeFiles/net_static.dir/common/config.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/config.cc > CMakeFiles/net_static.dir/common/config.cc.i
 
 src/CMakeFiles/net_static.dir/common/config.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/config.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/config.cc -o CMakeFiles/net_static.dir/common/config.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/config.cc -o CMakeFiles/net_static.dir/common/config.cc.s
 
 src/CMakeFiles/net_static.dir/common/config.cc.o.requires:
 
@@ -107,16 +107,16 @@ src/CMakeFiles/net_static.dir/common/config.cc.o.provides.build: src/CMakeFiles/
 
 src/CMakeFiles/net_static.dir/common/description.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/description.cc.o: ../src/common/description.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object src/CMakeFiles/net_static.dir/common/description.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/description.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/description.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object src/CMakeFiles/net_static.dir/common/description.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/description.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/description.cc
 
 src/CMakeFiles/net_static.dir/common/description.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/description.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/description.cc > CMakeFiles/net_static.dir/common/description.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/description.cc > CMakeFiles/net_static.dir/common/description.cc.i
 
 src/CMakeFiles/net_static.dir/common/description.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/description.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/description.cc -o CMakeFiles/net_static.dir/common/description.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/description.cc -o CMakeFiles/net_static.dir/common/description.cc.s
 
 src/CMakeFiles/net_static.dir/common/description.cc.o.requires:
 
@@ -131,16 +131,16 @@ src/CMakeFiles/net_static.dir/common/description.cc.o.provides.build: src/CMakeF
 
 src/CMakeFiles/net_static.dir/common/mime.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/mime.cc.o: ../src/common/mime.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object src/CMakeFiles/net_static.dir/common/mime.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/mime.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/mime.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object src/CMakeFiles/net_static.dir/common/mime.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/mime.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/mime.cc
 
 src/CMakeFiles/net_static.dir/common/mime.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/mime.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/mime.cc > CMakeFiles/net_static.dir/common/mime.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/mime.cc > CMakeFiles/net_static.dir/common/mime.cc.i
 
 src/CMakeFiles/net_static.dir/common/mime.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/mime.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/mime.cc -o CMakeFiles/net_static.dir/common/mime.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/mime.cc -o CMakeFiles/net_static.dir/common/mime.cc.s
 
 src/CMakeFiles/net_static.dir/common/mime.cc.o.requires:
 
@@ -155,16 +155,16 @@ src/CMakeFiles/net_static.dir/common/mime.cc.o.provides.build: src/CMakeFiles/ne
 
 src/CMakeFiles/net_static.dir/common/net.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/net.cc.o: ../src/common/net.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object src/CMakeFiles/net_static.dir/common/net.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/net.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/net.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object src/CMakeFiles/net_static.dir/common/net.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/net.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/net.cc
 
 src/CMakeFiles/net_static.dir/common/net.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/net.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/net.cc > CMakeFiles/net_static.dir/common/net.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/net.cc > CMakeFiles/net_static.dir/common/net.cc.i
 
 src/CMakeFiles/net_static.dir/common/net.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/net.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/net.cc -o CMakeFiles/net_static.dir/common/net.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/net.cc -o CMakeFiles/net_static.dir/common/net.cc.s
 
 src/CMakeFiles/net_static.dir/common/net.cc.o.requires:
 
@@ -179,16 +179,16 @@ src/CMakeFiles/net_static.dir/common/net.cc.o.provides.build: src/CMakeFiles/net
 
 src/CMakeFiles/net_static.dir/common/http_defs.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/http_defs.cc.o: ../src/common/http_defs.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object src/CMakeFiles/net_static.dir/common/http_defs.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/http_defs.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/http_defs.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object src/CMakeFiles/net_static.dir/common/http_defs.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/http_defs.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/http_defs.cc
 
 src/CMakeFiles/net_static.dir/common/http_defs.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/http_defs.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/http_defs.cc > CMakeFiles/net_static.dir/common/http_defs.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/http_defs.cc > CMakeFiles/net_static.dir/common/http_defs.cc.i
 
 src/CMakeFiles/net_static.dir/common/http_defs.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/http_defs.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/http_defs.cc -o CMakeFiles/net_static.dir/common/http_defs.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/http_defs.cc -o CMakeFiles/net_static.dir/common/http_defs.cc.s
 
 src/CMakeFiles/net_static.dir/common/http_defs.cc.o.requires:
 
@@ -203,16 +203,16 @@ src/CMakeFiles/net_static.dir/common/http_defs.cc.o.provides.build: src/CMakeFil
 
 src/CMakeFiles/net_static.dir/common/peer.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/peer.cc.o: ../src/common/peer.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object src/CMakeFiles/net_static.dir/common/peer.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/peer.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/peer.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object src/CMakeFiles/net_static.dir/common/peer.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/peer.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/peer.cc
 
 src/CMakeFiles/net_static.dir/common/peer.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/peer.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/peer.cc > CMakeFiles/net_static.dir/common/peer.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/peer.cc > CMakeFiles/net_static.dir/common/peer.cc.i
 
 src/CMakeFiles/net_static.dir/common/peer.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/peer.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/peer.cc -o CMakeFiles/net_static.dir/common/peer.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/peer.cc -o CMakeFiles/net_static.dir/common/peer.cc.s
 
 src/CMakeFiles/net_static.dir/common/peer.cc.o.requires:
 
@@ -227,16 +227,16 @@ src/CMakeFiles/net_static.dir/common/peer.cc.o.provides.build: src/CMakeFiles/ne
 
 src/CMakeFiles/net_static.dir/common/callcommand.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/callcommand.cc.o: ../src/common/callcommand.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object src/CMakeFiles/net_static.dir/common/callcommand.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/callcommand.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/callcommand.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object src/CMakeFiles/net_static.dir/common/callcommand.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/callcommand.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/callcommand.cc
 
 src/CMakeFiles/net_static.dir/common/callcommand.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/callcommand.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/callcommand.cc > CMakeFiles/net_static.dir/common/callcommand.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/callcommand.cc > CMakeFiles/net_static.dir/common/callcommand.cc.i
 
 src/CMakeFiles/net_static.dir/common/callcommand.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/callcommand.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/callcommand.cc -o CMakeFiles/net_static.dir/common/callcommand.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/callcommand.cc -o CMakeFiles/net_static.dir/common/callcommand.cc.s
 
 src/CMakeFiles/net_static.dir/common/callcommand.cc.o.requires:
 
@@ -251,16 +251,16 @@ src/CMakeFiles/net_static.dir/common/callcommand.cc.o.provides.build: src/CMakeF
 
 src/CMakeFiles/net_static.dir/common/transport.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/transport.cc.o: ../src/common/transport.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object src/CMakeFiles/net_static.dir/common/transport.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/transport.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/transport.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object src/CMakeFiles/net_static.dir/common/transport.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/transport.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/transport.cc
 
 src/CMakeFiles/net_static.dir/common/transport.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/transport.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/transport.cc > CMakeFiles/net_static.dir/common/transport.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/transport.cc > CMakeFiles/net_static.dir/common/transport.cc.i
 
 src/CMakeFiles/net_static.dir/common/transport.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/transport.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/transport.cc -o CMakeFiles/net_static.dir/common/transport.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/transport.cc -o CMakeFiles/net_static.dir/common/transport.cc.s
 
 src/CMakeFiles/net_static.dir/common/transport.cc.o.requires:
 
@@ -275,16 +275,16 @@ src/CMakeFiles/net_static.dir/common/transport.cc.o.provides.build: src/CMakeFil
 
 src/CMakeFiles/net_static.dir/common/reactor.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/reactor.cc.o: ../src/common/reactor.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object src/CMakeFiles/net_static.dir/common/reactor.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/reactor.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/reactor.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object src/CMakeFiles/net_static.dir/common/reactor.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/reactor.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/reactor.cc
 
 src/CMakeFiles/net_static.dir/common/reactor.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/reactor.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/reactor.cc > CMakeFiles/net_static.dir/common/reactor.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/reactor.cc > CMakeFiles/net_static.dir/common/reactor.cc.i
 
 src/CMakeFiles/net_static.dir/common/reactor.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/reactor.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/reactor.cc -o CMakeFiles/net_static.dir/common/reactor.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/reactor.cc -o CMakeFiles/net_static.dir/common/reactor.cc.s
 
 src/CMakeFiles/net_static.dir/common/reactor.cc.o.requires:
 
@@ -299,16 +299,16 @@ src/CMakeFiles/net_static.dir/common/reactor.cc.o.provides.build: src/CMakeFiles
 
 src/CMakeFiles/net_static.dir/common/http_header.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/http_header.cc.o: ../src/common/http_header.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object src/CMakeFiles/net_static.dir/common/http_header.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/http_header.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/http_header.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object src/CMakeFiles/net_static.dir/common/http_header.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/http_header.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/http_header.cc
 
 src/CMakeFiles/net_static.dir/common/http_header.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/http_header.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/http_header.cc > CMakeFiles/net_static.dir/common/http_header.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/http_header.cc > CMakeFiles/net_static.dir/common/http_header.cc.i
 
 src/CMakeFiles/net_static.dir/common/http_header.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/http_header.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/http_header.cc -o CMakeFiles/net_static.dir/common/http_header.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/http_header.cc -o CMakeFiles/net_static.dir/common/http_header.cc.s
 
 src/CMakeFiles/net_static.dir/common/http_header.cc.o.requires:
 
@@ -323,16 +323,16 @@ src/CMakeFiles/net_static.dir/common/http_header.cc.o.provides.build: src/CMakeF
 
 src/CMakeFiles/net_static.dir/common/Itoc.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/Itoc.cc.o: ../src/common/Itoc.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object src/CMakeFiles/net_static.dir/common/Itoc.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/Itoc.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/Itoc.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object src/CMakeFiles/net_static.dir/common/Itoc.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/Itoc.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/Itoc.cc
 
 src/CMakeFiles/net_static.dir/common/Itoc.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/Itoc.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/Itoc.cc > CMakeFiles/net_static.dir/common/Itoc.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/Itoc.cc > CMakeFiles/net_static.dir/common/Itoc.cc.i
 
 src/CMakeFiles/net_static.dir/common/Itoc.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/Itoc.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/Itoc.cc -o CMakeFiles/net_static.dir/common/Itoc.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/Itoc.cc -o CMakeFiles/net_static.dir/common/Itoc.cc.s
 
 src/CMakeFiles/net_static.dir/common/Itoc.cc.o.requires:
 
@@ -347,16 +347,16 @@ src/CMakeFiles/net_static.dir/common/Itoc.cc.o.provides.build: src/CMakeFiles/ne
 
 src/CMakeFiles/net_static.dir/common/os.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/os.cc.o: ../src/common/os.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object src/CMakeFiles/net_static.dir/common/os.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/os.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/os.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object src/CMakeFiles/net_static.dir/common/os.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/os.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/os.cc
 
 src/CMakeFiles/net_static.dir/common/os.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/os.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/os.cc > CMakeFiles/net_static.dir/common/os.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/os.cc > CMakeFiles/net_static.dir/common/os.cc.i
 
 src/CMakeFiles/net_static.dir/common/os.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/os.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/os.cc -o CMakeFiles/net_static.dir/common/os.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/os.cc -o CMakeFiles/net_static.dir/common/os.cc.s
 
 src/CMakeFiles/net_static.dir/common/os.cc.o.requires:
 
@@ -371,16 +371,16 @@ src/CMakeFiles/net_static.dir/common/os.cc.o.provides.build: src/CMakeFiles/net_
 
 src/CMakeFiles/net_static.dir/common/stream.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/stream.cc.o: ../src/common/stream.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object src/CMakeFiles/net_static.dir/common/stream.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/stream.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/stream.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object src/CMakeFiles/net_static.dir/common/stream.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/stream.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/stream.cc
 
 src/CMakeFiles/net_static.dir/common/stream.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/stream.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/stream.cc > CMakeFiles/net_static.dir/common/stream.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/stream.cc > CMakeFiles/net_static.dir/common/stream.cc.i
 
 src/CMakeFiles/net_static.dir/common/stream.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/stream.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/stream.cc -o CMakeFiles/net_static.dir/common/stream.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/stream.cc -o CMakeFiles/net_static.dir/common/stream.cc.s
 
 src/CMakeFiles/net_static.dir/common/stream.cc.o.requires:
 
@@ -395,16 +395,16 @@ src/CMakeFiles/net_static.dir/common/stream.cc.o.provides.build: src/CMakeFiles/
 
 src/CMakeFiles/net_static.dir/common/cookie.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/cookie.cc.o: ../src/common/cookie.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object src/CMakeFiles/net_static.dir/common/cookie.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/cookie.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/cookie.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object src/CMakeFiles/net_static.dir/common/cookie.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/cookie.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/cookie.cc
 
 src/CMakeFiles/net_static.dir/common/cookie.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/cookie.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/cookie.cc > CMakeFiles/net_static.dir/common/cookie.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/cookie.cc > CMakeFiles/net_static.dir/common/cookie.cc.i
 
 src/CMakeFiles/net_static.dir/common/cookie.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/cookie.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/cookie.cc -o CMakeFiles/net_static.dir/common/cookie.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/cookie.cc -o CMakeFiles/net_static.dir/common/cookie.cc.s
 
 src/CMakeFiles/net_static.dir/common/cookie.cc.o.requires:
 
@@ -419,16 +419,16 @@ src/CMakeFiles/net_static.dir/common/cookie.cc.o.provides.build: src/CMakeFiles/
 
 src/CMakeFiles/net_static.dir/common/http.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/http.cc.o: ../src/common/http.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object src/CMakeFiles/net_static.dir/common/http.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/http.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/http.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object src/CMakeFiles/net_static.dir/common/http.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/http.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/http.cc
 
 src/CMakeFiles/net_static.dir/common/http.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/http.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/http.cc > CMakeFiles/net_static.dir/common/http.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/http.cc > CMakeFiles/net_static.dir/common/http.cc.i
 
 src/CMakeFiles/net_static.dir/common/http.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/http.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/http.cc -o CMakeFiles/net_static.dir/common/http.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/http.cc -o CMakeFiles/net_static.dir/common/http.cc.s
 
 src/CMakeFiles/net_static.dir/common/http.cc.o.requires:
 
@@ -443,16 +443,16 @@ src/CMakeFiles/net_static.dir/common/http.cc.o.provides.build: src/CMakeFiles/ne
 
 src/CMakeFiles/net_static.dir/common/http_headers.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/http_headers.cc.o: ../src/common/http_headers.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object src/CMakeFiles/net_static.dir/common/http_headers.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/http_headers.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/http_headers.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object src/CMakeFiles/net_static.dir/common/http_headers.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/http_headers.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/http_headers.cc
 
 src/CMakeFiles/net_static.dir/common/http_headers.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/http_headers.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/http_headers.cc > CMakeFiles/net_static.dir/common/http_headers.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/http_headers.cc > CMakeFiles/net_static.dir/common/http_headers.cc.i
 
 src/CMakeFiles/net_static.dir/common/http_headers.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/http_headers.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/http_headers.cc -o CMakeFiles/net_static.dir/common/http_headers.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/http_headers.cc -o CMakeFiles/net_static.dir/common/http_headers.cc.s
 
 src/CMakeFiles/net_static.dir/common/http_headers.cc.o.requires:
 
@@ -467,16 +467,16 @@ src/CMakeFiles/net_static.dir/common/http_headers.cc.o.provides.build: src/CMake
 
 src/CMakeFiles/net_static.dir/common/udpipstack.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/udpipstack.cc.o: ../src/common/udpipstack.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object src/CMakeFiles/net_static.dir/common/udpipstack.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/udpipstack.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/udpipstack.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object src/CMakeFiles/net_static.dir/common/udpipstack.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/udpipstack.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/udpipstack.cc
 
 src/CMakeFiles/net_static.dir/common/udpipstack.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/udpipstack.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/udpipstack.cc > CMakeFiles/net_static.dir/common/udpipstack.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/udpipstack.cc > CMakeFiles/net_static.dir/common/udpipstack.cc.i
 
 src/CMakeFiles/net_static.dir/common/udpipstack.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/udpipstack.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/udpipstack.cc -o CMakeFiles/net_static.dir/common/udpipstack.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/udpipstack.cc -o CMakeFiles/net_static.dir/common/udpipstack.cc.s
 
 src/CMakeFiles/net_static.dir/common/udpipstack.cc.o.requires:
 
@@ -491,16 +491,16 @@ src/CMakeFiles/net_static.dir/common/udpipstack.cc.o.provides.build: src/CMakeFi
 
 src/CMakeFiles/net_static.dir/common/tcp.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/tcp.cc.o: ../src/common/tcp.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object src/CMakeFiles/net_static.dir/common/tcp.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/tcp.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/tcp.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object src/CMakeFiles/net_static.dir/common/tcp.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/tcp.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/tcp.cc
 
 src/CMakeFiles/net_static.dir/common/tcp.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/tcp.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/tcp.cc > CMakeFiles/net_static.dir/common/tcp.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/tcp.cc > CMakeFiles/net_static.dir/common/tcp.cc.i
 
 src/CMakeFiles/net_static.dir/common/tcp.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/tcp.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/tcp.cc -o CMakeFiles/net_static.dir/common/tcp.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/tcp.cc -o CMakeFiles/net_static.dir/common/tcp.cc.s
 
 src/CMakeFiles/net_static.dir/common/tcp.cc.o.requires:
 
@@ -515,16 +515,16 @@ src/CMakeFiles/net_static.dir/common/tcp.cc.o.provides.build: src/CMakeFiles/net
 
 src/CMakeFiles/net_static.dir/common/timer_pool.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/timer_pool.cc.o: ../src/common/timer_pool.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object src/CMakeFiles/net_static.dir/common/timer_pool.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/timer_pool.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/timer_pool.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object src/CMakeFiles/net_static.dir/common/timer_pool.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/common/timer_pool.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/timer_pool.cc
 
 src/CMakeFiles/net_static.dir/common/timer_pool.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/common/timer_pool.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/timer_pool.cc > CMakeFiles/net_static.dir/common/timer_pool.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/timer_pool.cc > CMakeFiles/net_static.dir/common/timer_pool.cc.i
 
 src/CMakeFiles/net_static.dir/common/timer_pool.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/common/timer_pool.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/timer_pool.cc -o CMakeFiles/net_static.dir/common/timer_pool.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/timer_pool.cc -o CMakeFiles/net_static.dir/common/timer_pool.cc.s
 
 src/CMakeFiles/net_static.dir/common/timer_pool.cc.o.requires:
 
@@ -539,16 +539,16 @@ src/CMakeFiles/net_static.dir/common/timer_pool.cc.o.provides.build: src/CMakeFi
 
 src/CMakeFiles/net_static.dir/server/endpoint.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/server/endpoint.cc.o: ../src/server/endpoint.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object src/CMakeFiles/net_static.dir/server/endpoint.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/server/endpoint.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/server/endpoint.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object src/CMakeFiles/net_static.dir/server/endpoint.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/server/endpoint.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/server/endpoint.cc
 
 src/CMakeFiles/net_static.dir/server/endpoint.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/server/endpoint.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/server/endpoint.cc > CMakeFiles/net_static.dir/server/endpoint.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/server/endpoint.cc > CMakeFiles/net_static.dir/server/endpoint.cc.i
 
 src/CMakeFiles/net_static.dir/server/endpoint.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/server/endpoint.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/server/endpoint.cc -o CMakeFiles/net_static.dir/server/endpoint.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/server/endpoint.cc -o CMakeFiles/net_static.dir/server/endpoint.cc.s
 
 src/CMakeFiles/net_static.dir/server/endpoint.cc.o.requires:
 
@@ -563,16 +563,16 @@ src/CMakeFiles/net_static.dir/server/endpoint.cc.o.provides.build: src/CMakeFile
 
 src/CMakeFiles/net_static.dir/server/router.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/server/router.cc.o: ../src/server/router.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object src/CMakeFiles/net_static.dir/server/router.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/server/router.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/server/router.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object src/CMakeFiles/net_static.dir/server/router.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/server/router.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/server/router.cc
 
 src/CMakeFiles/net_static.dir/server/router.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/server/router.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/server/router.cc > CMakeFiles/net_static.dir/server/router.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/server/router.cc > CMakeFiles/net_static.dir/server/router.cc.i
 
 src/CMakeFiles/net_static.dir/server/router.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/server/router.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/server/router.cc -o CMakeFiles/net_static.dir/server/router.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/server/router.cc -o CMakeFiles/net_static.dir/server/router.cc.s
 
 src/CMakeFiles/net_static.dir/server/router.cc.o.requires:
 
@@ -587,16 +587,16 @@ src/CMakeFiles/net_static.dir/server/router.cc.o.provides.build: src/CMakeFiles/
 
 src/CMakeFiles/net_static.dir/server/listener.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/server/listener.cc.o: ../src/server/listener.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object src/CMakeFiles/net_static.dir/server/listener.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/server/listener.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/server/listener.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object src/CMakeFiles/net_static.dir/server/listener.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/server/listener.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/server/listener.cc
 
 src/CMakeFiles/net_static.dir/server/listener.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/server/listener.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/server/listener.cc > CMakeFiles/net_static.dir/server/listener.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/server/listener.cc > CMakeFiles/net_static.dir/server/listener.cc.i
 
 src/CMakeFiles/net_static.dir/server/listener.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/server/listener.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/server/listener.cc -o CMakeFiles/net_static.dir/server/listener.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/server/listener.cc -o CMakeFiles/net_static.dir/server/listener.cc.s
 
 src/CMakeFiles/net_static.dir/server/listener.cc.o.requires:
 
@@ -611,16 +611,16 @@ src/CMakeFiles/net_static.dir/server/listener.cc.o.provides.build: src/CMakeFile
 
 src/CMakeFiles/net_static.dir/client/client.cc.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/client/client.cc.o: ../src/client/client.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object src/CMakeFiles/net_static.dir/client/client.cc.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/client/client.cc.o -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/client/client.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object src/CMakeFiles/net_static.dir/client/client.cc.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/net_static.dir/client/client.cc.o -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/client/client.cc
 
 src/CMakeFiles/net_static.dir/client/client.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/net_static.dir/client/client.cc.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/client/client.cc > CMakeFiles/net_static.dir/client/client.cc.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/client/client.cc > CMakeFiles/net_static.dir/client/client.cc.i
 
 src/CMakeFiles/net_static.dir/client/client.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/net_static.dir/client/client.cc.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/client/client.cc -o CMakeFiles/net_static.dir/client/client.cc.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/client/client.cc -o CMakeFiles/net_static.dir/client/client.cc.s
 
 src/CMakeFiles/net_static.dir/client/client.cc.o.requires:
 
@@ -635,16 +635,16 @@ src/CMakeFiles/net_static.dir/client/client.cc.o.provides.build: src/CMakeFiles/
 
 src/CMakeFiles/net_static.dir/common/MxlApiLib.c.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/MxlApiLib.c.o: ../src/common/MxlApiLib.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building C object src/CMakeFiles/net_static.dir/common/MxlApiLib.c.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxlApiLib.c.o   -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxlApiLib.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building C object src/CMakeFiles/net_static.dir/common/MxlApiLib.c.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxlApiLib.c.o   -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxlApiLib.c
 
 src/CMakeFiles/net_static.dir/common/MxlApiLib.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/net_static.dir/common/MxlApiLib.c.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxlApiLib.c > CMakeFiles/net_static.dir/common/MxlApiLib.c.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxlApiLib.c > CMakeFiles/net_static.dir/common/MxlApiLib.c.i
 
 src/CMakeFiles/net_static.dir/common/MxlApiLib.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/net_static.dir/common/MxlApiLib.c.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxlApiLib.c -o CMakeFiles/net_static.dir/common/MxlApiLib.c.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxlApiLib.c -o CMakeFiles/net_static.dir/common/MxlApiLib.c.s
 
 src/CMakeFiles/net_static.dir/common/MxlApiLib.c.o.requires:
 
@@ -659,16 +659,16 @@ src/CMakeFiles/net_static.dir/common/MxlApiLib.c.o.provides.build: src/CMakeFile
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_PhyCtrl.c.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_PhyCtrl.c.o: ../src/common/MxLWare_HYDRA_PhyCtrl.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_PhyCtrl.c.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_PhyCtrl.c.o   -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_PhyCtrl.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_PhyCtrl.c.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_PhyCtrl.c.o   -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_PhyCtrl.c
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_PhyCtrl.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/net_static.dir/common/MxLWare_HYDRA_PhyCtrl.c.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_PhyCtrl.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_PhyCtrl.c.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_PhyCtrl.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_PhyCtrl.c.i
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_PhyCtrl.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/net_static.dir/common/MxLWare_HYDRA_PhyCtrl.c.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_PhyCtrl.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_PhyCtrl.c.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_PhyCtrl.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_PhyCtrl.c.s
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_PhyCtrl.c.o.requires:
 
@@ -683,16 +683,16 @@ src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_PhyCtrl.c.o.provides.build: s
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DeviceApi.c.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DeviceApi.c.o: ../src/common/MxLWare_HYDRA_DeviceApi.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DeviceApi.c.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DeviceApi.c.o   -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DeviceApi.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DeviceApi.c.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DeviceApi.c.o   -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DeviceApi.c
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DeviceApi.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DeviceApi.c.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DeviceApi.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DeviceApi.c.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DeviceApi.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DeviceApi.c.i
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DeviceApi.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DeviceApi.c.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DeviceApi.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DeviceApi.c.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DeviceApi.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DeviceApi.c.s
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DeviceApi.c.o.requires:
 
@@ -707,16 +707,16 @@ src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DeviceApi.c.o.provides.build:
 
 src/CMakeFiles/net_static.dir/common/MxlApiCall.c.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/MxlApiCall.c.o: ../src/common/MxlApiCall.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building C object src/CMakeFiles/net_static.dir/common/MxlApiCall.c.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxlApiCall.c.o   -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxlApiCall.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building C object src/CMakeFiles/net_static.dir/common/MxlApiCall.c.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxlApiCall.c.o   -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxlApiCall.c
 
 src/CMakeFiles/net_static.dir/common/MxlApiCall.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/net_static.dir/common/MxlApiCall.c.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxlApiCall.c > CMakeFiles/net_static.dir/common/MxlApiCall.c.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxlApiCall.c > CMakeFiles/net_static.dir/common/MxlApiCall.c.i
 
 src/CMakeFiles/net_static.dir/common/MxlApiCall.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/net_static.dir/common/MxlApiCall.c.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxlApiCall.c -o CMakeFiles/net_static.dir/common/MxlApiCall.c.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxlApiCall.c -o CMakeFiles/net_static.dir/common/MxlApiCall.c.s
 
 src/CMakeFiles/net_static.dir/common/MxlApiCall.c.o.requires:
 
@@ -731,16 +731,16 @@ src/CMakeFiles/net_static.dir/common/MxlApiCall.c.o.provides.build: src/CMakeFil
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_OEM_Drv.c.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_OEM_Drv.c.o: ../src/common/MxLWare_HYDRA_OEM_Drv.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_OEM_Drv.c.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_OEM_Drv.c.o   -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_OEM_Drv.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_OEM_Drv.c.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_OEM_Drv.c.o   -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_OEM_Drv.c
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_OEM_Drv.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/net_static.dir/common/MxLWare_HYDRA_OEM_Drv.c.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_OEM_Drv.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_OEM_Drv.c.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_OEM_Drv.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_OEM_Drv.c.i
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_OEM_Drv.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/net_static.dir/common/MxLWare_HYDRA_OEM_Drv.c.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_OEM_Drv.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_OEM_Drv.c.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_OEM_Drv.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_OEM_Drv.c.s
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_OEM_Drv.c.o.requires:
 
@@ -755,16 +755,16 @@ src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_OEM_Drv.c.o.provides.build: s
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DemodTunerApi.c.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DemodTunerApi.c.o: ../src/common/MxLWare_HYDRA_DemodTunerApi.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DemodTunerApi.c.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DemodTunerApi.c.o   -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DemodTunerApi.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DemodTunerApi.c.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DemodTunerApi.c.o   -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DemodTunerApi.c
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DemodTunerApi.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DemodTunerApi.c.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DemodTunerApi.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DemodTunerApi.c.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DemodTunerApi.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DemodTunerApi.c.i
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DemodTunerApi.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DemodTunerApi.c.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DemodTunerApi.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DemodTunerApi.c.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DemodTunerApi.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DemodTunerApi.c.s
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DemodTunerApi.c.o.requires:
 
@@ -779,16 +779,16 @@ src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DemodTunerApi.c.o.provides.bu
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_CommonApi.c.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_CommonApi.c.o: ../src/common/MxLWare_HYDRA_CommonApi.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_CommonApi.c.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_CommonApi.c.o   -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_CommonApi.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_CommonApi.c.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_CommonApi.c.o   -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_CommonApi.c
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_CommonApi.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/net_static.dir/common/MxLWare_HYDRA_CommonApi.c.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_CommonApi.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_CommonApi.c.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_CommonApi.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_CommonApi.c.i
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_CommonApi.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/net_static.dir/common/MxLWare_HYDRA_CommonApi.c.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_CommonApi.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_CommonApi.c.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_CommonApi.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_CommonApi.c.s
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_CommonApi.c.o.requires:
 
@@ -803,16 +803,16 @@ src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_CommonApi.c.o.provides.build:
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DiseqcFskApi.c.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DiseqcFskApi.c.o: ../src/common/MxLWare_HYDRA_DiseqcFskApi.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_32) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DiseqcFskApi.c.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DiseqcFskApi.c.o   -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DiseqcFskApi.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_32) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DiseqcFskApi.c.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DiseqcFskApi.c.o   -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DiseqcFskApi.c
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DiseqcFskApi.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DiseqcFskApi.c.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DiseqcFskApi.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DiseqcFskApi.c.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DiseqcFskApi.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DiseqcFskApi.c.i
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DiseqcFskApi.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DiseqcFskApi.c.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DiseqcFskApi.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DiseqcFskApi.c.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_DiseqcFskApi.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DiseqcFskApi.c.s
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DiseqcFskApi.c.o.requires:
 
@@ -827,16 +827,16 @@ src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_DiseqcFskApi.c.o.provides.bui
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_ChanBondApi.c.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_ChanBondApi.c.o: ../src/common/MxLWare_HYDRA_ChanBondApi.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_ChanBondApi.c.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_ChanBondApi.c.o   -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_ChanBondApi.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_ChanBondApi.c.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_ChanBondApi.c.o   -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_ChanBondApi.c
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_ChanBondApi.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/net_static.dir/common/MxLWare_HYDRA_ChanBondApi.c.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_ChanBondApi.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_ChanBondApi.c.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_ChanBondApi.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_ChanBondApi.c.i
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_ChanBondApi.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/net_static.dir/common/MxLWare_HYDRA_ChanBondApi.c.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_ChanBondApi.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_ChanBondApi.c.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_ChanBondApi.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_ChanBondApi.c.s
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_ChanBondApi.c.o.requires:
 
@@ -851,16 +851,16 @@ src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_ChanBondApi.c.o.provides.buil
 
 src/CMakeFiles/net_static.dir/common/MxLWare_FW_Download.c.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/MxLWare_FW_Download.c.o: ../src/common/MxLWare_FW_Download.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_34) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_FW_Download.c.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_FW_Download.c.o   -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_FW_Download.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_34) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_FW_Download.c.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_FW_Download.c.o   -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_FW_Download.c
 
 src/CMakeFiles/net_static.dir/common/MxLWare_FW_Download.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/net_static.dir/common/MxLWare_FW_Download.c.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_FW_Download.c > CMakeFiles/net_static.dir/common/MxLWare_FW_Download.c.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_FW_Download.c > CMakeFiles/net_static.dir/common/MxLWare_FW_Download.c.i
 
 src/CMakeFiles/net_static.dir/common/MxLWare_FW_Download.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/net_static.dir/common/MxLWare_FW_Download.c.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_FW_Download.c -o CMakeFiles/net_static.dir/common/MxLWare_FW_Download.c.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_FW_Download.c -o CMakeFiles/net_static.dir/common/MxLWare_FW_Download.c.s
 
 src/CMakeFiles/net_static.dir/common/MxLWare_FW_Download.c.o.requires:
 
@@ -875,16 +875,16 @@ src/CMakeFiles/net_static.dir/common/MxLWare_FW_Download.c.o.provides.build: src
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_TsMuxCtrlApi.c.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_TsMuxCtrlApi.c.o: ../src/common/MxLWare_HYDRA_TsMuxCtrlApi.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_35) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_TsMuxCtrlApi.c.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_TsMuxCtrlApi.c.o   -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_TsMuxCtrlApi.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_35) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_TsMuxCtrlApi.c.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_TsMuxCtrlApi.c.o   -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_TsMuxCtrlApi.c
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_TsMuxCtrlApi.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/net_static.dir/common/MxLWare_HYDRA_TsMuxCtrlApi.c.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_TsMuxCtrlApi.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_TsMuxCtrlApi.c.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_TsMuxCtrlApi.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_TsMuxCtrlApi.c.i
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_TsMuxCtrlApi.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/net_static.dir/common/MxLWare_HYDRA_TsMuxCtrlApi.c.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_TsMuxCtrlApi.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_TsMuxCtrlApi.c.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_TsMuxCtrlApi.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_TsMuxCtrlApi.c.s
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_TsMuxCtrlApi.c.o.requires:
 
@@ -899,16 +899,16 @@ src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_TsMuxCtrlApi.c.o.provides.bui
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_BERTApi.c.o: src/CMakeFiles/net_static.dir/flags.make
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_BERTApi.c.o: ../src/common/MxLWare_HYDRA_BERTApi.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_36) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_BERTApi.c.o"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_BERTApi.c.o   -c /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_BERTApi.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_36) "Building C object src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_BERTApi.c.o"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_BERTApi.c.o   -c /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_BERTApi.c
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_BERTApi.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/net_static.dir/common/MxLWare_HYDRA_BERTApi.c.i"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_BERTApi.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_BERTApi.c.i
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_BERTApi.c > CMakeFiles/net_static.dir/common/MxLWare_HYDRA_BERTApi.c.i
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_BERTApi.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/net_static.dir/common/MxLWare_HYDRA_BERTApi.c.s"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_BERTApi.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_BERTApi.c.s
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && /usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/user/Videos/CONTROLLER_V4/pistache-master/src/common/MxLWare_HYDRA_BERTApi.c -o CMakeFiles/net_static.dir/common/MxLWare_HYDRA_BERTApi.c.s
 
 src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_BERTApi.c.o.requires:
 
@@ -1001,9 +1001,9 @@ src/libnet_static.a: src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_TsMuxCtr
 src/libnet_static.a: src/CMakeFiles/net_static.dir/common/MxLWare_HYDRA_BERTApi.c.o
 src/libnet_static.a: src/CMakeFiles/net_static.dir/build.make
 src/libnet_static.a: src/CMakeFiles/net_static.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_37) "Linking CXX static library libnet_static.a"
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && $(CMAKE_COMMAND) -P CMakeFiles/net_static.dir/cmake_clean_target.cmake
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/net_static.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/user/Videos/CONTROLLER_V4/pistache-master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_37) "Linking CXX static library libnet_static.a"
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && $(CMAKE_COMMAND) -P CMakeFiles/net_static.dir/cmake_clean_target.cmake
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/net_static.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 src/CMakeFiles/net_static.dir/build: src/libnet_static.a
@@ -1050,10 +1050,10 @@ src/CMakeFiles/net_static.dir/requires: src/CMakeFiles/net_static.dir/common/MxL
 .PHONY : src/CMakeFiles/net_static.dir/requires
 
 src/CMakeFiles/net_static.dir/clean:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src && $(CMAKE_COMMAND) -P CMakeFiles/net_static.dir/cmake_clean.cmake
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build/src && $(CMAKE_COMMAND) -P CMakeFiles/net_static.dir/cmake_clean.cmake
 .PHONY : src/CMakeFiles/net_static.dir/clean
 
 src/CMakeFiles/net_static.dir/depend:
-	cd /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/src /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src /home/user/Music/new_build_git/CONTROLLER_V4/pistache-master/build/src/CMakeFiles/net_static.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/user/Videos/CONTROLLER_V4/pistache-master/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/user/Videos/CONTROLLER_V4/pistache-master /home/user/Videos/CONTROLLER_V4/pistache-master/src /home/user/Videos/CONTROLLER_V4/pistache-master/build /home/user/Videos/CONTROLLER_V4/pistache-master/build/src /home/user/Videos/CONTROLLER_V4/pistache-master/build/src/CMakeFiles/net_static.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : src/CMakeFiles/net_static.dir/depend
 
