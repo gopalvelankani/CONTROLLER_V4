@@ -354,7 +354,7 @@
 				    msgBuf[5] = (unsigned char)uProg;
 				    msgBuf[6] = 0;
 				    msgBuf[7] = ETX;
-			    }else{
+			    }else if(readWriteMode==1){
 					std::string service_name=json["NewName"].asString();
 					uProg=(unsigned short)std::stoi(json["progNumber"].asString());
 					int addFlag = json["addFlag"].asInt();
@@ -378,6 +378,15 @@
 				    msgBuf[4] = uProg>>8;
 					msgBuf[5] = (unsigned char)uProg;	
 					msgBuf[4+len] = ETX;
+				}else{
+					uProg = std::stoi(json.get("progNumber","0").asString());
+	    			len = 2;
+				    msgBuf[1] = (unsigned char) (len>>8);
+				    msgBuf[2] = (unsigned char) len;
+				    msgBuf[3] = CMD_CHANGE_NAME;
+				    msgBuf[4] = uProg >> 8;
+				    msgBuf[5] = (unsigned char)uProg;
+				    msgBuf[6] = ETX;
 				}
 			    break;
 			case 21:
@@ -467,7 +476,7 @@
 				    msgBuf[5] = (unsigned char)uProg;
 				    msgBuf[6] = 0;
 				    msgBuf[7] = ETX;
-				}else{
+				}else if(readWriteMode==1){
 					int addFlag  =json["addFlag"].asInt();
 					uProg=(unsigned short)std::stoi(json["serviceNumber"].asString());
 					
@@ -489,6 +498,15 @@
 					msgBuf[1] = (unsigned char) (len>>8);
 					msgBuf[2] = (unsigned char) len;
 					msgBuf[4+len] = ETX;						
+				}else{
+					uProg = std::stoi(json.get("serviceNumber","0").asString());
+	    			len = 2;
+				    msgBuf[1] = (unsigned char) (len>>8);
+				    msgBuf[2] = (unsigned char) len;
+				    msgBuf[3] = CMD_CHANGE_PROV;
+				    msgBuf[4] = uProg >> 8;
+				    msgBuf[5] = (unsigned char)uProg;
+				    msgBuf[6] = ETX;
 				}
 				break;
 			case 27:

@@ -34,10 +34,12 @@ public:
 	int addFrequency(std::string center_frequency,std::string str_rmx_no,unsigned int* frequencies);
 	int addSymbolRate(std::string symbol_rate,std::string str_rmx_no,std::string output,std::string rolloff);
 	Json::Value getSymbolRates();
-	int addChannelname(int channel_number,std::string channel_name,int rmx_no,int addOrDel);
+	int addChannelname(std::string channel_number,std::string channel_name,std::string rmx_no,std::string input,int addOrDel);
 	int flushServiceNames();
-	int addServiceId(int channel_number,int service_id,int rmx_no,int addFlag);
+	int addServiceId(std::string channel_number,std::string service_id,std::string rmx_no,std::string input,int addFlag);
+	int removeServiceIdName(std::string channel_number,std::string rmx_no,std::string input);
 	int flushServiceId();
+	int isServiceActivated(std::string channel_number,std::string rmx_no,std::string input);
 	int addNetworkname(std::string network_name,std::string output,int rmx_no);
 	int addTablesVersion(std::string pat_ver,std::string pat_isenable,std::string std_ver,std::string sdt_isenable,std::string nit_ver,std::string nit_isenable,std::string output,int rmx_no);
 	int addTableTimeout(std::string table,std::string timeout,int rmx_no);
@@ -83,8 +85,8 @@ public:
 	Json::Value getCenterFrequency();
 	int getServiceInputChannel(std::string service_no);
 	Json::Value getServiceNewnames();
-	Json::Value getServiceIds(int rmx_no);
-	Json::Value getServiceIds(int rmx_no,std::string old_service_id);
+	Json::Value getServiceIds(int rmx_no,int input);
+	Json::Value getServiceIds(int rmx_no,std::string old_service_id,std::string input);
 	Json::Value getStreams();
 	Json::Value getChannels();
 	Json::Value getEMMChannels();
@@ -139,6 +141,7 @@ public:
 	int addQAM(std::string rmx_no, std::string output_channel,std::string qam_id);	
 	Json::Value getQAM(int rmx_id);
 	Json::Value getSPTSControl();
+	Json::Value getMuxOutValue(std::string mux_id);
 	int addCustomPid(std::string rmx_no, std::string output,std::string pid, int addFlag);
 	Json::Value getCustomPids(std::string rmx_no);
 	int setIndexSetUnset(int index, int indexValue,int flag);
@@ -154,8 +157,13 @@ public:
 	Json::Value getNITHostMode();
 	Json::Value getLcnIds(std::string output,std::string rmx_no);
 	int addLcnIds(std::string service_id,std::string lcn_id,std::string input, std::string output,std::string rmx_no);
+	int unsetLcnId(std::string service_id,std::string input, std::string output,std::string rmx_no);
 	int isLcnIdExists(std::string lcn_id);
 	Json::Value getNetworkId(std::string rmx_no,std::string output);
+	Json::Value getPrivateData();
+	Json::Value getPrivateData(int withId);
+	int addPrivateData(std::string sPrivateData,std::string private_data_id,int addFlag);
+	int disableHostNIT();
 };
 // This is the content of the .h file, which is where the declarations go
 
