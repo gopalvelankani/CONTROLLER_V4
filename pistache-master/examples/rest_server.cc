@@ -102,9 +102,9 @@ public:
         initRedisConn();
         
         std::cout<<"------------------------------INIT()-----------------------------"<<std::endl;
-        // forkEMMChannels();
-        // forkChannels();
-        // forkCWthread();
+        updateEMMChannelsInRedis();
+        updateECMChannelsInRedis();
+        updateECMStreamsInRedis();
         runBootupscript();
     }
     void start() {
@@ -181,9 +181,9 @@ private:
         Routes::Post(router, "/getSmoothFilterInfo", Routes::bind(&StatsEndpoint::getSmoothFilterinfo, this));
         Routes::Get(router, "/getProgramList/:rmx_no", Routes::bind(&StatsEndpoint::getProgramList, this));
         Routes::Post(router, "/getProgramList", Routes::bind(&StatsEndpoint::getProgramsList, this));
-        // Routes::Post(router, "/getProgramsListNames", Routes::bind(&StatsEndpoint::getProgramsListNames, this));
-        Routes::Get(router, "/getCryptedProg/:rmx_no", Routes::bind(&StatsEndpoint::getCryptedProg, this));
-        Routes::Post(router, "/getCryptedProg", Routes::bind(&StatsEndpoint::getCryptedPrograms, this));
+        Routes::Post(router, "/getServiceList", Routes::bind(&StatsEndpoint::getServiceList, this));
+        Routes::Get(router, "/getServiceTypeAndStatus/:rmx_no", Routes::bind(&StatsEndpoint::getCryptedProg, this));
+        Routes::Post(router, "/getServiceTypeAndStatus", Routes::bind(&StatsEndpoint::getServiceTypeAndStatus, this));
         Routes::Get(router, "/getAllReferencedPIDInfo/:rmx_no", Routes::bind(&StatsEndpoint::getAllReferencedPIDInfo, this));
         Routes::Post(router, "/getAllReferencedPIDInfo", Routes::bind(&StatsEndpoint::getAllReferencedPidInfo, this));
         Routes::Post(router, "/setEraseCAMod", Routes::bind(&StatsEndpoint::setEraseCAMod, this));
@@ -386,6 +386,17 @@ private:
         Routes::Post(router, "/setPrivateData", Routes::bind(&StatsEndpoint::setPrivateData, this));
         Routes::Post(router, "/getPrivateData", Routes::bind(&StatsEndpoint::getPrivateData, this));
 
+        //FPGA Version 
+        Routes::Post(router, "/getFPGA1To3Version", Routes::bind(&StatsEndpoint::getFPGA1To3Version, this)); 
+        Routes::Post(router, "/getFPGA5To7Version", Routes::bind(&StatsEndpoint::getFPGA5To7Version, this)); 
+        Routes::Post(router, "/getFPGA8To13Version", Routes::bind(&StatsEndpoint::getFPGA8To13Version, this));
+        Routes::Post(router, "/getFPGA4Version", Routes::bind(&StatsEndpoint::getFPGA4Version, this)); 
+
+        Routes::Post(router, "/setControllerFactoryReset", Routes::bind(&StatsEndpoint::setControllerFactoryReset, this)); 
+        Routes::Post(router, "/getControllerBackup", Routes::bind(&StatsEndpoint::getControllerBackup, this)); 
+        Routes::Post(router, "/restoreBackup", Routes::bind(&StatsEndpoint::restoreBackup, this)); 
+        
+        Routes::Get(router, "/disConnect", Routes::bind(&StatsEndpoint::disConnect, this)); 
 
     }
     /*****************************************************************************/
@@ -3440,13 +3451,13 @@ private:
             if (!uLen || RxBuffer[0] != STX || RxBuffer[3] != 0x32) {
                 json["error"]= true;
                 json["message"]= "STATUS COMMAND ERROR!";
-                addToLog("getProgramList","Error");
+                // addToLog("getProgramList","Error");
             }else{
                 uLen = ((RxBuffer[1] << 8) | RxBuffer[2]);
                 if (!uLen) {
                     json["error"]= true;
                     json["message"]= "STATUS COMMAND ERROR!";
-                    addToLog("getProgramList","Error");
+                    // addToLog("getProgramList","Error");
                 }else{
                     json["error"] = false;
                     json["message"] = "Get program list!";
@@ -3483,6 +3494,7 @@ private:
                        }
                         db->addChannelList(input,ProgNum[i].asInt(),rmx_no);
                     }
+                    callGetServiceTypeAndStatus(std::to_string(rmx_no),std::to_string(input));
                     // for (int i = 0; i < ProgNum.size(); ++i)
                     // {
                     //     db->addChannelList(input,ProgNum[i].asInt(),rmx_no);
@@ -3493,7 +3505,7 @@ private:
                     json["uband"] = band;
                     json["uishared"] = uishared;
                     json["status"] = 1;
-                    addToLog("getProgramList","Success");
+                    // addToLog("getProgramList","Success");
                 }
             }
         }else{
@@ -3534,6 +3546,109 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
+
+    /*****************************************************************************/
+    /*  Commande 0x33   function getServiceList                        */
+    /*****************************************************************************/
+    void getServiceList(const Rest::Request& request, Net::Http::ResponseWriter response){
+        Json::Value json,iojson;
+        Json::FastWriter fastWriter;
+        std::string para[] = {"rmx_no","input"};
+        int error[ sizeof(para) / sizeof(para[0])];
+        bool all_para_valid=true;
+        addToLog("getProgramsList",request.body());
+        std::string input, output,str_rmx_no;
+        std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
+        if(res=="0"){
+            str_rmx_no = getParameter(request.body(),"rmx_no");
+            input = getParameter(request.body(),"input");
+            error[0] = verifyInteger(str_rmx_no,1,1,RMX_COUNT,1);
+            error[1] = verifyInteger(input,1,1,INPUT_COUNT);
+            for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
+            {
+               if(error[i]!=0){
+                    continue;
+                }
+                all_para_valid=false;
+                json["error"]= true;
+                json[para[i]]= (i!=0)? "Require Integer between 0-3!" : "Require Integer between 1-6!";
+            }
+            if(all_para_valid){
+               json = callGetServiceList(input,std::stoi(str_rmx_no));
+            }      
+        }else{
+            json["error"]= true;
+            json["message"]= res;
+        } 
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
+    }
+
+    Json::Value callGetServiceList(std::string input,int rmx_no){
+        unsigned char RxBuffer[1024]={0};
+        
+        Json::Value json,iojson;
+        Json::Value ProgNum,ProgNames;
+        Json::Value band;
+        Json::Value uishared;
+        int uNumProg;
+        unsigned short *uProgNum; 
+        unsigned short *uBand; 
+        unsigned char *uiShared;
+        iojson=callSetInputOutput(input,"0",rmx_no);
+        if(iojson["error"]==false)  {
+            int uLen = c1.callCommand(32,RxBuffer,1024,5,json,0);
+
+            if (!uLen || RxBuffer[0] != STX || RxBuffer[3] != 0x32) {
+                json["error"]= true;
+                json["message"]= "STATUS COMMAND ERROR!";
+                // addToLog("getProgramList","Error");
+            }else{
+                uLen = ((RxBuffer[1] << 8) | RxBuffer[2]);
+                if (!uLen) {
+                    json["error"]= true;
+                    json["message"]= "STATUS COMMAND ERROR!";
+                    // addToLog("getProgramList","Error");
+                }else{
+                    json["error"] = false;
+                    json["message"] = "Get program list!";
+                    uProgNum = (unsigned short *)malloc(uLen*sizeof(unsigned short));
+                    uBand = (unsigned short *)malloc(uLen*sizeof(unsigned short));
+                    uiShared = (unsigned char *)malloc(uLen*sizeof(unsigned char));
+
+                    uProgNum[0] = 8191;         // NULL
+                    uBand[0] = ((RxBuffer[4] << 8) | RxBuffer[5]);
+                    uiShared[0] = 0;
+                    uProgNum[1] = 0;            // PAT
+                    uBand[1] = ((RxBuffer[6] << 8) | RxBuffer[7]);
+                    uiShared[1] = 0;
+                    //prog list
+                    uLen -= 4;
+                    uNumProg = (uLen /= 4);
+                    for (int i = 0; i<uLen; i++) {
+                        // uProgNum[2 + i] = ((RxBuffer[8 + i * 4] << 8) | RxBuffer[8 + i * 4 + 1]);
+                        int pnumber = ((RxBuffer[8 + i * 4] << 8) | RxBuffer[8 + i * 4 + 1]); 
+                        ProgNum[i]= pnumber;
+                        // uBand[2 + i] = (((RxBuffer[8 + i * 4 + 2] & 0x7F) << 8) | RxBuffer[8 + i * 4 + 3]);
+                        band[i] = (((RxBuffer[8 + i * 4 + 2] & 0x7F) << 8) | RxBuffer[8 + i * 4 + 3]);
+                        // uiShared[2 + i] = ((RxBuffer[8 + i * 4 + 2] & 0x80) >> 7);
+                        uishared[i] = ((RxBuffer[8 + i * 4 + 2] & 0x80) >> 7);
+                    }
+                    
+                    json["prog_names"] = ProgNames;
+                    json["progNums"] = ProgNum;
+                    json["uband"] = band;
+                    json["uishared"] = uishared;
+                    json["status"] = 1;
+                    // addToLog("getProgramList","Success");
+                }
+            }
+        }else{
+           json = iojson;
+        }
+        return json;
+    }
+    
     /*****************************************************************************/
     /*  Commande 0x33   function getCryptedProg                        */
     /*****************************************************************************/
@@ -3545,7 +3660,7 @@ private:
         if( rmx_no > 0 && rmx_no <= 6){
             int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
             if(write32bCPU(0,0,target) != -1) {
-                json = callGetCryptedProg(rmx_no);
+                json = callGetServiceTypeAndStatus(std::to_string(rmx_no),"0");
             }else{
                 json["error"]= true;
                 json["message"]= "Connection error!";
@@ -3558,59 +3673,66 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
-    Json::Value callGetCryptedProg(int rmx_no){
+    Json::Value callGetServiceTypeAndStatus(std::string rmx_no,std::string input){
         unsigned char RxBuffer[1024]={0};
         
-        Json::Value json;
+        Json::Value json,iojson;
         Json::Value progNum;
         Json::Value service_type,encrypted_flag;
-        int uLen = c1.callCommand(33,RxBuffer,1024,5,json,0);
 
-        if (!uLen || RxBuffer[0] != STX || RxBuffer[3] != 0x33) {
-            json["error"]= true;
-            json["message"]= "STATUS COMMAND ERROR!";
-            addToLog("getCryptedProg","Error");
-        }else{
-            uLen = ((RxBuffer[1] << 8) | RxBuffer[2]);
-           if (RxBuffer[4 + uLen] != ETX) {
+        iojson=callSetInputOutput(input,"0",std::stoi(rmx_no));
+        if(iojson["error"]==false){
+            int uLen = c1.callCommand(33,RxBuffer,1024,5,json,0);
+
+            if (!uLen || RxBuffer[0] != STX || RxBuffer[3] != 0x33) {
                 json["error"]= true;
                 json["message"]= "STATUS COMMAND ERROR!";
-                addToLog("getCryptedProg","Error");
+                // addToLog("callGetServiceTypeAndStatus","Error");
             }else{
-                json["error"] = false;
-                json["message"] = "Get encrypted program list!";
-                json["NumProg"] = (uLen /= 4);
-                for (int i = 0; i<uLen; i++) {
-                        progNum[i] = ((RxBuffer[4 + i * 4] << 8) | RxBuffer[4 + i * 4 + 1]);
-                        //service_type[i] = ((RxBuffer[4 + i * 4 + 2] << 8) | RxBuffer[4 + i * 4 + 3]);
-                        service_type[i] = RxBuffer[4 + i * 4 + 2];
-                        encrypted_flag[i] = RxBuffer[4 + i * 4 + 3];
+                uLen = ((RxBuffer[1] << 8) | RxBuffer[2]);
+               if (RxBuffer[4 + uLen] != ETX) {
+                    json["error"]= true;
+                    json["message"]= "STATUS COMMAND ERROR!";
+                    // addToLog("callGetServiceTypeAndStatus","Error");
+                }else{
+                    json["error"] = false;
+                    json["message"] = "Get encrypted program list!";
+                    json["NumProg"] = (uLen /= 4);
+                    for (int i = 0; i<uLen; i++) {
+                            progNum[i] = ((RxBuffer[4 + i * 4] << 8) | RxBuffer[4 + i * 4 + 1]);
+                            //service_type[i] = ((RxBuffer[4 + i * 4 + 2] << 8) | RxBuffer[4 + i * 4 + 3]);
+                            service_type[i] = RxBuffer[4 + i * 4 + 2];
+                            encrypted_flag[i] = RxBuffer[4 + i * 4 + 3];
+                        }
+                    if(progNum.size() > 0){
+                        db->updateServiceType(rmx_no,input,progNum,service_type,encrypted_flag);
                     }
-                json["progNums"] = progNum;
-                json["service_type"] = service_type;
-                json["encrypted_flag"] = encrypted_flag;
-                addToLog("getCryptedProg","Success");
+                    json["progNums"] = progNum;
+                    json["service_type"] = service_type;
+                    json["encrypted_flag"] = encrypted_flag;
+                    // addToLog("callGetServiceTypeAndStatus","Success");
+                }
             }
-        }
+        }else{
+                json = iojson;
+            }
         return json;
     }
-    void getCryptedPrograms(const Rest::Request& request, Net::Http::ResponseWriter response){
+    void getServiceTypeAndStatus(const Rest::Request& request, Net::Http::ResponseWriter response){
         
         Json::Value json,iojson;
         Json::FastWriter fastWriter;
-        std::string para[] = {"rmx_no","input","output"};
+        std::string para[] = {"rmx_no","input"};
         int error[ sizeof(para) / sizeof(para[0])];
         bool all_para_valid=true;
-        addToLog("getCryptedProg",request.body());
+        addToLog("getServiceTypeAndStatus",request.body());
         std::string input, output,str_rmx_no;
         std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         if(res=="0"){
             str_rmx_no = getParameter(request.body(),"rmx_no");
             input = getParameter(request.body(),"input");
-            output = getParameter(request.body(),"output");
             error[0] = verifyInteger(str_rmx_no,1,1,RMX_COUNT,1);
             error[1] = verifyInteger(input,1,1,INPUT_COUNT);
-            error[2] = verifyInteger(output,1,1,OUTPUT_COUNT);
             for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
             {
                if(error[i]!=0){
@@ -3621,12 +3743,7 @@ private:
                 json[para[i]]= (i!=0)? "Require Integer between 0-3!" : "Require Integer between 1-6!";
             }
             if(all_para_valid){
-                iojson=callSetInputOutput(input,output,std::stoi(str_rmx_no));
-                if(iojson["error"]==false){
-                    json = callGetCryptedProg(std::stoi(str_rmx_no));
-                }else{
-                    json = iojson;
-                }
+                json = callGetServiceTypeAndStatus(str_rmx_no,input);
             }      
         }else{
             json["error"]= true;
@@ -5948,7 +6065,7 @@ private:
                 if(all_para_valid){
                 	for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
                 	{
-                		for (int output = 0; output < OUTPUT_COUNT; ++output)
+                		for (int output = 0; output <= OUTPUT_COUNT; ++output)
                 		{
                 			Json::Value json_table_ver = callSetTablesVersion(pat_ver,pat_isenable,sdt_ver,sdt_isenable,nit_ver,nit_isenable,std::to_string(output),rmx_no);		
                 			if(json_table_ver["error"] == true)
@@ -6350,7 +6467,7 @@ private:
             if(verifyInteger(mode,1,1)){
                 for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
                 {
-                    for (int output = 0; output < OUTPUT_COUNT; ++output)
+                    for (int output = 0; output <= OUTPUT_COUNT; ++output)
                     {
                         Json::Value iojson=callSetInputOutput("0",std::to_string(output),rmx_no);
                         if(iojson["error"]==false){
@@ -6834,7 +6951,7 @@ private:
             if(all_para_valid){
 	            for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
 	            {
-	            	for (int output = 0; output < OUTPUT_COUNT; ++output)
+	            	for (int output = 0; output <= OUTPUT_COUNT; ++output)
 	            	{
             			Json::Value json_psi_int = callSetPsiSiInterval(patint,sdtint,nitint,std::to_string(output),rmx_no);
             			if(json_psi_int["error"] == true)
@@ -6960,37 +7077,42 @@ private:
                 Json::Value service_ids,new_service_ids,old_service_ids;
                 int rmx_no_i = std::stoi(rmx_no);
                 int flag = std::stoi(addFlag);
-                Json::Value iojson = callSetInputOutput(input,"0",rmx_no_i);
-                if(iojson["error"] == false){
-                    Json::Value service_ids = db->getServiceIds(rmx_no_i,oldpronum,input);
-                    int is_present = 0;
-                    if(service_ids["error"] == false){
-                        for (int i = 0; i < service_ids["list"].size(); ++i)
-                        {
-                            std::string old_service_id = service_ids["list"][i]["channel_number"].asString();
-                            if(std::stoi(oldpronum) != std::stoi(old_service_id)){
-                                old_service_ids[i] = old_service_id;
-                                new_service_ids[i] = service_ids["list"][i]["service_id"].asString();   
+                if(db->checkDuplicateServiceId(newprognum,oldpronum) == 0){
+                    Json::Value iojson = callSetInputOutput(input,"0",rmx_no_i);
+                    if(iojson["error"] == false){
+                        Json::Value service_ids = db->getServiceIds(rmx_no_i,oldpronum,input);
+                        int is_present = 0;
+                        if(service_ids["error"] == false){
+                            for (int i = 0; i < service_ids["list"].size(); ++i)
+                            {
+                                std::string old_service_id = service_ids["list"][i]["channel_number"].asString();
+                                if(std::stoi(oldpronum) != std::stoi(old_service_id)){
+                                    old_service_ids[i] = old_service_id;
+                                    new_service_ids[i] = service_ids["list"][i]["service_id"].asString();   
+                                }
+                            }
+                            if(flag){
+                                old_service_ids[service_ids["list"].size()] = oldpronum;
+                                new_service_ids[service_ids["list"].size()] = newprognum;   
+                            }
+                        }else{
+                            if(flag){
+                                old_service_ids[0] = oldpronum;
+                                new_service_ids[0] = newprognum;    
                             }
                         }
-                        if(flag){
-                            old_service_ids[service_ids["list"].size()] = oldpronum;
-                            new_service_ids[service_ids["list"].size()] = newprognum;   
-                        }
-                    }else{
-                        if(flag){
-                            old_service_ids[0] = oldpronum;
-                            new_service_ids[0] = newprognum;    
-                        }
+                        json["old_service_ids"] = old_service_ids;
+                        json["new_service_ids"] = new_service_ids;
+                        json = callSetServiceID(old_service_ids,new_service_ids,rmx_no_i);
+                        if(json["error"] == false)
+                            db->addServiceId(oldpronum,newprognum,rmx_no,input,flag);
                     }
-                    json["old_service_ids"] = old_service_ids;
-                    json["new_service_ids"] = new_service_ids;
-                    json = callSetServiceID(old_service_ids,new_service_ids,rmx_no_i);
-                    if(json["error"] == false)
-                        db->addServiceId(oldpronum,newprognum,rmx_no,input,flag);
+                    else
+                        json = iojson;
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Duplicate service id!";
                 }
-                else
-                    json = iojson;
             }else{
                 json["error"]= true;
             }
@@ -7092,7 +7214,7 @@ private:
             std::string address = getParameter(request.body(),"address"); 
             std::string data = getParameter(request.body(),"data"); 
             
-            error[0] = verifyInteger(cs,0,0,128,1);
+            error[0] = verifyInteger(cs,0,0,128,0);
             error[1] = verifyInteger(address);
             error[2] = verifyInteger(data);
             error[3] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
@@ -7435,9 +7557,9 @@ private:
                 std::string input = getParameter(request.body(),"input"); 
                 std::string progNumber = getParameter(request.body(),"pnumber"); 
                
-                error[1] = verifyInteger(progNumber);
-                error[2] = verifyInteger(input,1,1,INPUT_COUNT);
-                error[3] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+                error[0] = verifyInteger(progNumber);
+                error[1] = verifyInteger(input,1,1,INPUT_COUNT);
+                error[2] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
 
                 for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
                 {
@@ -8060,7 +8182,7 @@ private:
     void updateCATCADescriptor(std::string channel_id){
         for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
         {
-            for (int output = 0; output <OUTPUT_COUNT; ++output)
+            for (int output = 0; output <= OUTPUT_COUNT; ++output)
             {
                 Json::Value JSON_emmgs,JSON_CA_System_id,emm_pids,private_data_list,auth_outputs,json;
                 JSON_emmgs = db->getEMMGChannels(std::to_string(rmx_no),std::to_string(output),channel_id);
@@ -8166,6 +8288,7 @@ private:
 
 		                    	}
 		                    	json = callSetPMTCADescriptor(service_pids,JSON_CA_System_id,ecm_pids,private_data_list,std::stoi(rmx_no),output,input);
+                                json["rmx_no"] = rmx_no;
 		                  //   	Json::Value customPid = callsetCustomPids(ecm_pids,auth_outputs,std::stoi(rmx_no),output);
 				               	// if(customPid["error"] == false){
 				               	// 	json["customPid"] = "Successfully enabled ECM PID!";
@@ -8437,7 +8560,7 @@ private:
     	Json::Value json;
     	bool error_flag = false;
     	// int remx_bit[]= {0,4,1,5,2,6};
-    	int iParity = (std::stoi(parity) == 0)? 0 : 1;
+    	int iParity = (std::stoi(parity) == 0)? 0 : 255;
     	for (int rmx_no = 0; rmx_no < RMX_COUNT; ++rmx_no)
     	{
     		Json::Value core_json;
@@ -9251,74 +9374,63 @@ private:
         Json::Value json;
         Json::FastWriter fastWriter;        
 
-        // std::string para[] = {"mode","output","rmx_no"};
-        // int error[ sizeof(para) / sizeof(para[0])];
-        // bool all_para_valid=true;
-        // addToLog("setTDT_TOT",request.body());
-        // std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
-        // if(res=="0"){
-        //     std::string mode = getParameter(request.body(),"mode"); 
-        //     std::string output = getParameter(request.body(),"output");
-        //     std::string rmx_no =getParameter(request.body(),"rmx_no") ; 
+        std::string para[] = {"input","rmx_no"};
+        int error[ sizeof(para) / sizeof(para[0])];
+        bool all_para_valid=true;
+        addToLog("setTDT_TOT",request.body());
+        std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
+        if(res=="0"){
+            std::string input = getParameter(request.body(),"input");
+            std::string rmx_no =getParameter(request.body(),"rmx_no") ; 
             
-        //     error[0] = verifyInteger(mode,1,1);
-        //     error[1] = verifyInteger(output,1,1,OUTPUT_COUNT);
-        //     error[2] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
-        //     for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
-        //     {
-        //        if(error[i]!=0){
-        //             continue;
-        //         }
-        //         all_para_valid=false;
-        //         json["error"]= true;
-        //         json[para[i]]= (i==0)? "Require Integer between 1-6!" :(i==1) ? "Require Integer" : "Require Integer between 0 - "+std::to_string(INPUT_COUNT)+"!" ;
-        //     }
-        //     if(all_para_valid){
-        //         Json::Value iojson=callSetInputOutput("0",output,std::stoi(rmx_no));
-        //         if(iojson["error"]==false){
-        //             json=callSetNITmode(mode,output,std::stoi(rmx_no));
-        //             if(json["error"] == false)
-        //                 db->addNitMode(mode,output,std::stoi(rmx_no)); 
-        //         }else{
-        //             json["error"]= true;
-        //             json["message"]= "Error while selecting output!";     
-        //         }
-        //     }
-        // }else{
-        //     json["error"]= true;
-        //     json["message"]= res;
-        // }
+            error[0] = verifyInteger(input,1,1,OUTPUT_COUNT);
+            error[1] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
+            {
+               if(error[i]!=0){
+                    continue;
+                }
+                all_para_valid=false;
+                json["error"]= true;
+                json[para[i]]= (i==1)? "Require Integer between 1-6!" :"Require Integer between 0 - "+std::to_string(INPUT_COUNT)+"!" ;
+            }
+            if(all_para_valid){
+                json = callSetTDT_TOT(input,rmx_no);
+            }
+        }else{
+            json["error"]= true;
+            json["message"]= res;
+        }
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
-    // Json::Value callSetNITmode(std::string mode,std::string output,int rmx_no){
-    //     unsigned char RxBuffer[6]={0};
-    //     int uLen;
-    //     Json::Value json,jsonMsg;
-    //     jsonMsg["Mode"] = mode;
-    //     json["error"]= false;
-    //     uLen = c1.callCommand(10,RxBuffer,6,6,jsonMsg,1);
-                     
-    //     if (!uLen || RxBuffer[0] != STX || RxBuffer[3] != CMD_INIT_NIT_MODE || uLen != 6 || RxBuffer[5] != ETX){
-    //         json["error"]= true;
-    //         json["message"]= "STATUS COMMAND ERROR!";
-    //     }            
-    //     else{
-    //         uLen = ((RxBuffer[1]<<8) | RxBuffer[2]);
-    //         if (uLen != 1 ) {
-    //             // json["error"]= true;
-    //             json["message"]= "STATUS COMMAND ERROR!";
-    //             addToLog("setNitMode","Error");
-    //         }else{
-    //             json["status"] = RxBuffer[4];
-    //             json["error"]= false;
-    //             json["message"]= "set Nit Mode!!";    
-                     
-    //             addToLog("setTDT_TOT","Success");
-    //         }
-    //     }
-    //     return json;
-    // }
+    Json::Value callSetTDT_TOT(std::string input_source,std::string rmx_no){
+        unsigned char RxBuffer[6]={0};
+        int uLen;
+        Json::Value json,jsonMsg;
+        jsonMsg["input_source"] = input_source;
+        json["error"]= false;
+
+        Json::Value iojson=callSetInputOutput(input_source,"0",std::stoi(rmx_no));
+        if(iojson["error"]==false){
+            uLen = c1.callCommand(59,RxBuffer,6,60,jsonMsg,1);
+                         
+            if (!uLen || RxBuffer[0] != STX || RxBuffer[3] != 0x3B || RxBuffer[5] != ETX){
+                json["error"]= true;
+                json["message"]= "STATUS COMMAND ERROR!";
+            }            
+            else{
+                json["status"] = RxBuffer[4];
+                json["error"]= false;
+                json["message"]= "Set TDT TOT!!";    
+            }
+        }else{
+            json["error"]= true;
+            json["message"]= "Error while selecting output!";     
+            json["iojson"] = iojson["message"];
+        }
+        return json;
+    }
 
     // UDP STACK DEFINITIONS
 
@@ -9845,9 +9957,9 @@ private:
                         json["error"]= true;
                         json["message"]= "Failed MUX OUT!";
                     }
-                    // json["mux_out"] =std::to_string(mux_out);
+                    json["mux_out"] =std::to_string(mux_out);
                     if(json["error"] == false){
-                        db->addSPTSIPInputChannels(str_rmx_no,channel_no,std::to_string(ip_addr),port,str_type);
+                        db->addSPTSIPInputChannels(std::to_string(control_fpga),channel_no,std::to_string(ip_addr),port,str_type);
                     }
                     // json["tuner_ch"] = tuner_ch;
                     // json["target"] = target;
@@ -9900,7 +10012,7 @@ private:
                         }
                         json["input_type"] = json_input_type;
                         json["error"]= false;
-                        json["message"]= "!";
+                        json["message"]= "Input channel type!";
                     }
                 }else{
                     json["error"]= true;
@@ -9917,6 +10029,297 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
+    /*****************************************************************************/
+    /*  Commande 0x05   function getFPGA1To3Version              */
+    /*****************************************************************************/
+    void getFPGA1To3Version(const Rest::Request& request, Net::Http::ResponseWriter response){
+        Json::Value json,jsonInput;
+        Json::FastWriter fastWriter;
+
+        Json::Value json_fpga13,value,json_min_ver,json_maj_ver,json_mpts_spts;
+        for (int mux_id = 0; mux_id < 3; ++mux_id)
+        {
+            int target =((0&0x3)<<8) | ((0&0x7)<<5) | ((mux_id&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1){
+                long int type = read32bI2C(5,0);
+                if(type != -1){
+                    json_fpga13.append(std::to_string((type & 3145728) >>20));
+                    json_min_ver.append(std::to_string((type & 251658240) >>24));
+                    json_maj_ver.append(std::to_string((type & 4026531840) >>28));
+                    json_mpts_spts.append((((type & 65536) >>16) == 1)? "SPTS" : "MPTS");
+                    value.append(std::to_string(type));
+                    json["error"]= false;
+                    json["message"]= "FPGA1-3 bitstream version and MUX_OUT configuration!";
+                }else{
+                    json["error"]= false;
+                    json["message"]= "Failed read!";
+                }
+            }else{
+                json["error"]= true;
+                json["message"]= "Connection error!";
+            }    
+        }
+        json["custom_line"] = json_fpga13;
+        json["min_ver"] = json_min_ver;
+        json["maj_ver"] = json_maj_ver;
+        json["first_input"] = json_mpts_spts;
+        json["val"] = value;
+
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
+    }
+
+    /*****************************************************************************/
+    /*  Commande 0x05   function getFPGA4Version              */
+    /*****************************************************************************/
+    void getFPGA4Version(const Rest::Request& request, Net::Http::ResponseWriter response){
+        Json::Value json,jsonInput;
+        Json::FastWriter fastWriter;
+
+        Json::Value value;
+       
+        if(write32bCPU(0,0,0) != -1){
+            long int type = read32bCPU(0,0);
+            if(type != -1){
+                json["version"] = getDecToHex(type);
+                json["error"]= false;
+                json["message"]= "FPGA4 bitstream version!";
+            }else{
+                json["error"]= false;
+                json["message"]= "Failed read!";
+            }
+        }else{
+            json["error"]= true;
+            json["message"]= "Connection error!";
+        }    
+        
+
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
+    }
+
+    /*****************************************************************************/
+    /*  Commande 0x05   function getFPGA5To7Version              */
+    /*****************************************************************************/
+    void getFPGA5To7Version(const Rest::Request& request, Net::Http::ResponseWriter response){
+        Json::Value json,jsonInput;
+        Json::FastWriter fastWriter;
+
+        Json::Value value;
+        for (int mux_id = 3; mux_id <= 5; ++mux_id)
+        {
+            int target =((0&0x3)<<8) | ((0&0x7)<<5) | ((mux_id&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1){
+                long int type = read32bI2C(1,0);
+                if(type != -1){
+                    value.append(getDecToHex(type));
+                    json["error"]= false;
+                    json["message"]= "FPGA5-7 bitstream version!";
+                }else{
+                    json["error"]= false;
+                    json["message"]= "Failed read!";
+                }
+            }else{
+                json["error"]= true;
+                json["message"]= "Connection error!";
+            }    
+        }
+        json["version"] = value;
+
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
+    }
+
+    /*****************************************************************************/
+    /*  Commande 0x05   function getFPGA8To13Version              */
+    /*****************************************************************************/
+    void getFPGA8To13Version(const Rest::Request& request, Net::Http::ResponseWriter response){
+        Json::Value json,jsonInput;
+        Json::FastWriter fastWriter;
+
+        Json::Value json_fpga_id,value,json_auth,json_maj_ver,json_min_ver;
+        for (int rmx_no = 0; rmx_no < 6; ++rmx_no)
+        {
+            int target =((0&0x3)<<8) | ((rmx_no&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1){
+                Json::Value json_resp = callGetCore("0","0");
+                 long int type;
+                if(json_resp["error"] == false){
+                    type = std::stol(json_resp["data"].asString());
+                    json_fpga_id.append(std::to_string(type & 7));
+                    json_auth.append(std::to_string((type & 8)>>3));
+                    json_maj_ver.append(std::to_string((type & 16711680) >>16));
+                    json_min_ver.append(std::to_string((type & 251658240) >>24));
+                    value.append(std::to_string(type));
+                    json["error"]= false;
+                    json["message"]= "FPGA5-18 bitstream version and RMX IDs!";
+                }else{
+                    json["error"]= false;
+                    json["message"]= json_resp["message"];
+                }
+            }else{
+                json["error"]= true;
+                json["message"]= "Connection error!";
+            }    
+        }
+        json["fpga_id"] = json_fpga_id;
+        json["authentication"] = json_auth;
+        json["maj_ver"] = json_maj_ver;
+        json["min_ver"] = json_min_ver;
+        json["val"] = value;
+
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
+    }
+    /*****************************************************************************/
+    /*  Commande 0x05   function getControllerBackup              */
+    /*****************************************************************************/
+    void getControllerBackup(const Rest::Request& request, Net::Http::ResponseWriter response){
+        Json::Value json;
+        Json::FastWriter fastWriter;
+
+        json["message"] = "Controller backuu details!";
+        json["db_name"] = cnf.DB_NAME;
+        json["db_host"] = cnf.DB_HOST;
+        json["db_user"] = cnf.DB_USER;
+        json["db_pass"] = cnf.DB_PASS;
+        json["error"] = false; 
+        
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
+    }
+    /*****************************************************************************/
+    /*  Commande    function setControllerFactoryReset              */
+    /*****************************************************************************/
+    void setControllerFactoryReset(const Rest::Request& request, Net::Http::ResponseWriter response){
+        Json::Value json;
+        Json::FastWriter fastWriter;
+
+        MYSQL_RES *res_set;
+        MYSQL_ROW row;
+        MYSQL *connect;
+        // std::cout<<cnf.DB_NAME<<"****"<<cnf.DB_HOST<<"****"<<cnf.DB_USER<<"****"<<cnf.DB_PASS<<std::endl;
+        char cwd[1024];
+        if(getcwd(cwd,sizeof(cwd)) != NULL)
+            printf("CWD %s\n",cwd);
+        else
+            printf("CWD error\n");
+        strcat(cwd,"/rmx_controller.sql");
+        if(write32bCPU(0,0,0) != -1){
+            if (std::ifstream(cwd))
+            {
+                connect = connectMysql(cnf.DB_HOST,cnf.DB_USER,cnf.DB_PASS,"-1");
+                mysql_query (connect,("DROP Database "+cnf.DB_NAME).c_str());
+                mysql_query (connect,("CREATE Database IF NOT EXISTS "+cnf.DB_NAME).c_str());
+                mysql_close (connect);
+
+                connect = connectMysql(cnf.DB_HOST,cnf.DB_USER,cnf.DB_PASS,cnf.DB_NAME);
+                std::string query = "mysql -u "+cnf.DB_USER+" -p"+cnf.DB_PASS+" "+cnf.DB_NAME+" <  rmx_controller.sql";
+                system(query.c_str());
+
+                // //readling .sql file and writing
+                // std::ifstream infile("rmx_contr.sql");
+                // std::string line="";
+                // std::string query="";
+                // while (std::getline(infile, line))
+                // {
+                //     std::istringstream iss(line);
+                //     std::size_t comment_ln1 = line.find("--");
+                //     std::size_t comment_ln2 = line.find("/*");
+                //     if (comment_ln1 ==std::string::npos && comment_ln2 == std::string::npos){
+                //         query+="\n";
+                //         query +=line;
+                //         std::size_t semi_c = line.find(";");
+                //         if (semi_c != std::string::npos){
+                //             std::cout<<"------------;------"<<endl;
+                //             mysql_query (connect,query.c_str());
+                //             query = "";
+                //         }
+                //     }
+                //     // process pair (a,b)
+                // }
+
+                mysql_query (connect,"SELECT COUNT(*) from information_schema.tables");
+                res_set = mysql_store_result(connect);
+                if(mysql_num_rows(res_set)>0){
+                    if(write32bCPU(0,0,12) != -1){
+                        usleep(100);
+                        write32bI2C(32, 0 ,63<<24);
+                        usleep(100);
+                        write32bI2C(32, 0 ,63);
+                    }
+                    json["message"] ="RMX: Factory reset successful! \n Please restart the board to apply changes!";
+                    json["error"] = false;    
+                }else{
+                    json["message"] ="RMX: Factory reset failed!";
+                    json["error"] = true;
+                }
+            }else{
+                json["message"] ="RMX: rmx_controller.sql file does not exists!";
+                json["error"] = true; 
+            }
+        }else{
+            json["message"] ="RMX: Connection error!";
+            json["error"] = true; 
+        }
+        // mysql_query(connect,"mysqldump test > backup-file.sql; ");
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
+    }
+    /*****************************************************************************/
+    /*  Commande    function restoreBackup              */
+    /*****************************************************************************/
+    void restoreBackup(const Rest::Request& request, Net::Http::ResponseWriter response){
+        Json::Value json;
+        Json::FastWriter fastWriter;
+
+        MYSQL_RES *res_set;
+        MYSQL_ROW row;
+        MYSQL *connect;
+        // std::cout<<cnf.DB_NAME<<"****"<<cnf.DB_HOST<<"****"<<cnf.DB_USER<<"****"<<cnf.DB_PASS<<std::endl;
+        if(write32bCPU(0,0,0) != -1){
+            connect = connectMysql(cnf.DB_HOST,cnf.DB_USER,cnf.DB_PASS,"-1");
+            mysql_query (connect,("DROP Database "+cnf.DB_NAME).c_str());
+            mysql_query (connect,("CREATE Database IF NOT EXISTS "+cnf.DB_NAME).c_str());
+            mysql_close (connect);
+            json["message"] ="RMX: Database recreated successfully!";
+            json["db_name"] = cnf.DB_NAME;
+            json["db_host"] = cnf.DB_HOST;
+            json["db_user"] = cnf.DB_USER;
+            json["db_pass"] = cnf.DB_PASS;
+            json["error"] = false;    
+        }else{
+            json["message"] ="RMX: Connection error!";
+            json["error"] = true; 
+        }
+        // mysql_query(connect,"mysqldump test > backup-file.sql; ");
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
+    }
+    MYSQL* connectMysql(std::string localhost,std::string pass,std::string user,std::string db_name){
+        MYSQL *connect;
+        connect=mysql_init(NULL);
+        if (!connect)
+        {
+            cout<<"MySQL Initialization failed";
+            exit(1);
+        }
+        if(db_name == "-1")
+            connect=mysql_real_connect(connect, "localhost", "root", "root" , NULL ,0,NULL,0);
+        else
+            connect=mysql_real_connect(connect, localhost.c_str(), user.c_str(), pass.c_str() , db_name.c_str() ,0,NULL,0);
+        if (connect)
+        {
+            cout<<"MYSQL connection Succeeded\n";
+        }
+        else
+        {
+            cout<<"MYSQL connection failed\n";
+            exit(1);
+        }
+        return connect;
+    }
+
     /*****************************************************************************/
     /*  UDP Ip Stack Command    function setSPTSEthernetIn                      */
     /*****************************************************************************/
@@ -12376,18 +12779,8 @@ private:
         reply = (redisReply *)redisCommand(context,"SELECT 5");
         // std::cout<<"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"<<std::endl;
         if(isAdd==1){
-            this->channel_ids = channel_id;
-            this->supercas_id = supercas_id;
-            this->ecm_port = ecm_port;
-            this->ecm_ip = ecm_ip;
-            int err = pthread_create(&thid, 0,&StatsEndpoint::spawnChannel, this);
-            if (err != 0){
-                printf("\ncan't create thread :[%s]", strerror(err));
-            }else{  
-                printf("\n Thread created successfully\n");
-                reply = (redisReply *)redisCommand(context,("SET channel_counter:ch_"+std::to_string(channel_id)+" 1").c_str());
-                reply = (redisReply *)redisCommand(context,("SET stream_counter:ch_"+std::to_string(channel_id)+" 1").c_str());
-            }  
+            reply = (redisReply *)redisCommand(context,("SET channel_counter:ch_"+std::to_string(channel_id)+" 1").c_str());
+            // reply = (redisReply *)redisCommand(context,("SET stream_counter:ch_"+std::to_string(channel_id)+" 1").c_str());
         }else{
             if(channel_id != old_channel_id){
                 reply = (redisReply *)redisCommand(context,("RENAME Channel_list:"+std::to_string(old_channel_id)+" Channel_list:"+std::to_string(channel_id)).c_str());
@@ -12412,7 +12805,6 @@ private:
                     }
                 }
             }
-            printf("\n Thread already exists\n");
             reply = (redisReply *)redisCommand(context,("INCR channel_counter:ch_"+std::to_string(channel_id)).c_str());
         }
         std::string query ="HMSET Channel_list:"+std::to_string(channel_id)+" channel_id "+std::to_string(channel_id)+" supercas_id "+supercas_id+" ip "+ecm_ip+" port "+std::to_string(ecm_port)+" is_deleted 0";
@@ -12499,7 +12891,8 @@ private:
             
             if(verifyInteger(str_channel_id)){
                 channel_id = std::stoi(str_channel_id);
-                if(db->isECMExists(channel_id) && deleteECMChannel(channel_id)){
+                if(db->isECMExists(channel_id)){
+                    deleteECMChannel(channel_id);
                     json["error"]= false;
                     json["message"]= "ECM deleted!";
                     addToLog("deleteECMChannelSetup","Success");
@@ -12522,17 +12915,42 @@ private:
     int deleteECMChannel(int channel_id){
         int is_deleted=0;
         reply = (redisReply *)redisCommand(context,"SELECT 5");
+
+        redisReply *reply = (redisReply *)redisCommand(context,("KEYS stream:ch_"+std::to_string(channel_id)+":*").c_str());
+        for (int i = 0; i <reply->elements; ++i)
+        {
+            std::string old_key = reply->element[i]->str;
+            std::cout<<old_key;
+            redisReply *reply1  = (redisReply *)redisCommand(context,("DEL "+old_key).c_str());
+        }
+         
+        reply = (redisReply *)redisCommand(context,("KEYS cw_provision:channel_"+std::to_string(channel_id)+":*").c_str());
+        for (int i = 0; i <reply->elements; ++i)
+        {
+            std::string old_key = reply->element[i]->str;
+            std::cout<<old_key;
+            redisReply *reply1 = (redisReply *)redisCommand(context,("DEL "+old_key).c_str());
+        }
+
+        reply = (redisReply *)redisCommand(context,("KEYS stream_counter:ch_"+std::to_string(channel_id)+"*").c_str());
+        for (int i = 0; i <reply->elements; ++i)
+        {
+            std::string old_key = reply->element[i]->str;
+            std::cout<<old_key;
+            redisReply *reply1 = (redisReply *)redisCommand(context,("DEL "+old_key).c_str());
+        }
+
         reply = (redisReply *)redisCommand(context,("HGETALL Channel_list:"+std::to_string(channel_id)).c_str());
         if(reply->elements>0){
             std::string query ="HMSET Channel_list:"+std::to_string(channel_id)+" is_deleted 1";
             reply = (redisReply *)redisCommand(context,query.c_str());
-            if(db->deleteECM(channel_id)){
-                is_deleted=1;
-                std::cout<<"ECM DELETED"<<std::endl;
-                streams_json=db->getScrambledServices();
-                reply = (redisReply *)redisCommand(context,("INCR channel_counter:ch_"+std::to_string(channel_id)).c_str());
-                reply = (redisReply *)redisCommand(context,("SET deleted_ecm:ch_"+std::to_string(channel_id)+" 1").c_str());
-            }
+        }
+        if(db->deleteECM(channel_id)){
+            is_deleted=1;
+            std::cout<<"ECM DELETED"<<std::endl;
+            streams_json=db->getScrambledServices();
+            reply = (redisReply *)redisCommand(context,("INCR channel_counter:ch_"+std::to_string(channel_id)).c_str());
+            reply = (redisReply *)redisCommand(context,("SET deleted_ecm:ch_"+std::to_string(channel_id)+" 1").c_str());
         }
         freeReplyObject(reply);
         return is_deleted;
@@ -12585,7 +13003,7 @@ private:
                 if(db->isECMExists(channel_id)){
                     std::string currtime=getCurrentTime();
                     if(db->addECMStreamSetup(stream_id,ecm_id,channel_id,str_access_criteria,cp_number,str_ecm_pid,currtime)){
-                        ecmStreamSetup(channel_id,stream_id,ecm_id,str_access_criteria,cp_number,currtime,str_ecm_pid);
+                        ecmStreamSetup(channel_id,stream_id,ecm_id,str_access_criteria,cp_number,currtime,str_ecm_pid,0);
                         int err;
                         // if(CW_THREAD_CREATED==0){
                             
@@ -12618,17 +13036,17 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
-    void ecmStreamSetup(int channel_id,int stream_id,int ecm_id, std::string access_criteria,int cp_number,std::string currtime,std::string ecm_pid){
+    void ecmStreamSetup(int channel_id,int stream_id,int ecm_id, std::string access_criteria,int cp_number,std::string currtime,std::string ecm_pid,int read_flag){
         redisReply *reply1;
         reply = (redisReply *)redisCommand(context,"SELECT 5");
-        reply = (redisReply *)redisCommand(context,("KEYS stream:ch_"+std::to_string(channel_id)+":stm_"+std::to_string(stream_id)+"*").c_str());
-        if(reply->elements>0){
-            for(unsigned int i=0; i<reply->elements;i++){
-                reply1 = (redisReply *)redisCommand(context,("DEL "+(std::string)reply->element[i]->str).c_str());
-            }
-            freeReplyObject(reply1);
-        }
-        std::string query="HMSET stream:ch_"+std::to_string(channel_id)+":stm_"+std::to_string(stream_id)+" stream_id "+std::to_string(stream_id)+" ecm_id "+std::to_string(ecm_id)+" access_criteria "+access_criteria+" cp_number "+std::to_string(cp_number)+" ecm_pid "+ecm_pid+" read_flag 0";        
+        // reply = (redisReply *)redisCommand(context,("KEYS stream:ch_"+std::to_string(channel_id)+":stm_"+std::to_string(stream_id)+"*").c_str());
+        // if(reply->elements>0){
+        //     for(unsigned int i=0; i<reply->elements;i++){
+        //         reply1 = (redisReply *)redisCommand(context,("DEL "+(std::string)reply->element[i]->str).c_str());
+        //     }
+        //     freeReplyObject(reply1);
+        // }
+        std::string query="HMSET stream:ch_"+std::to_string(channel_id)+":stm_"+std::to_string(stream_id)+" stream_id "+std::to_string(stream_id)+" ecm_id "+std::to_string(ecm_id)+" access_criteria "+access_criteria+" cp_number "+std::to_string(cp_number)+" ecm_pid "+ecm_pid+" read_flag "+std::to_string(read_flag);        
         reply = (redisReply *)redisCommand(context,query.c_str());
         reply = (redisReply *)redisCommand(context,("INCR stream_counter:ch_"+std::to_string(channel_id)+"").c_str());
         //streams_json=db->getStreams();
@@ -12683,7 +13101,7 @@ private:
                 if(db->isECMExists(channel_id)){
                     std::string currtime=getCurrentTime();
                     if(db->updateECMStreamSetup(stream_id,ecm_id,channel_id,str_access_criteria,cp_number,str_ecm_pid,currtime)){
-                        ecmStreamSetup(channel_id,stream_id,ecm_id,str_access_criteria,cp_number,currtime,str_ecm_pid);
+                        ecmStreamSetup(channel_id,stream_id,ecm_id,str_access_criteria,cp_number,currtime,str_ecm_pid,0);
                         int err;
                         json["error"]= false;
                         json["message"]= "Stream Added!";
@@ -12739,7 +13157,7 @@ private:
                 channel_id =std::stoi(getParameter(request.body(),"channel_id"));
                 stream_id = std::stoi(getParameter(request.body(),"stream_id")); 
                 if(db->isECMStreamExists(channel_id,stream_id)){
-                	json["desc"] = disableECMStreams(str_channel_id,str_stream_id);
+                	disableECMStreams(str_channel_id,str_stream_id);
                 	if(deleteECMStream(channel_id,stream_id)){
 	                    json["error"]= false;
 	                    json["message"]= "Stream deleted!";
@@ -12838,9 +13256,10 @@ private:
             is_deleted=1;
             std::cout<<"DELETED"<<std::endl;
             streams_json=db->getScrambledServices();
-            reply = (redisReply *)redisCommand(context,("INCR stream_counter:ch_"+std::to_string(channel_id)).c_str());
+            // reply = (redisReply *)redisCommand(context,("INCR stream_counter:ch_"+std::to_string(channel_id)).c_str());
             reply = (redisReply *)redisCommand(context,("SET deleted_ecm_stream:ch_"+std::to_string(channel_id)+":stm_"+std::to_string(stream_id)+" 1").c_str());
         }
+        reply = (redisReply *)redisCommand(context,("DEL stream_counter:ch_"+std::to_string(channel_id)).c_str());
         freeReplyObject(reply);
         return is_deleted;
     }
@@ -12914,7 +13333,7 @@ private:
      void emmgSetup(int channel_id,int stream_id, int data_id,std::string client_id,int bw,int port,std::string currtime,int emm_pid){
         std::string CA_system_id = client_id.substr(2);
         reply = (redisReply *)redisCommand(context,"SELECT 6");
-        std::string query ="HMSET UI_Input channel_id "+std::to_string(channel_id)+" client_id "+CA_system_id+" data_id "+std::to_string(data_id)+" port "+std::to_string(port)+" stream_id "+std::to_string(stream_id)+" PID "+std::to_string(emm_pid)+" bandwidth "+std::to_string(bw)+" is_deleted 0";
+        std::string query ="HMSET UI_Input_"+std::to_string(port)+" channel_id "+std::to_string(channel_id)+" client_id "+CA_system_id+" data_id "+std::to_string(data_id)+" port "+std::to_string(port)+" stream_id "+std::to_string(stream_id)+" PID "+std::to_string(emm_pid)+" bandwidth "+std::to_string(bw)+" is_running 0";
         reply = (redisReply *)redisCommand(context,query.c_str());
         // reply = (redisReply *)redisCommand(context,("GET emm_channel_counter:ch_"+std::to_string(channel_id)).c_str());
         // if(isAdd == 1){
@@ -13021,15 +13440,16 @@ private:
             str_channel_id =getParameter(request.body(),"channel_id");
             if(verifyInteger(str_channel_id)){
                 channel_id = std::stoi(str_channel_id);
-                if(db->isEMMExists(channel_id)){ //&& deleteEMMChannel(channel_id)
+                if(db->isEMMExists(channel_id)){ 
+                    deleteEMMChannel(channel_id);
                     updateCATCADescriptor(str_channel_id);
                     json["error"]= false;
                     json["message"]= "EMM deleted!";
-                    addToLog("deleteEMMSetup","Success");
+                    // addToLog("deleteEMMSetup","Success");
                 }else{
                     json["error"]= true;
                     json["message"]= "EMM does't exists or already deleted!";
-                    addToLog("deleteEMMSetup","Error");
+                    // addToLog("deleteEMMSetup","Error");
                 }
             }else{
                 json["error"]= true;
@@ -13043,18 +13463,17 @@ private:
         response.send(Http::Code::Ok, resp);
     }
     int deleteEMMChannel(int channel_id){
+        int port = db->getEMMGPort(std::to_string(channel_id));
         int is_deleted = 0;
         reply = (redisReply *)redisCommand(context,"SELECT 6");
-        // reply = (redisReply *)redisCommand(context,("HGETALL UI_Input").c_str());
-        // if(reply->elements>0){
-            std::string query ="HMSET UI_Input is_deleted 1";
-            reply = (redisReply *)redisCommand(context,query.c_str());
-            if(db->deleteEMM(channel_id)){
-                is_deleted= 1;
-                std::cout<<"EMM DELETED"<<std::endl;
-                // reply = (redisReply *)redisCommand(context,("INCR emm_channel_counter:ch_"+std::to_string(channel_id)).c_str());
-                // reply = (redisReply *)redisCommand(context,("SET deleted_emm:ch_"+std::to_string(channel_id)+" 1").c_str());
-            // }
+        std::string query ="DEL UI_Input_"+std::to_string(port);
+        
+        reply = (redisReply *)redisCommand(context,query.c_str());
+        if(db->deleteEMM(channel_id)){  
+            is_deleted= 1;
+            std::cout<<"EMM DELETED"<<std::endl;
+            // reply = (redisReply *)redisCommand(context,("INCR emm_channel_counter:ch_"+std::to_string(channel_id)).c_str());
+            // reply = (redisReply *)redisCommand(context,("SET deleted_emm:ch_"+std::to_string(channel_id)+" 1").c_str());
         }
         freeReplyObject(reply);
         return is_deleted;
@@ -13088,7 +13507,7 @@ private:
     //     freeReplyObject(reply);
     // }
     
-    void forkChannels(){
+    void updateECMChannelsInRedis(){
         int err;
         Json::Value json,channel_json;
         json=db->getChannels();
@@ -13103,25 +13522,17 @@ private:
 
                 reply = (redisReply *)redisCommand(context,"SELECT 5");
                 // reply = (redisReply *)redisCommand(context,("DEL Channel_list:"+std::to_string(channel_id)).c_str());
-                std::string query ="HMSET Channel_list:"+std::to_string(channel_id)+" channel_id "+std::to_string(channel_id)+" supercas_id "+supercas_id+" ip "+ecm_ip+" port "+std::to_string(ecm_port)+"";
+                std::string query ="HMSET Channel_list:"+std::to_string(channel_id)+" channel_id "+std::to_string(channel_id)+" supercas_id "+supercas_id+" ip "+ecm_ip+" port "+std::to_string(ecm_port)+" is_deleted 0";
                 reply = (redisReply *)redisCommand(context,query.c_str());
-                this->channel_ids=channel_id;
-                this->supercas_id = supercas_id;
-                this->ecm_port = ecm_port;
-                this->ecm_ip = ecm_ip;
+                
+                reply = (redisReply *)redisCommand(context,("INCR channel_counter:ch_"+std::to_string(channel_id)).c_str());
 
-                err = pthread_create(&thid, 0,&StatsEndpoint::spawnChannel, this);
-                if (err != 0){
-                    printf("\ncan't create thread :[%s]", strerror(err));
-                }else{
-                    printf("\n Thread already exists\n");
-                    reply = (redisReply *)redisCommand(context,("INCR channel_counter:ch_"+std::to_string(this->channel_ids)).c_str());
-                }    
-                usleep(1000000);
+                usleep(100);
             }
         }
     }
-    void forkEMMChannels(){
+
+    void updateEMMChannelsInRedis(){
         int err;
         Json::Value json,channel_json;
         json=db->getEMMChannels();
@@ -13129,32 +13540,21 @@ private:
         std::cout<<channel_json.size()<<std::endl; 
         for(int i=0;i<channel_json.size();i++){
             if(std::stoi((channel_json[i]["is_enable"]).asString())){
-                int channel_id = std::stoi(channel_json[i]["channel_id"].asString());
+                std::string channel_id = channel_json[i]["channel_id"].asString();
                 std::string client_id = channel_json[i]["client_id"].asString();
-                int emm_port = std::stoi(channel_json[i]["port"].asString());
-               int data_id = std::stoi(channel_json[i]["data_id"].asString());
-                int emm_bw = std::stoi(channel_json[i]["bw"].asString());
-                int stream_id = std::stoi(channel_json[i]["stream_id"].asString());
+                std::string emm_port = channel_json[i]["port"].asString();
+                std::string data_id = channel_json[i]["data_id"].asString();
+                std::string emm_bw = channel_json[i]["bw"].asString();
+                std::string stream_id = channel_json[i]["stream_id"].asString();
+                std::string emm_pid = channel_json[i]["emm_pid"].asString();
+                std::string CA_system_id = client_id.substr(2);
                 
-                reply = (redisReply *)redisCommand(context,"SELECT 3");
-                std::string query ="HMSET emm_channel_list:"+std::to_string(channel_id)+" channel_id "+std::to_string(channel_id)+" client_id "+client_id+" data_id "+std::to_string(data_id)+" port "+std::to_string(emm_port)+" bw "+std::to_string(emm_bw)+" stream_id "+std::to_string(stream_id)+" is_deleted 0";
+                reply = (redisReply *)redisCommand(context,"SELECT 6");
+                std::string query ="HMSET UI_Input_"+emm_port+" channel_id "+channel_id+" client_id "+CA_system_id+" data_id "+data_id+" port "+emm_port+" stream_id "+stream_id+" PID "+emm_pid+" bandwidth "+emm_bw+" is_running 1";
                 reply = (redisReply *)redisCommand(context,query.c_str());
-                if(reply->str){
-                    this->channel_ids=channel_id;
-                    this->client_id = client_id;
-                    this->emm_port = emm_port;
-                    this->data_id = data_id;
-                    this->emm_bw = emm_bw;
-                    this->stream_id = stream_id;
 
-                    err = pthread_create(&thid, 0,&StatsEndpoint::spawnEMMChannel, this);
-                    if (err != 0){
-                        printf("\ncan't create thread :[%s]", strerror(err));
-                    }else{
-                        printf("\n Thread already exists\n");
-                        reply = (redisReply *)redisCommand(context,("INCR emm_channel_counter:ch_"+std::to_string(this->channel_ids)).c_str());
-                    }    
-                }
+                reply = (redisReply *)redisCommand(context,("INCR emm_channel_counter:ch_"+channel_id).c_str());
+                
             }
         }
     }
@@ -13281,7 +13681,7 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
-    void forkCWthread(){
+    void updateECMStreamsInRedis(){
 
         int err;
         Json::Value streams=db->getStreams();
@@ -13290,18 +13690,25 @@ private:
             {
                 // std::cout<<streams["list"][i]["access_criteria"].asString()<<std::endl;
                 std::string currtime=getCurrentTime();
-                ecmStreamSetup(std::stoi(streams["list"][i]["channel_id"].asString()),std::stoi(streams["list"][i]["stream_id"].asString()),std::stoi(streams["list"][i]["ecm_id"].asString()),streams["list"][i]["access_criteria"].asString(),std::stoi(streams["list"][i]["cp_number"].asString()),currtime,streams["list"][i]["ecm_pid"].asString());
+                ecmStreamSetup(std::stoi(streams["list"][i]["channel_id"].asString()),std::stoi(streams["list"][i]["stream_id"].asString()),std::stoi(streams["list"][i]["ecm_id"].asString()),streams["list"][i]["access_criteria"].asString(),std::stoi(streams["list"][i]["cp_number"].asString()),currtime,streams["list"][i]["ecm_pid"].asString(),1);
             }
         }
-        streams_json = db->getScrambledServices();
-        if(streams_json["list"].size()>0){
-            err = pthread_create(&tid, 0,&StatsEndpoint::cwProvision, this);
-            if (err != 0){
-                printf("\ncan't create thread :[%s]", strerror(err));
-            }else{
-                CW_THREAD_CREATED=1;
-                printf("\n Thread created successfully\n");
-            }    
+
+        Json::Value JSON_ecm_desc = db->getECMDescriptors();
+        if(JSON_ecm_desc["error"] == false){
+            for (int i = 0; i < JSON_ecm_desc["list"].size(); ++i)
+            {
+                int rmx_id =std::stoi(JSON_ecm_desc["list"][i]["rmx_no"].asString());
+                std::string input =JSON_ecm_desc["list"][i]["input"].asString();
+                std::string output =JSON_ecm_desc["list"][i]["output"].asString();
+                std::string service_no =JSON_ecm_desc["list"][i]["service_no"].asString();
+
+                int key_index = db->getCWKeyIndex(std::to_string(rmx_id),input,output,service_no);
+                if(rmx_id%2 == 0)
+                    key_index = key_index+128;
+                std::string port =(rmx_id == 1 || rmx_id == 2)? "5000" : ((rmx_id == 3 || rmx_id == 4)? "5001" : "5002");
+                updateCWIndex(JSON_ecm_desc["list"][i]["channel_id"].asString(),JSON_ecm_desc["list"][i]["stream_id"].asString(),std::to_string(key_index),port,output,1);    
+            }
         }
     }
     
@@ -13548,6 +13955,29 @@ private:
         response.send(Http::Code::Ok, resp);
     }
     
+    void  disConnect(const Rest::Request& request, Net::Http::ResponseWriter response){
+        int uLen;        
+        Json::Value json;
+        Json::FastWriter fastWriter;
+        int flag=1;
+        while(1){
+            for(int i=1;i<=6;i++){
+                json = callGetFirmwareVersion(1);
+                if(json["error"]==false){
+                    flag=0;
+                    break;
+                }  
+                cout<<"MUX DISCONNECTED"<<endl;  
+            }
+            if(flag==0){
+                cout<<"MUX CONNECTED"<<endl;
+                break;
+            }
+        }
+        runBootupscript();
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
+    }
 
     /*****************************************************************************/
     /*  Command    function    disableNITable                       */
@@ -13560,7 +13990,7 @@ private:
         bool error_disabling_NIT = false;
         for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
         {
-            for (int output = 0; output < OUTPUT_COUNT; ++output)
+            for (int output = 0; output <= OUTPUT_COUNT; ++output)
             {
                 Json::Value json_io = callSetInputOutput("0",std::to_string(output),rmx_no);
                 if(json_io["error"] == false){
@@ -13679,7 +14109,7 @@ private:
         
         bool nit_insert_error = true;
         int pusSectionL=  getCountSections();
-        std::cout<<"\n-----------------------------LAST SECTION COUNT----------------------------"<<pusSectionL<<endl;
+        std::cout<<"\n-----------------------------LAST SECTION COUNT----------------------------\n"<<NIT_Host_modes<<endl;
         if(NIT_Host_modes["error"] == false){
             for (int i = 0; i <NIT_Host_modes["list"].size() ; ++i)
             {
@@ -13897,7 +14327,7 @@ private:
 	        unsigned short ucServiceType = (unsigned short) pucServiceType[input];
 	        *(pData++) = (unsigned char)(ucServiceId>>8);
 	        *(pData++) = (unsigned char)ucServiceId;
-	        *(pData++) = 0x01;//(ucServiceType);
+	        *(pData++) = (unsigned char)(ucServiceType);
 			desc_len+=3;
 			// printf("\n ucServiceType ---------->%d",ucServiceType);
 			}
@@ -14023,7 +14453,7 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
                                 int service_id = std::stoi(json_active_progs["list"][iServiceCount]["service_id"].asString());
                                 int orig_service_id =std::stoi(json_active_progs["list"][iServiceCount]["orig_service_id"].asString());
 				      			pucServiceId[iServiceCount] = (unsigned short) (service_id != -1)? service_id : orig_service_id;	
-				      			pucServiceType[iServiceCount] = 1;//Get the service type from getProg INFO
+				      			pucServiceType[iServiceCount] = std::stoi(json_active_progs["list"][iServiceCount]["service_type"].asString());;//Get the service type from getProg INFO
 				      		}
 				      		//Add Service List Descriptor
 				      		usDescriptorLength = setServiceListDescriptor(pucData, uiNbServices, pucServiceId,pucServiceType);
@@ -14329,6 +14759,20 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
         downloadMxlFW(6,0);
         printf("\n\n MXL Downlod Completed! \n\n");
         usleep(100);
+
+        usleep(100);
+        //Intialize the RMX_FPGA's
+        int remx_bit[]= {0,4,1,5,2,6};
+        for (int rmx_no = 0; rmx_no < RMX_COUNT; ++rmx_no)
+        {
+            int target =((0&0x3)<<8) | ((rmx_no&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1) {
+            Json::Value core_json = callSetCore("0","0",std::to_string(remx_bit[rmx_no]),rmx_no+1);
+                    if(core_json["status"] == 1)
+                        std::cout<<remx_bit[rmx_no]<<std::endl;
+            }
+        }
+
         Json::Value jsonAllegro = db->getConfAllegro();
         if(jsonAllegro["error"] == false){
             for(int i=0;i<jsonAllegro["list"].size();i++ ){
@@ -14426,6 +14870,7 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
                     }
                     std::cout<<"-------------------SPTS IP(getSPTSControl)!--------------------------------------"<<custom_line<<std::endl;
                 }
+                usleep(100);
             }
         }
         usleep(1000);
@@ -14453,18 +14898,7 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
             }
         }
 
-        usleep(1000);
-        // Json::Value jsonRfauth = db->getRFauthorizedRmx();
-        // int rmx_no =0;
-        // if(jsonRfauth["error"] == false){
-        //     std::cout<<jsonRfauth["list"].size()<<std::endl;
-        //     for(int i=0;i<jsonRfauth["list"].size();i++ ){
-        //          rmx_no = std::stoi(jsonRfauth["list"][0].asString());
-        //     }
-        // }
-        RFauthorization(1);
         usleep(100);
-        RFauthorization(63);
 
         for (int rmx = 1; rmx <= RMX_COUNT; rmx++)
         {
@@ -14507,7 +14941,7 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
         usleep(100);
         for (int rmx = 1; rmx <= RMX_COUNT; ++rmx)
         {
-            for (int input = 0; input < INPUT_COUNT; ++input)
+            for (int input = 0; input <= INPUT_COUNT; ++input)
             {
 
                 Json::Value new_service_ids,old_service_ids,NewService_ids;
@@ -14697,27 +15131,27 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
         }
         std::cout<<"-------------------------Table versions END-------------------------------"<<std::endl;
         
-        usleep(100);
-        nit_mode = db->getNITmode();
-        if(nit_mode["error"]==false){
-            for (int i = 0; i < nit_mode["list"].size(); ++i)
-            {
-            	 Json::Value iojson=callSetInputOutput("0",nit_mode["list"][i]["output"].asString(),std::stoi(nit_mode["list"][i]["rmx_no"].asString()));
-                if(iojson["error"]==false){
-                	if(std::stoi(nit_mode["list"][i]["mode"].asString()) != 1){
-						Json::Value json = callSetNITmode(nit_mode["list"][i]["mode"].asString(),nit_mode["list"][i]["output"].asString(),std::stoi(nit_mode["list"][i]["rmx_no"].asString()));
-		                //std::cout<<"-------------------------"<<json["message"]<<std::endl;
-			            if(json["error"]==false){
-		                    std::cout<<"------------------NIT mode has been restored for output--------------------- "<<nit_mode["list"][i]["output"]<<std::endl;
-		                }
-		            }
-				}else{
-                    json["error"]= true;
-                    json["message"]= "Error while selecting output!";     
-                }
+    //     usleep(100);
+    //     nit_mode = db->getNITmode();
+    //     if(nit_mode["error"]==false){
+    //         for (int i = 0; i < nit_mode["list"].size(); ++i)
+    //         {
+    //         	 Json::Value iojson=callSetInputOutput("0",nit_mode["list"][i]["output"].asString(),std::stoi(nit_mode["list"][i]["rmx_no"].asString()));
+    //             if(iojson["error"]==false){
+    //             	if(std::stoi(nit_mode["list"][i]["mode"].asString()) != 1){
+				// 		Json::Value json = callSetNITmode(nit_mode["list"][i]["mode"].asString(),nit_mode["list"][i]["output"].asString(),std::stoi(nit_mode["list"][i]["rmx_no"].asString()));
+		  //               //std::cout<<"-------------------------"<<json["message"]<<std::endl;
+			 //            if(json["error"]==false){
+		  //                   std::cout<<"------------------NIT mode has been restored for output--------------------- "<<nit_mode["list"][i]["output"]<<std::endl;
+		  //               }
+		  //           }
+				// }else{
+    //                 json["error"]= true;
+    //                 json["message"]= "Error while selecting output!";     
+    //             }
                 
-            }
-        }
+    //         }
+    //     }
 
         usleep(100);
         table_timeout_json = db->getNITtableTimeout();
@@ -14859,7 +15293,7 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
        //Initializing CUSTOM PIDS to the core
         for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
         {
-            for (int output = 0; output < OUTPUT_COUNT; ++output)
+            for (int output = 0; output <= OUTPUT_COUNT; ++output)
             {
                 Json::Value json_pids = db->getCustomPids(std::to_string(rmx_no));
                 if(json_pids["error"] == false){
@@ -14873,12 +15307,14 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
         }
 
         usleep(100);
-   //      //Insert NIT insertion 
+        //Insert NIT insertion 
         Json::Value json_nit = db->getNITDetails();
        	if(json_nit["error"] == false){
             if(json_nit["mode"] == "2"){
            		std::string networkid = json_nit["network_id"].asString();
     			std::string networkName =json_nit["network_name"].asString();
+                NIT_VER = std::stoi(json_nit["nit_version"].asString());
+
                 Json::Value json_nit =  callInsertNITable(networkid,networkName);
                 if(json_nit["error"] == false)
                     std::cout<<"-----------------------NIT Updated successfully!----------------------------";
@@ -14893,17 +15329,17 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
        	}
 
         usleep(100);
-       	//Intialize the RMX_FPGA's
-        int remx_bit[]= {0,4,1,5,2,6};
-        for (int rmx_no = 0; rmx_no < RMX_COUNT; ++rmx_no)
-        {
-            int target =((0&0x3)<<8) | (((rmx_no)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-            if(write32bCPU(0,0,target) != -1) {
-			Json::Value core_json = callSetCore("0","0",std::to_string(remx_bit[rmx_no]),rmx_no+1);
-		    		if(core_json["status"] == 1)
-						std::cout<<remx_bit[rmx_no]<<std::endl;
-            }
-		}
+        // Json::Value jsonRfauth = db->getRFauthorizedRmx();
+        // int rmx_no =0;
+        // if(jsonRfauth["error"] == false){
+        //     std::cout<<jsonRfauth["list"].size()<<std::endl;
+        //     for(int i=0;i<jsonRfauth["list"].size();i++ ){
+        //          rmx_no = std::stoi(jsonRfauth["list"][0].asString());
+        //     }
+        // }
+        RFauthorization(1);
+        usleep(100);
+        RFauthorization(63);
 	
         std::cout<<"----------------END OF EMMG INITIALIZATION! -----------------------"<<std::endl;
 

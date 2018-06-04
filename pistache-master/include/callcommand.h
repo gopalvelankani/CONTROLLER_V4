@@ -63,6 +63,7 @@
 #define CMD_GET_PROG_NAME		0x60
 #define CMD_GET_PROV_NAME		0x61
 #define CMD_GET_NETWORK_NAME	0x62
+#define CMD_SET_TDTTOT			0x3B
 
 #define MMSB_32_8(x)		(x&0xFF000000)>>24
 #define MLSB_32_8(x)		0xFF&((x&0x00FF0000)>>16)

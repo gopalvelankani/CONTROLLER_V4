@@ -754,7 +754,7 @@
 			    break;
 			case 47:
 				if(readWriteMode==0){
-					std::cout<<"auth_bit"<<json["auth_bit"]<<json["parity"]<<std::endl;
+					// std::cout<<"auth_bit"<<json["auth_bit"]<<json["parity"]<<std::endl;
 					len = 2;
 				    msgBuf[1] = (unsigned char) (len>>8);
 				    msgBuf[2] = (unsigned char) len;
@@ -1017,6 +1017,22 @@
 				msgBuf[7] = ETX;	
 		    }
 			break;
+		case 59:{
+				int input_source = std::stoi(json["input_source"].asString());;
+	    		len = 6;
+	    		msgBuf[0] = STX;
+				msgBuf[1] = (unsigned char) (len>>8);
+				msgBuf[2] = (unsigned char) len;
+				msgBuf[3] = CMD_SET_TDTTOT;
+				msgBuf[4] = 0x00;
+				msgBuf[5] = (unsigned char)input_source;
+				msgBuf[6] = 0x00;
+				msgBuf[7] = 0x00;
+				msgBuf[8] = 0x00;
+				msgBuf[9] = 0x00;
+				msgBuf[10] = ETX;
+				}
+		    	break;
 	    }
 		len += 5; 
 		int count;

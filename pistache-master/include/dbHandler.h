@@ -68,6 +68,7 @@ public:
 	int deleteEMM(int channel_id);
 	Json::Value getEMMGChannels(std::string rmx_no,std::string output,std::string channel_id);
 	Json::Value getECMDescriptors(std::string rmx_no,std::string input);
+	Json::Value getECMDescriptors();
 	// Json::Value getEMMGChannels(std::string channel_id);
 	int enableEMM(std::string channel_id, std::string rmx_no,std::string output,int addFlag);
 	int enableECM(std::string channel_id,std::string stream_id,std::string service_pid,std::string programNumber, std::string rmx_no,std::string output,std::string input,int addFlag);
@@ -76,6 +77,7 @@ public:
 	int generateECMPID(std::string rmx_no,std::string output,std::string channel_id,std::string stream_id,std::string programNumber);
 	unsigned long int getScramblingIndex(std::string rmx_no,std::string output);
 	int updateCWIndex(std::string rmx_no,std::string output,std::string programNumber,long int index,int indexValue,int addFlag);
+	int getEMMGPort(std::string channel_id);
 
 	int addInputMode(std::string SPTS,std::string PMT,std::string SID,std::string RISE,std::string MASTER,std::string INSELECT,std::string BITRATE,std::string input,int rmx_no);
 	int createAlarmFlags(std::string mode,std::string level1,std::string level2,std::string level3,std::string level4,int rmx_no);
@@ -164,7 +166,9 @@ public:
 	Json::Value getPrivateData(int withId);
 	int addPrivateData(std::string sPrivateData,std::string private_data_id,int addFlag);
 	int disableHostNIT();
-};
+	int updateServiceType(std::string rmx_no,std::string input,Json::Value service_id,Json::Value service_type,Json::Value encryption);
+	int checkDuplicateServiceId(std::string newprognum ,std::string orig_service_id);
+};	
 // This is the content of the .h file, which is where the declarations go
 
 // This is the end of the header guard
