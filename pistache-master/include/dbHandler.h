@@ -28,7 +28,8 @@ public:
 	int addActivatedPrograms(std::string input,std::string output,Json::Value program_number,int rmx_no,int incFlag,std::string prog_list_str);
 	int addEncryptedPrograms(std::string input,std::string output,Json::Value program_number,int rmx_no,int incFlag,std::string prog_list_str,Json::Value keyIndex);
 	Json::Value getActivePrograms(int input,int output);
-	Json::Value getEncryptedPrograms(std::string program_number,std::string input,std::string output ,std::string rmx_no);
+	Json::Value getEncryptedPrograms(std::string program_number,std::string input ,std::string rmx_no);
+	Json::Value getEncryptedPrograms(std::string input ,std::string rmx_no);
 	int addLcnNumbers(std::string program_number,std::string channel_number,std::string input,int rmx_no,int addFlag);
 	int addPmtAlarm(std::string program_number,std::string alarm,std::string input,int rmx_no);
 	int addFrequency(std::string center_frequency,std::string str_rmx_no,unsigned int* frequencies);
@@ -144,7 +145,7 @@ public:
 	Json::Value getQAM(int rmx_id);
 	Json::Value getSPTSControl();
 	Json::Value getMuxOutValue(std::string mux_id);
-	int addCustomPid(std::string rmx_no, std::string output,std::string pid, int addFlag);
+	int addCustomPid(std::string rmx_no, std::string output,std::string pid,std::string auth_output, int addFlag);
 	Json::Value getCustomPids(std::string rmx_no);
 	int setIndexSetUnset(int index, int indexValue,int flag);
 	long int getCWKeyIndex(std::string rmx_no,std::string input,std::string output,std::string programNumber);
@@ -168,6 +169,12 @@ public:
 	int disableHostNIT();
 	int updateServiceType(std::string rmx_no,std::string input,Json::Value service_id,Json::Value service_type,Json::Value encryption);
 	int checkDuplicateServiceId(std::string newprognum ,std::string orig_service_id);
+	int recreateDatabase();
+	int checkDatabaseContains();
+	int addBATServiceList(std::string bouquet_id,std::string bouquet_name,Json::Value service_list,Json::Value outputs,Json::Value rmx_nos,Json::Value inputs);
+	Json::Value getBATList();
+	Json::Value getBATServiceList(std::string bouquet_id);
+	int deleteBouquet(std::string bouquet_id);
 };	
 // This is the content of the .h file, which is where the declarations go
 

@@ -64,11 +64,28 @@
 #define CMD_GET_PROV_NAME		0x61
 #define CMD_GET_NETWORK_NAME	0x62
 #define CMD_SET_TDTTOT			0x3B
+#define CMD_NITBATSDT			0x1F
 
 #define MMSB_32_8(x)		(x&0xFF000000)>>24
 #define MLSB_32_8(x)		0xFF&((x&0x00FF0000)>>16)
 #define LMSB_32_8(x)		0xFF&((x&0x0000FF00)>>8)
 #define LLSB_32_8(x)		0xFF&((x&0x000000FF))
+
+enum TABLE_TYPE
+{
+  TABLE_NIT = 0,
+  TABLE_SDT = 1,
+  TABLE_BAT = 2
+};
+
+enum  TABLE_COMMAND_TYPE
+{
+  TABLE_WRITE = 0,
+  TABLE_READ = 1,
+  TABLE_SET_LEN = 2,
+  TABLE_ACTIVATE = 3
+};
+
 class Callcommand{
 
    	public:
@@ -92,9 +109,13 @@ class Callcommand{
     Callcommand();
 	Callcommand(std::string path);
 	int callCommand(int cmd,unsigned char* RxBuffer,int rx_len,int msgBLen,Json::Value json,int readWriteMode =0);
-	int updateNITTable(unsigned char *ucSectiobData,unsigned short usPayloadLen,unsigned short usPointer,unsigned short usSectionNo);
+	int insertTable(unsigned char *ucSectiobData,unsigned short usPayloadLen,unsigned short usPointer,unsigned short usSectionNo,TABLE_TYPE table_type,TABLE_COMMAND_TYPE command_type);
 	int leftShifting(int val,int noofbit,int isenable);
 	std::string hexStr(unsigned char *data, int len);
 	long string2long(const std::string &str, int base = 10);
 	std::string getCurrentTime();
+	int sendCommand(unsigned char *msgBuf,unsigned short len);
+	int setTableSectionLen(unsigned short *ucSecLenList,int usSecCount,TABLE_TYPE table_type,TABLE_COMMAND_TYPE command_type);
+	int activateTable(TABLE_TYPE table_type,TABLE_COMMAND_TYPE command_type);
+	int updateNITTable(unsigned char *ucSectiobData, unsigned short usPayloadLen,unsigned short usPointer,unsigned short usSectionNo);
 };

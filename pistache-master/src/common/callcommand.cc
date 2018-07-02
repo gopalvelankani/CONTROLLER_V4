@@ -1059,7 +1059,124 @@
 		shutdown(socketHandle,2);
 	    return count;
 	}
-int Callcommand :: updateNITTable(unsigned char *ucSectiobData, unsigned short usPayloadLen,unsigned short usPointer,unsigned short usSectionNo)
+int Callcommand :: insertTable(unsigned char *ucSectiobData, unsigned short usPayloadLen,unsigned short usPointer,unsigned short usSectionNo,TABLE_TYPE table_type,TABLE_COMMAND_TYPE command_type)
+{
+   
+    unsigned char msgBuf[300];
+    unsigned short len=0;
+    len = usPayloadLen+7;
+    msgBuf[0] = 0x02;
+	msgBuf[1] = (unsigned char) (len>>8);
+	msgBuf[2] = (unsigned char) len;
+	msgBuf[3] = CMD_NITBATSDT; //command
+	msgBuf[4] = (unsigned char)command_type; //command type
+	msgBuf[5] = (unsigned char)table_type; //table type
+	msgBuf[6] = (unsigned char) usSectionNo;
+	msgBuf[7] = (unsigned char) (usPointer >> 8);
+	msgBuf[8] = (unsigned char) usPointer;
+	msgBuf[9] = (unsigned char) (usPayloadLen >> 8);
+	msgBuf[10] = (unsigned char) usPayloadLen;
+ 	int i=0;
+	for(i=0;i<usPayloadLen;i++ ){
+		unsigned char ucSectiobData1 = *ucSectiobData++; 
+		// printf("%x:",ucSectiobData1);
+        msgBuf[11+i] = ucSectiobData1;
+	}
+    len = usPayloadLen+11;
+	msgBuf[len] = 0x03;
+	
+	// printf("\n-------------------usPointer --- %d SECTION -------->>%d -------->>> %d\n",usPointer,usSectionNo,usPayloadLen);
+	len++;
+	return sendCommand(msgBuf,len);
+   	   
+ }
+ int Callcommand :: setTableSectionLen(unsigned short *ucSecLenList,int usSecCount,TABLE_TYPE table_type,TABLE_COMMAND_TYPE command_type){
+ 	unsigned char msgBuf[300];
+    unsigned short len=0;
+    len = (usSecCount * 2)+2;
+    msgBuf[0] = 0x02;
+	msgBuf[1] = (unsigned char) (len>>8);
+	msgBuf[2] = (unsigned char) len;
+	msgBuf[3] = CMD_NITBATSDT; //command
+	msgBuf[4] = (unsigned char)command_type; //command type
+	msgBuf[5] = (unsigned char)table_type; //table type
+ 	int i=0;
+	for(i=0; i< usSecCount; i++ ){
+        msgBuf[6+i*2] = (unsigned char)(ucSecLenList[i] >> 8);
+        msgBuf[7+i*2] = (unsigned char)(ucSecLenList[i] & 0xFF);
+	}
+    len = (usSecCount * 2)+6;
+	msgBuf[len] = 0x03;
+	
+	// printf("\n SECTION COUNT-------->>%d --- PEY LEN------>>> %d ------TOT LEN-------->> %d\n",usSecCount,((usSecCount * 2)+2),len);
+	len++;
+	return sendCommand(msgBuf,len);
+
+ }
+  int Callcommand :: activateTable(TABLE_TYPE table_type,TABLE_COMMAND_TYPE command_type){
+ 	unsigned char msgBuf[300];
+    unsigned short len=0;
+    len = 2;
+    msgBuf[0] = 0x02;
+	msgBuf[1] = (unsigned char) (len>>8);
+	msgBuf[2] = (unsigned char) len;
+	msgBuf[3] = CMD_NITBATSDT; //command
+	msgBuf[4] = (unsigned char)command_type; //command type
+	msgBuf[5] = (unsigned char)table_type; //table type
+	msgBuf[6] = 0x03;
+
+	len = 7;
+	return sendCommand(msgBuf,len);
+
+ }
+ int Callcommand :: sendCommand(unsigned char* msgBuf,unsigned short len)
+{
+    struct sockaddr_in serverAddress,clientAddress;
+    unsigned short port = 4660;
+    unsigned char RxBuffer[15]={0};
+    
+    struct timeval tv;
+
+    tv.tv_sec = 0;  /*  Secs Timeout */
+    tv.tv_usec = 300000;
+    int socketHandle = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP/* or 0? */);
+    setsockopt(socketHandle, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
+      if (socketHandle<0)
+      {
+          printf("could not make socket\n");
+          return 0;
+      }
+      memset(&serverAddress, 0, sizeof(serverAddress));
+      memset(&clientAddress, 0, sizeof(clientAddress));
+      serverAddress.sin_family = AF_INET;
+      serverAddress.sin_port = htons(port);
+      serverAddress.sin_addr.s_addr = inet_addr("192.168.1.20");
+
+      clientAddress.sin_family = AF_INET;
+      clientAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+      clientAddress.sin_port = htons(port);
+
+    if(bind(socketHandle,(struct sockaddr*)&clientAddress,sizeof(clientAddress))<0){
+     printf("bind failed\n");
+    }
+    int x=0;
+    unsigned int count;
+    while (x == 0)
+    {
+          int n = sendto(socketHandle,msgBuf, len, 0,(struct sockaddr*)&serverAddress, sizeof(serverAddress));
+
+          int serv_addr_size = sizeof(clientAddress);
+          count=recvfrom(socketHandle,RxBuffer,32, 0, (struct sockaddr*)&clientAddress,(socklen_t*) &serv_addr_size);
+          x=1;
+    }
+    close(socketHandle);
+    if (RxBuffer[0] != STX || RxBuffer[3] != 0x1F || RxBuffer[4] != 0x01 || RxBuffer[5] != ETX )
+    	return 0;
+    else
+    	return 1;
+      
+ }
+ int Callcommand :: updateNITTable(unsigned char *ucSectiobData, unsigned short usPayloadLen,unsigned short usPointer,unsigned short usSectionNo)
 {
     struct sockaddr_in serverAddress,
         clientAddress;

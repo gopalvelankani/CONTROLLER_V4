@@ -73,7 +73,7 @@ public:
     redisReply *reply,*stream_reply;
     int err;
     pthread_t tid,thid;
-    static int CW_THREAD_CREATED;
+    static int STATUS_THREAD_CREATED,CW_THREAD_CREATED;
     Json::Value streams_json,scrambled_services;
     Callcommand c1;
     Udpipstack c2;
@@ -106,6 +106,7 @@ public:
         updateECMChannelsInRedis();
         updateECMStreamsInRedis();
         runBootupscript();
+        // downloadMxlFW(1,0);
     }
     void start() {
         
@@ -378,6 +379,9 @@ private:
 
         Routes::Post(router, "/insertNITable", Routes::bind(&StatsEndpoint::insertNITable, this));
         Routes::Post(router, "/disableNITable", Routes::bind(&StatsEndpoint::disableNITable, this));
+        Routes::Post(router, "/insertBATable", Routes::bind(&StatsEndpoint::insertBATable, this));
+        Routes::Post(router, "/deleteBouquet", Routes::bind(&StatsEndpoint::deleteBouquet, this));
+
         Routes::Post(router, "/unsetHostNITLcn", Routes::bind(&StatsEndpoint::unsetHostNITLcn, this));
         Routes::Post(router, "/setHostNITLcn", Routes::bind(&StatsEndpoint::setHostNITLcn, this));
         Routes::Post(router, "/getHostNITLcn", Routes::bind(&StatsEndpoint::getHostNITLcn, this));
@@ -395,7 +399,7 @@ private:
         Routes::Post(router, "/setControllerFactoryReset", Routes::bind(&StatsEndpoint::setControllerFactoryReset, this)); 
         Routes::Post(router, "/getControllerBackup", Routes::bind(&StatsEndpoint::getControllerBackup, this)); 
         Routes::Post(router, "/restoreBackup", Routes::bind(&StatsEndpoint::restoreBackup, this)); 
-        
+
         Routes::Get(router, "/disConnect", Routes::bind(&StatsEndpoint::disConnect, this)); 
 
     }
@@ -404,9 +408,7 @@ private:
         confAllegro, tuneMxl, setMpegMode, RF authorization
     */
     /*****************************************************************************/
-    void  setMxlTuner(const Rest::Request& request, Net::Http::ResponseWriter response){
-        unsigned char RxBuffer[20]={0};
-        
+    void  setMxlTuner(const Rest::Request& request, Net::Http::ResponseWriter response){        
         int uLen;        
         Json::Value json,injson;
         Json::FastWriter fastWriter;   
@@ -517,6 +519,8 @@ private:
                             setMpegMode(demod_id,1,MXL_HYDRA_MPEG_CLK_CONTINUOUS,MXL_HYDRA_MPEG_CLK_IN_PHASE,104,MXL_HYDRA_MPEG_CLK_PHASE_SHIFT_0_DEG,1,1,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_MODE_SERIAL_3_WIRE,MXL_HYDRA_MPEG_ERR_INDICATION_DISABLED);
                             //Set RF authorization
                             usleep(1000000);
+                            if(locked)
+                                updateServiceToDB(demod_id,rmx_no);
                             // RFauthorization(rmx_no);
                             // write32bCPU(0,0,12);
                             // write32bI2C(32, 0 ,std::stoi(auth_bit));
@@ -541,7 +545,6 @@ private:
     /*  function setDemodMxl                                                    */
     /*****************************************************************************/
     void  setDemodMxl(const Rest::Request& request, Net::Http::ResponseWriter response){
-        unsigned char RxBuffer[20]={0};
         
         int uLen;        
         Json::Value json,injson;
@@ -684,7 +687,6 @@ private:
     /*  function getDemodMxl                                                    */
     /*****************************************************************************/
     void  getDemodMxl(const Rest::Request& request, Net::Http::ResponseWriter response){
-        unsigned char RxBuffer[20]={0};
         
         int uLen;
         unsigned char locked,modulation=MXL_HYDRA_MOD_AUTO,standard= MXL_HYDRA_DVBS,fec=MXL_HYDRA_FEC_AUTO,rolloff=MXL_HYDRA_ROLLOFF_AUTO,pilots=MXL_HYDRA_PILOTS_AUTO,spectrum= MXL_HYDRA_SPECTRUM_AUTO;
@@ -761,7 +763,6 @@ private:
     /*****************************************************************************/
     void  setConfAllegro(const Rest::Request& request, Net::Http::ResponseWriter response){
   
-        unsigned char RxBuffer[20]={0};
         int uLen;
         Json::Value json;
         Json::FastWriter fastWriter;     
@@ -856,7 +857,6 @@ private:
     /*  function readAllegro                                                    */
     /*****************************************************************************/
     void  readAllegro(const Rest::Request& request, Net::Http::ResponseWriter response){
-        unsigned char RxBuffer[20]={0};
         
         int uLen;
         Json::Value json;
@@ -900,7 +900,6 @@ private:
     /*  function setMPEGOut                                                     */
     /*****************************************************************************/
     void  setMPEGOut(const Rest::Request& request, Net::Http::ResponseWriter response){
-        unsigned char RxBuffer[20]={0};
         
         int uLen;
         Json::Value json,injson;
@@ -1003,7 +1002,6 @@ private:
     /*  function setIPTV                                                    */
     /*****************************************************************************/
     void  setIPTV(const Rest::Request& request, Net::Http::ResponseWriter response){
-        unsigned char RxBuffer[20]={0};
         Json::Value json,injson;
         Json::FastWriter fastWriter;  
         int target =((0&0x3)<<8) | ((0&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
@@ -1018,7 +1016,6 @@ private:
     /*  function connectMxl                                                     */
     /*****************************************************************************/
     void  connectMxl(const Rest::Request& request, Net::Http::ResponseWriter response){
-        unsigned char RxBuffer[20]={0};
         Json::Value json,injson;
         Json::FastWriter fastWriter;        
         std::string para[] = {"mxl_id","rmx_no"};
@@ -1131,7 +1128,6 @@ private:
     /*  function downloadFirmware                                                       */
     /*****************************************************************************/
     void  downloadFirmware(const Rest::Request& request, Net::Http::ResponseWriter response){
-        unsigned char RxBuffer[20]={0};
         
         int uLen;
         Json::Value json,injson;
@@ -1240,7 +1236,6 @@ private:
     /*  function setMxlTunerOff                                                     */
     /*****************************************************************************/
     void  setMxlTunerOff(const Rest::Request& request, Net::Http::ResponseWriter response){
-        unsigned char RxBuffer[20]={0};
         bool input_error;
         int uLen;
         Json::Value json;
@@ -1286,7 +1281,6 @@ private:
     /*  function readWrite32bUdpCpu                                                     */
     /*****************************************************************************/
     void  readWrite32bUdpCpu(const Rest::Request& request, Net::Http::ResponseWriter response){
-        unsigned char RxBuffer[20]={0};
         
         int uLen;
         Json::Value json,injson;
@@ -1335,7 +1329,6 @@ private:
     /*  function readWrite32bUdpI2C                                                     */
     /*****************************************************************************/
     void  readWrite32bUdpI2C(const Rest::Request& request, Net::Http::ResponseWriter response){
-        unsigned char RxBuffer[20]={0};
         
         int uLen;
         Json::Value json,injson;
@@ -1385,7 +1378,6 @@ private:
     /*  function selectInterface                                                     */
     /*****************************************************************************/
     void  selectInterface(const Rest::Request& request, Net::Http::ResponseWriter response){
-        unsigned char RxBuffer[20]={0};
         
         int uLen;
         Json::Value json,injson;
@@ -3465,12 +3457,6 @@ private:
                     uBand = (unsigned short *)malloc(uLen*sizeof(unsigned short));
                     uiShared = (unsigned char *)malloc(uLen*sizeof(unsigned char));
 
-                    uProgNum[0] = 8191;         // NULL
-                    uBand[0] = ((RxBuffer[4] << 8) | RxBuffer[5]);
-                    uiShared[0] = 0;
-                    uProgNum[1] = 0;            // PAT
-                    uBand[1] = ((RxBuffer[6] << 8) | RxBuffer[7]);
-                    uiShared[1] = 0;
                     //prog list
                     uLen -= 4;
                     uNumProg = (uLen /= 4);
@@ -3492,14 +3478,10 @@ private:
                        }else{
                            ProgNames.append("NoName");
                        }
-                        db->addChannelList(input,ProgNum[i].asInt(),rmx_no);
+                        // db->addChannelList(input,ProgNum[i].asInt(),rmx_no);
                     }
-                    callGetServiceTypeAndStatus(std::to_string(rmx_no),std::to_string(input));
-                    // for (int i = 0; i < ProgNum.size(); ++i)
-                    // {
-                    //     db->addChannelList(input,ProgNum[i].asInt(),rmx_no);
-                    //     // std::cout<<"channel number"<<ProgNum[i]<<endl;
-                    // }
+                    // callGetServiceTypeAndStatus(std::to_string(rmx_no),std::to_string(input));
+                   
                     json["prog_names"] = ProgNames;
                     json["progNums"] = ProgNum;
                     json["uband"] = band;
@@ -3513,6 +3495,9 @@ private:
         }
         return json;
     }
+
+    
+
     void getProgramsList(const Rest::Request& request, Net::Http::ResponseWriter response){
         Json::Value json,iojson;
         Json::FastWriter fastWriter;
@@ -3547,6 +3532,48 @@ private:
         response.send(Http::Code::Ok, resp);
     }
 
+    Json::Value updateServiceToDB(int input,int rmx_no){
+        unsigned char RxBuffer[1024]={0};
+        
+        Json::Value json,iojson;
+        Json::Value ProgNum,ProgNames;
+        Json::Value band;
+        Json::Value uishared;
+        int uNumProg;
+        unsigned short *uProgNum; 
+        unsigned short *uBand; 
+        unsigned char *uiShared;
+        iojson=callSetInputOutput(std::to_string(input),"0",rmx_no);
+        if(iojson["error"]==false)  {
+            //
+            int uLen = c1.callCommand(33,RxBuffer,1024,5,json,0);
+
+            if (!uLen || RxBuffer[0] != STX || RxBuffer[3] != 0x33) {
+                std::cout<<"Status Command Error!"<<endl;
+            }else{
+                uLen = ((RxBuffer[1] << 8) | RxBuffer[2]);
+               if (RxBuffer[4 + uLen] != ETX) {
+                    std::cout<<"Status Command Error!"<<endl;
+                }else{
+                    Json::Value progNum,service_type,encrypted_flag;
+                   
+                    for (int i = 0; i<uLen; i++) {
+                            progNum[i] = ((RxBuffer[4 + i * 4] << 8) | RxBuffer[4 + i * 4 + 1]);
+                            //service_type[i] = ((RxBuffer[4 + i * 4 + 2] << 8) | RxBuffer[4 + i * 4 + 3]);
+                            service_type[i] = RxBuffer[4 + i * 4 + 2];
+                            encrypted_flag[i] = RxBuffer[4 + i * 4 + 3];
+                        }
+                    if(progNum.size() > 0){
+                        db->updateServiceType(std::to_string(rmx_no),std::to_string(input),progNum,service_type,encrypted_flag);
+                        std::cout<<"Services Types update to DB successfully!"<<endl;
+                    }
+                }
+            }
+        }else{
+           json = iojson;
+        }
+        return json;
+    }
     /*****************************************************************************/
     /*  Commande 0x33   function getServiceList                        */
     /*****************************************************************************/
@@ -4393,26 +4420,30 @@ private:
             Json::Value jsonNewIds;
             jsonNewIds = callGetServiceID(rmx_no);
 
+            int progIndex = 0;
             for(int i=0; i<num_prog; i++) {
                 Json::Value jsondata,jservName;
                 // pProg[i] = (RxBuffer[2*i+4]<<8)|RxBuffer[2*i+5];
                 int pnum = (RxBuffer[2*i+4]<<8)|RxBuffer[2*i+5];
                 jpnames = callGetProgramOriginalName(std::to_string(pnum),rmx_no);
                 if(jpnames["error"] == false){
-                    jsondata["original_name"] = jpnames["name"];
+                    if(jpnames["name"] != ""){
+                        jsondata["original_name"] = jpnames["name"];
+                        jservName = callGetServiceName(rmx_no,std::to_string(pnum));
+                        if(jservName["error"]==false){
+                            jsondata["new_name"] = jservName["nName"];
+                        }else{
+                            jsondata["new_name"] = -1;
+                        }
+                        jsondata["original_service_id"] = pnum;
+                        jsondata["new_service_id"] = getNewServiceIdIfExists(jsonNewIds,pnum);
+                    }else{
+                        continue;
+                    }
                 }else{
                     jsondata["original_name"] = -1;
                 }
-                jservName = callGetServiceName(rmx_no,std::to_string(pnum));
-                if(jservName["error"]==false){
-                    jsondata["new_name"] = jservName["nName"];
-                }else{
-                    jsondata["new_name"] = -1;
-                }
-                jsondata["original_service_id"] = pnum;
-                jsondata["new_service_id"] = getNewServiceIdIfExists(jsonNewIds,pnum);
-
-                pProg[i] = jsondata;
+                pProg[progIndex++] = jsondata;
             }
             json["pProg"] = pProg;
             json["error"] = false;
@@ -7978,7 +8009,8 @@ private:
                 json["error"]= true;
                 json[para[i]]= "Require Integer!";
             }
-            db->addCustomPid(rmx_no,output,pid,std::stoi(addFlag));
+
+            db->addCustomPid(rmx_no,output,pid,auth_output,std::stoi(addFlag));
             Json::Value json_pids = db->getCustomPids(rmx_no);
             std::cout<<json_pids<<std::endl;
             if(json_pids["error"] == false){
@@ -8542,9 +8574,10 @@ private:
         // std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
         // if(res=="0"){
             	std::string parity =getParameter(request.body(),"parity");
+                int rmx_no =std::stoi(getParameter(request.body(),"rmx_no"));
             	
                 // if(verifyInteger(parity,1,1,1,0)){
-                	json = callSetCSAParity(parity);
+                	json = callSetCSAParity(parity,rmx_no);
                 // }else{
                 //     json["error"]= true;
                 // }
@@ -8556,13 +8589,13 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
-    Json::Value callSetCSAParity(std::string parity){
+    Json::Value callSetCSAParity(std::string parity,int rmx_no){
     	Json::Value json;
     	bool error_flag = false;
     	// int remx_bit[]= {0,4,1,5,2,6};
     	int iParity = (std::stoi(parity) == 0)? 0 : 255;
-    	for (int rmx_no = 0; rmx_no < RMX_COUNT; ++rmx_no)
-    	{
+    	// for (int rmx_no = 0; rmx_no < RMX_COUNT; ++rmx_no)
+    	// {
     		Json::Value core_json;
     		// core_json = callSetCore("2","0",std::to_string(remx_bit[i]),i+1);
     		// if(core_json["status"] == 1){
@@ -8574,7 +8607,7 @@ private:
     			 // std::cout<<remx_bit[rmx_no]<<std::endl;
     		}
     		
-    	}
+    	// }
     	json["error"] = error_flag;
     	return json;
 
@@ -8711,7 +8744,7 @@ private:
         
         key_str = key_str.substr(1);
         if(iojson["error"]==false){
-            Json::Value active_prog = db->getEncryptedPrograms(prog_nos_str,input,output,std::to_string(rmx_no));
+            Json::Value active_prog = db->getEncryptedPrograms(prog_nos_str,input,std::to_string(rmx_no));
             if(active_prog["error"]==false){
                 for (int i = 0; i < active_prog["list"].size(); ++i)
                 {
@@ -8801,7 +8834,7 @@ private:
 	        		key_index = db->getCWKeyIndex(rmx_no,input,output,programNumber);
 	        	}
 	        	db->addEncryptedService(rmx_no,input,output,programNumber,key_index,flag);
-                json = callsetEncryptedServices(programNumber,key_index,input,output,uiRmx_no,flag);
+                json = callsetEncryptedServices(input,uiRmx_no);
                 // json["error"] = false;
                 if(json["error"] == false){
 		        	db->updateCWIndex(rmx_no,output,programNumber,key_index,indexValue,flag);
@@ -8816,11 +8849,11 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
-   Json::Value callsetEncryptedServices(std::string programNumbers,long int keyID,std::string input,std::string output,int rmx_no, int flag){
+   Json::Value callsetEncryptedServices(std::string input,int rmx_no){
 	   	Json::Value json,service_nos,key_indexes,jsonMsg;
 	   	unsigned int uLen;
 	   	unsigned char RxBuffer[4090]={0};
-   		Json::Value active_prog = db->getEncryptedPrograms("-1",input,output,std::to_string(rmx_no));
+   		Json::Value active_prog = db->getEncryptedPrograms("-1",input,std::to_string(rmx_no));
    		std::cout<<active_prog<<std::endl;
         if(active_prog["error"]==false){
             for (int i = 0; i < active_prog["list"].size(); ++i)
@@ -8829,10 +8862,10 @@ private:
                 key_indexes.append(active_prog["list"][i]["key_index"].asString());
             }
         }
-        std::cout<<service_nos<<std::endl;
+        // std::cout<<service_nos<<std::endl;
         jsonMsg["programNumbers"] = service_nos; 
         jsonMsg["keyids"] = key_indexes; 
-        Json::Value iojson = callSetInputOutput(input,output,rmx_no);
+        Json::Value iojson = callSetInputOutput(input,"0",rmx_no);
         if(iojson["error"] == false){
 	        uLen = c1.callCommand(45,RxBuffer,6,4090,jsonMsg,1);
 	        if (!uLen|| RxBuffer[0] != STX || RxBuffer[3] != CMD_ENCRYPT_PROG_STATE || uLen != 6 || RxBuffer[4] != 1 || RxBuffer[5] != ETX ){
@@ -9139,6 +9172,9 @@ private:
                                 updateServiceIDs(rmx_no,input);
                                 resetServiceName(pNumber);
                                 resetServiceProviderName(pNumber);
+                                db->addEncryptedService(rmx_no,input,output,pNumber,-1,0);
+                                callsetEncryptedServices(input,std::stoi(rmx_no));
+
                             }
                         }
                     }
@@ -9795,7 +9831,7 @@ private:
                     json["rmx_no2"] = rmx_no2;
                     int controller_of_rmx = (rmx_no % 2 == 0)?1:0;
                     int ch_no = ((controller_of_rmx)*8)+std::stoi(channel_no);
-                    json = callSetEthernetIn(ch_no,ip_addr,std::stoi(port),std::stoi(str_type));
+                    json = callSetEthernetIn(ch_no,ip_addr,std::stoi(port),rmx_no,std::stoi(str_type));
                     usleep(1000);
                     if(write32bI2C(4,0,tuner_ch) == -1){
                         json["error"]= true;
@@ -9838,7 +9874,7 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
-    Json::Value callSetEthernetIn(int channel_no,unsigned long int ip_addr,int port, int type,int tuner_ch=0){
+    Json::Value callSetEthernetIn(int channel_no,unsigned long int ip_addr,int port, int type,int rmx_no,int tuner_ch=0){
         Json::Value json;
         json["error"]= false;
         json["message"]= "successfully assigned IP OUT!";
@@ -9876,6 +9912,7 @@ private:
                 json["message"]= "Failed IGMP Channel Number!";
             }
         }
+        updateServiceToDB(channel_no-1,rmx_no);
         // usleep(1000);
         // if(write32bI2C(4,0,tuner_ch) == -1){
      //     json["error"]= true;
@@ -9949,7 +9986,7 @@ private:
                     json["rmx_no2"] = rmx_no2;
                     int controller_of_rmx = (rmx_no % 2 == 0)?1:0;
                     int ch_no = ((controller_of_rmx)*8)+std::stoi(channel_no);
-                    json = callSetEthernetIn(ch_no,ip_addr,std::stoi(port),std::stoi(str_type));
+                    json = callSetEthernetIn(ch_no,ip_addr,std::stoi(port),rmx_no, std::stoi(str_type));
                     usleep(1000);
                     long int mux_out =  65536; 
                     mux_out = (control_fpga == 1)? 65536 : ((control_fpga == 2)? (1048576 | 65536) : (2097152 | 65536));
@@ -10208,14 +10245,25 @@ private:
         if(write32bCPU(0,0,0) != -1){
             if (std::ifstream(cwd))
             {
-                connect = connectMysql(cnf.DB_HOST,cnf.DB_USER,cnf.DB_PASS,"-1");
-                mysql_query (connect,("DROP Database "+cnf.DB_NAME).c_str());
-                mysql_query (connect,("CREATE Database IF NOT EXISTS "+cnf.DB_NAME).c_str());
-                mysql_close (connect);
+                // connect = connectMysql(cnf.DB_HOST,cnf.DB_USER,cnf.DB_PASS,cnf.DB_NAME);
+                // mysql_query (connect,("DROP Database "+cnf.DB_NAME).c_str());
+                // mysql_query (connect,("CREATE Database IF NOT EXISTS "+cnf.DB_NAME).c_str());
+                // mysql_close (connect);
 
-                connect = connectMysql(cnf.DB_HOST,cnf.DB_USER,cnf.DB_PASS,cnf.DB_NAME);
+                // connect = connectMysql(cnf.DB_HOST,cnf.DB_USER,cnf.DB_PASS,cnf.DB_NAME);
+                db->recreateDatabase();
                 std::string query = "mysql -u "+cnf.DB_USER+" -p"+cnf.DB_PASS+" "+cnf.DB_NAME+" <  rmx_controller.sql";
                 system(query.c_str());
+                if(db->checkDatabaseContains()){
+                     if(write32bCPU(0,0,12) != -1){
+                        usleep(100);
+                        write32bI2C(32, 0 ,63<<24);
+                        usleep(100);
+                        write32bI2C(32, 0 ,63);
+                    }
+                    json["message"] ="RMX: Factory reset successful! \n Please restart the board to apply changes!";
+                    json["error"] = false;  
+                }
 
                 // //readling .sql file and writing
                 // std::ifstream infile("rmx_contr.sql");
@@ -10239,21 +10287,21 @@ private:
                 //     // process pair (a,b)
                 // }
 
-                mysql_query (connect,"SELECT COUNT(*) from information_schema.tables");
-                res_set = mysql_store_result(connect);
-                if(mysql_num_rows(res_set)>0){
-                    if(write32bCPU(0,0,12) != -1){
-                        usleep(100);
-                        write32bI2C(32, 0 ,63<<24);
-                        usleep(100);
-                        write32bI2C(32, 0 ,63);
-                    }
+                // mysql_query (connect,"SELECT COUNT(*) from information_schema.tables");
+                // res_set = mysql_store_result(connect);
+                // if(mysql_num_rows(res_set)>0){
+                //     if(write32bCPU(0,0,12) != -1){
+                //         usleep(100);
+                //         write32bI2C(32, 0 ,63<<24);
+                //         usleep(100);
+                //         write32bI2C(32, 0 ,63);
+                //     }
                     json["message"] ="RMX: Factory reset successful! \n Please restart the board to apply changes!";
                     json["error"] = false;    
-                }else{
-                    json["message"] ="RMX: Factory reset failed!";
-                    json["error"] = true;
-                }
+                // }else{
+                //     json["message"] ="RMX: Factory reset failed!";
+                //     json["error"] = true;
+                // }
             }else{
                 json["message"] ="RMX: rmx_controller.sql file does not exists!";
                 json["error"] = true; 
@@ -10278,10 +10326,11 @@ private:
         MYSQL *connect;
         // std::cout<<cnf.DB_NAME<<"****"<<cnf.DB_HOST<<"****"<<cnf.DB_USER<<"****"<<cnf.DB_PASS<<std::endl;
         if(write32bCPU(0,0,0) != -1){
-            connect = connectMysql(cnf.DB_HOST,cnf.DB_USER,cnf.DB_PASS,"-1");
-            mysql_query (connect,("DROP Database "+cnf.DB_NAME).c_str());
-            mysql_query (connect,("CREATE Database IF NOT EXISTS "+cnf.DB_NAME).c_str());
-            mysql_close (connect);
+            // connect = connectMysql(cnf.DB_HOST,cnf.DB_USER,cnf.DB_PASS,cnf.DB_NAME);
+            // mysql_query (connect,("DROP Database "+cnf.DB_NAME).c_str());
+            // mysql_query (connect,("CREATE Database IF NOT EXISTS "+cnf.DB_NAME).c_str());
+            // mysql_close (connect);
+            db->recreateDatabase();
             json["message"] ="RMX: Database recreated successfully!";
             json["db_name"] = cnf.DB_NAME;
             json["db_host"] = cnf.DB_HOST;
@@ -10305,16 +10354,17 @@ private:
             exit(1);
         }
         if(db_name == "-1")
-            connect=mysql_real_connect(connect, "localhost", "root", "root" , NULL ,0,NULL,0);
+            connect=mysql_real_connect(connect, localhost.c_str(), user.c_str(), pass.c_str() , NULL ,0,NULL,0);
         else
             connect=mysql_real_connect(connect, localhost.c_str(), user.c_str(), pass.c_str() , db_name.c_str() ,0,NULL,0);
+        cout<<"HOST "<<localhost<<" PASS "<<pass<<" USER "<<user;
         if (connect)
         {
             cout<<"MYSQL connection Succeeded\n";
         }
         else
-        {
-            cout<<"MYSQL connection failed\n";
+        {            
+            cout<<"\nMYSQL connection failed\n";
             exit(1);
         }
         return connect;
@@ -13960,23 +14010,69 @@ private:
         Json::Value json;
         Json::FastWriter fastWriter;
         int flag=1;
-        while(1){
-            for(int i=1;i<=6;i++){
-                json = callGetFirmwareVersion(1);
-                if(json["error"]==false){
-                    flag=0;
-                    break;
-                }  
-                cout<<"MUX DISCONNECTED"<<endl;  
+        if(write32bCPU(0,0,0) != -1){
+            long int type = read32bCPU(8,0);
+            if(type != 0){
+                json["version"] =std::to_string(type);
+                json["error"]= false;
+                json["message"]= "FPGA4 bitstream version!";
+            }else{
+                json["version"] =std::to_string(type);
+                json["error"]= false;
+                json["message"]= "Failed read!";
             }
-            if(flag==0){
-                cout<<"MUX CONNECTED"<<endl;
-                break;
-            }
-        }
-        runBootupscript();
+        }else{
+            json["error"]= true;
+            json["message"]= "Connection error!";
+        } 
+        // while(1){
+        //     for(int i=1;i<=6;i++){
+        //         json = callGetFirmwareVersion(1);
+        //         if(json["error"]==false){
+        //             flag=0;
+        //             break;
+        //         }  
+        //         cout<<"MUX DISCONNECTED"<<endl;  
+        //     }
+        //     if(flag==0){
+        //         cout<<"MUX CONNECTED"<<endl;
+        //         break;
+        //     }
+        // }
+        // runBootupscript();
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
+    }
+
+    int rebootStatusRegister(){
+        if(write32bCPU(0,0,0) != -1){
+            if(write32bCPU(8,0,1) != -1){
+                cout<<"Successfully initialized status register!"<<endl;
+            }else{
+                cout<<"Failed to initialize status register, Please check right bistream flashed to the board !"<<endl;
+            }
+        }else{
+            cout<<"Connection error while initializing status register,Please check connection and restart the controller!"<<endl;
+        } 
+        return 1;
+    }
+
+    int checkRebootStatusRegister(){
+        while(1){
+            if(write32bCPU(0,0,0) != -1){
+                if(read32bCPU(8,0) == 0){
+                    cout<<"Board rebooted, controller reboot starts in a moment!"<<endl;
+                    usleep(10000000);
+                    runBootupscript();
+                }else{
+                    cout<<"Board running!"<<endl;
+                }
+            }else{
+                cout<<"Waiting for the connection!"<<endl;
+            }
+            usleep(30000000); 
+        }
+        return 1;
     }
 
     /*****************************************************************************/
@@ -13994,10 +14090,16 @@ private:
             {
                 Json::Value json_io = callSetInputOutput("0",std::to_string(output),rmx_no);
                 if(json_io["error"] == false){
-                    Json::Value json_nitmode =  callSetNITmode("3",std::to_string(output),rmx_no);
-                    usleep(100);
-                    if(json_nitmode["error"] == true)
+                    unsigned short usNitLen[0] = {};
+                    int nit_sec_len_resp = c1.setTableSectionLen(usNitLen,0,TABLE_NIT,TABLE_SET_LEN);
+                    if(nit_sec_len_resp == 1){
+                        int nit_activation_resp = c1.activateTable(TABLE_NIT,TABLE_ACTIVATE);
+                        if(nit_activation_resp != 1){
+                            error_disabling_NIT = true;
+                        }
+                    }else{
                         error_disabling_NIT = true;
+                    }
                 }else{
                     error_disabling_NIT = true;
                 }
@@ -14049,44 +14151,7 @@ private:
                 json[para[i]]= "Please give valid input for "+para[i]+"!";
             }
             if(all_para_valid){
-                json = callInsertNITable(str_network_id,network_name);
-            	// NIT_VER = (NIT_VER == 31)? 0 : NIT_VER+1;
-            	// unsigned char* ucNetworkName =(unsigned char*) network_name.c_str();
-            	// Json::Value NIT_Host_modes = db->getNITHostMode();
-            	
-             //    int pusSectionL=  getCountSections();
-             //    std::cout<<"\n-----------------------------LAST SECTION COUNT----------------------------"<<pusSectionL<<endl;
-            	// if(NIT_Host_modes["error"] == false){
-            	// 	for (int i = 0; i <NIT_Host_modes["list"].size() ; ++i)
-            	// 	{
-            	// 		int rmx_no = std::stoi(NIT_Host_modes["list"][i]["rmx_no"].asString());
-            	// 		std::string output = NIT_Host_modes["list"][i]["output"].asString();
-            	// 		Json::Value json_io = callSetInputOutput("0",output,rmx_no);
-	            // 		if(json_io["error"] == false){
-	            // 			int count=  TS_GenNITSection(std::stoi(str_network_id),NIT_VER,ucNetworkName,pusSectionL);
-	            // 			usleep(10000);
-	            // 			nit_insert_error = false;
-	            // 			//set NIT MODE 
-	            // 			Json::Value json_nitmode =  callSetNITmode("2",output,rmx_no);
-	            // 			usleep(100);
-	            // 			if(json_nitmode["error"] == true)
-	            // 				json["nit_mode"] = "Setting NIT mode failed"; 
-	            // 		}else{
-	            // 			json = json_io;
-	            // 		}
-             //            break;
-	            // 	}
-	            // }
-	            // if(nit_insert_error == false){
-	            // 	db->addNITDetails(NIT_VER,network_name,str_network_id);
-	            // 	json["error"]= false;
-             //    	json["message"]= "NIT inserted!";
-	            // }else{
-	            // 	json["error"]= true;
-             //    	json["message"]= "Connection error!";	
-	            // }          		
-                
-                
+                json = callInsertNITable14_247(str_network_id,network_name);
             }else{
                 json["error"]= true;
                 json["message"]= "Invalid input!"; 
@@ -14100,7 +14165,133 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
+    
+    Json::Value callInsertNITables(std::string str_network_id,std::string network_name){
+        Json::Value json;
+        NIT_VER = (NIT_VER == 31)? 0 : NIT_VER+1;
+        unsigned char* ucNetworkName =(unsigned char*) network_name.c_str();       
+        bool nit_insert_error = true;
+        unsigned short usNitLength[16];
+        unsigned short *pusNitLength = usNitLength;
+        unsigned char usNitSections[16][1200] = {0}; 
+
+        int iNITsectionCount = TS_GenNITSections(usNitSections,pusNitLength,NIT_VER,std::stoi(str_network_id),ucNetworkName);
+        std::cout<<iNITsectionCount<<endl;
+        if(iNITsectionCount > -1){
+            for (int rmx_no = 0; rmx_no < RMX_COUNT; ++rmx_no)
+            {
+                for (int output = 0; output < OUTPUT_COUNT; ++output)
+                {
+                    Json::Value iojson = callSetInputOutput("0",std::to_string(output),rmx_no+1);
+                    if(iojson["error"] == false)
+                    { 
+                        for (int iSection = 0; iSection < iNITsectionCount; ++iSection)
+                        {
+                            usNitSections[iSection][7] = iNITsectionCount;
+                            unsigned char * ucSectionPayload = usNitSections[iSection];
+                            unsigned short usFullSectionLength = usNitLength[iSection];
+                            int k = 0;
+                            unsigned short usPointer=0;
+                            while(usFullSectionLength)
+                            {
+                                int size_of_payload = (usFullSectionLength>256)? 256 : usFullSectionLength;
+                                int nit_resp = c1.insertTable(ucSectionPayload+=k,size_of_payload,usPointer,iSection,TABLE_NIT,TABLE_WRITE);
+                                usPointer += size_of_payload;
+                                usFullSectionLength -= size_of_payload;
+                                // printf(")) --> %d\n",nit_resp);
+                                k =size_of_payload;
+                                if(nit_resp != 1)
+                                {
+                                    break;
+                                }else
+                                {
+                                    nit_insert_error = false;
+                                }
+                            }
+                        }
+                        if(!nit_insert_error){
+                            json["size"] = iNITsectionCount;
+                            if(!nit_insert_error){
+                                int nit_sec_len_resp = c1.setTableSectionLen(usNitLength,iNITsectionCount,TABLE_NIT,TABLE_SET_LEN);
+                                if(nit_sec_len_resp == 1){
+                                    int nit_activation_resp = c1.activateTable(TABLE_NIT,TABLE_ACTIVATE);
+                                    if(nit_activation_resp != 1){
+                                        nit_insert_error = true;
+                                    }
+                                }else{
+                                    nit_insert_error = true;
+                                }
+                            }  
+                        }
+                        usleep(100);
+                    }else{
+                        std::cout<<"------------------------------INPUT ERROR -------------------"<<output<<endl;
+                        Json::Value json_output_err;
+                        json_output_err["output:"+std::to_string(output)]= iojson;
+                        json["Remux:"+std::to_string(rmx_no+1)].append(json_output_err);
+                    }
+                }
+
+            }
+            db->addNITDetails(NIT_VER,network_name,str_network_id);
+            json["error"]= false;
+            json["message"]= "NIT inserted!";
+        }else{
+            json["error"]= true;
+            json["message"]= "No services output present!"; 
+        }
+        return json; 
+    }
+
     Json::Value callInsertNITable(std::string str_network_id,std::string network_name){
+        Json::Value json;
+
+        NIT_VER = (NIT_VER == 31)? 0 : NIT_VER+1;
+        unsigned char* ucNetworkName =(unsigned char*) network_name.c_str();
+        Json::Value NIT_Host_modes = db->getNITHostMode();
+        
+        bool nit_insert_error = true;
+        int pusSectionL=  getCountSections();
+        std::cout<<"\n-----------------------------LAST SECTION COUNT----------------------------\n"<<NIT_Host_modes<<endl;
+
+        for (int rmx_no = 0; rmx_no < RMX_COUNT; ++rmx_no)
+        {
+            for (int output = 0; output < OUTPUT_COUNT; ++output)
+            {
+                callSetInputOutput("0",std::to_string(output),rmx_no+1);
+                unsigned short usNitLen[pusSectionL];
+                unsigned short *pucData = usNitLen; 
+                int nit_insert_resp = TS_GenNITSection(std::stoi(str_network_id),NIT_VER,ucNetworkName,pusSectionL,pucData);
+                if(nit_insert_resp == 1){
+                    usleep(100);
+                    int nit_sec_len_resp = c1.setTableSectionLen(usNitLen,pusSectionL+1,TABLE_NIT,TABLE_SET_LEN);
+                    usleep(100);
+                    if(nit_sec_len_resp == 1){
+                        int nit_activation_resp = c1.activateTable(TABLE_NIT,TABLE_ACTIVATE);
+                        if(nit_activation_resp == 1){
+                            nit_insert_error = false;
+                        }
+                    }
+                }else{
+                    json["error"]= true;
+                    json["message"]= "NIT insertion error!";
+                }
+                usleep(100);
+            }
+        }
+        if(nit_insert_error == false){
+            db->addNITDetails(NIT_VER,network_name,str_network_id);
+            json["error"]= false;
+            json["message"]= "NIT inserted!";
+        }else{
+            json["error"]= true;
+            json["message"]= "Connection error!";   
+        } 
+        return json; 
+    }
+
+    // callInsertNITable14_247 for firmware version 14.247
+    Json::Value callInsertNITable14_247(std::string str_network_id,std::string network_name){
         Json::Value json;
 
         NIT_VER = (NIT_VER == 31)? 0 : NIT_VER+1;
@@ -14117,7 +14308,7 @@ private:
                 std::string output = NIT_Host_modes["list"][i]["output"].asString();
                 Json::Value json_io = callSetInputOutput("0",output,rmx_no);
                 if(json_io["error"] == false){
-                    int count=  TS_GenNITSection(std::stoi(str_network_id),NIT_VER,ucNetworkName,pusSectionL);
+                    int count=  TS_GenNITSection14_247(std::stoi(str_network_id),NIT_VER,ucNetworkName,pusSectionL);
                     usleep(10000);
                     nit_insert_error = false;
                     //set NIT MODE 
@@ -14140,6 +14331,777 @@ private:
         } 
         return json; 
     }
+    // int setTableLength(TABLE_TYPE){
+
+    // }
+    // Json::Value callInsertNITable(std::string str_network_id,std::string network_name){
+    //     Json::Value json;
+
+    //     NIT_VER = (NIT_VER == 31)? 0 : NIT_VER+1;
+    //     unsigned char* ucNetworkName =(unsigned char*) network_name.c_str();
+    //     Json::Value NIT_Host_modes = db->getNITHostMode();
+        
+    //     bool nit_insert_error = true;
+    //     int pusSectionL=  getCountSections();
+    //     std::cout<<"\n-----------------------------LAST SECTION COUNT----------------------------\n"<<NIT_Host_modes<<endl;
+    //     if(NIT_Host_modes["error"] == false){
+    //         for (int i = 0; i <NIT_Host_modes["list"].size() ; ++i)
+    //         {
+    //             int rmx_no = std::stoi(NIT_Host_modes["list"][i]["rmx_no"].asString());
+    //             std::string output = NIT_Host_modes["list"][i]["output"].asString();
+    //             Json::Value json_io = callSetInputOutput("0",output,rmx_no);
+    //             if(json_io["error"] == false){
+    //                 int count=  TS_GenNITSection(std::stoi(str_network_id),NIT_VER,ucNetworkName,pusSectionL);
+    //                 usleep(10000);
+    //                 nit_insert_error = false;
+    //                 //set NIT MODE 
+    //                 Json::Value json_nitmode =  callSetNITmode("2",output,rmx_no);
+    //                 usleep(100);
+    //                 if(json_nitmode["error"] == true)
+    //                     json["nit_mode"] = "Setting NIT mode failed"; 
+    //             }else{
+    //                 json = json_io;
+    //             }
+    //         }
+    //     }
+    //     if(nit_insert_error == false){
+    //         db->addNITDetails(NIT_VER,network_name,str_network_id);
+    //         json["error"]= false;
+    //         json["message"]= "NIT inserted!";
+    //     }else{
+    //         json["error"]= true;
+    //         json["message"]= "Connection error!";   
+    //     } 
+    //     return json; 
+    // }
+    //NIT creation
+
+    int BAT_VER = 31;
+    /*****************************************************************************/
+    /*  Command    function insertBATable                          */
+    /*****************************************************************************/
+    void insertBATable(const Rest::Request& request, Net::Http::ResponseWriter response){
+        std::string str_bouquet_id,bouquet_name,str_version;
+        int channel_id,stream_id,service_id;
+        Json::Value json,programNumbers,outputs,rmxs,inputs;
+        Json::FastWriter fastWriter;
+        Json::Reader reader;
+        std::string para[] = {"bouquet_id","bouquet_name","service_list","output_list","rmx_list","input_list"};
+        int error[ sizeof(para) / sizeof(para[0])];
+        bool all_para_valid=true,nit_insert_error = true;
+        addToLog("insertBATable",request.body());
+        std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
+        if(res=="0"){
+            bool parsedSuccess = true;
+            std::string service_list = getParameter(request.body(),"service_list"); 
+            std::string serviceList = UriDecode(service_list);
+            bool serviceParsedSuccess = reader.parse(serviceList,programNumbers,false);
+            if(!serviceParsedSuccess){
+                parsedSuccess = false;
+                json["error"] = true;
+                json["message"] = "service_list: Invalid JSON!";
+            }
+            std::string output_list = getParameter(request.body(),"output_list"); 
+            std::string outputList = UriDecode(output_list);
+            bool outputParsedSuccess = reader.parse(outputList,outputs,false);
+            if(!outputParsedSuccess){
+                parsedSuccess = false;
+                json["error"] = true;
+                json["message"] = "output_list: Invalid JSON!";
+            }
+            std::string rmx_list = getParameter(request.body(),"rmx_list"); 
+            std::string rmxList = UriDecode(rmx_list);
+            bool rmxParsedSuccess = reader.parse(rmxList,rmxs,false);
+            if(!rmxParsedSuccess){
+                parsedSuccess = false;
+                json["error"] = true;
+                json["message"] = "rmx_list: Invalid JSON!";
+            }
+            std::string input_list = getParameter(request.body(),"input_list"); 
+            std::string inputList = UriDecode(input_list);
+            bool inputParsedSuccess = reader.parse(inputList,inputs,false);
+            if(!inputParsedSuccess){
+                parsedSuccess = false;
+                json["error"] = true;
+                json["message"] = "input_list: Invalid JSON!";
+            }
+            if (parsedSuccess)
+            {
+                str_bouquet_id =getParameter(request.body(),"bouquet_id");
+                bouquet_name =getParameter(request.body(),"bouquet_name");
+                error[0] = verifyInteger(str_bouquet_id);
+                error[1] = verifyString(bouquet_name);
+                error[2] = verifyJsonArray(programNumbers,"service_ids",1);
+                error[3] = verifyJsonArray(outputs,"outputs",1);
+                error[4] = verifyJsonArray(rmxs,"rmx_nos",1);
+                error[5] = verifyJsonArray(inputs,"inputs",1);
+                for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
+                {
+                   if(error[i]!=0){
+                        continue;
+                    }
+                    all_para_valid=false;
+                    json["error"]= true;
+                    json[para[i]]= "Please give valid input for "+para[i]+"!";
+                }
+                if(all_para_valid){
+                    json["id"] = db->addBATServiceList(str_bouquet_id,bouquet_name,programNumbers["service_ids"],outputs["outputs"],rmxs["rmx_nos"],inputs["inputs"]);
+                    json = updateBATtable();
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Invalid input!"; 
+                }
+
+            }            
+        }else{
+            json["error"]= true;
+            json["message"]= res;
+        }
+
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
+    }
+    // Json::Value updateBATtable(){
+    //     Json::Value json;
+    //     bool bat_insert_error = false;
+    //     BAT_VER = (BAT_VER == 31)? 0 : BAT_VER+1;
+    //     Json::Value json_batList =  db->getBATList();
+    //     json["error"]= false;
+    //     if(json_batList["error"] == false)
+    //     {
+    //         for (int rmx_no = 0; rmx_no < RMX_COUNT ; ++rmx_no)
+    //         {
+    //             int target =((0&0x3)<<8) | ((rmx_no&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+    //             if(write32bCPU(0,0,target) != -1) {
+    //                 int size = json_batList["list"].size();
+    //                 unsigned short usBatLen[size];
+    //                 std::cout<<json_batList<<endl;
+    //                 for (int i = 0; i < json_batList["list"].size(); ++i)
+    //                 {
+    //                     unsigned int uiBouquetId = std::stoi(json_batList["list"][i]["bouquet_id"].asString());
+    //                     std::string bouquet_name = json_batList["list"][i]["bouquet_name"].asString();
+    //                     Json::Value json_batServiceList =  db->getBATServiceList(json_batList["list"][i]["bouquet_id"].asString());
+    //                     Json::Value json_servicelist_on_output;
+    //                     if(json_batServiceList["error"] == false)
+    //                     {
+    //                         for (int j = 0; j < json_batServiceList["list"].size(); ++j)
+    //                         {
+    //                             json_servicelist_on_output[json_batServiceList["list"][j]["rmx_id"].asString()+'_'+json_batServiceList["list"][j]["output"].asString()].append(json_batServiceList["list"][j]); 
+    //                         }
+    //                         unsigned short pucBATlen=0;
+    //                         int bat_insert_resp = TS_GenBATSection(uiBouquetId,BAT_VER,bouquet_name,json_servicelist_on_output,&pucBATlen,i,json_batList["list"][i]["nibble_level_1"].asString(),json_batList["list"][i]["nibble_level_2"].asString(),json_batList["list"][i]["user_nibble1"].asString(),json_batList["list"][i]["user_nibble2"].asString());
+    //                         if(bat_insert_resp != 1){
+    //                             bat_insert_error = true;
+    //                             json["error"]= true;
+    //                             json["message"]= "Bouquet insertion error!";
+    //                         }else{
+    //                             usBatLen[i] = pucBATlen;
+    //                         }
+
+    //                     }  
+    //                 }  
+    //                 json["size"] = size;
+    //                 if(!bat_insert_error){
+    //                     int bat_sec_len_resp = c1.setTableSectionLen(usBatLen,size,TABLE_BAT,TABLE_SET_LEN);
+    //                     if(bat_sec_len_resp == 1){
+    //                         int bat_activation_resp = c1.activateTable(TABLE_BAT,TABLE_ACTIVATE);
+    //                         if(bat_activation_resp != 1){
+    //                             bat_insert_error = true;
+    //                         }
+    //                     }else{
+    //                         bat_insert_error = true;
+    //                     }
+    //                 }                    
+    //             }else{
+    //                 json["error"]= true;
+    //                 json["message"]= "Connection error!";
+    //             }
+    //         }
+    //         if(bat_insert_error)
+    //         {
+    //             json["error"]= false;
+    //             json["message"]= "Bouquet inserted partially!";
+    //         }else{
+    //             json["error"]= false;
+    //             json["message"]= "Bouquet updated successfully!";
+    //         }
+            
+    //     }else{
+    //         unsigned short usBatLen[0];
+    //         for (int rmx_no = 0; rmx_no < RMX_COUNT ; ++rmx_no)
+    //         {
+    //             int target =((0&0x3)<<8) | ((rmx_no&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+    //             if(write32bCPU(0,0,target) != -1) {
+    //                 int bat_sec_len_resp = c1.setTableSectionLen(usBatLen,0,TABLE_BAT,TABLE_SET_LEN);
+    //                 if(bat_sec_len_resp == 1){
+    //                     int bat_activation_resp = c1.activateTable(TABLE_BAT,TABLE_ACTIVATE);
+    //                     if(bat_activation_resp != 1){
+    //                         bat_insert_error = true;
+    //                     }
+    //                 }else{
+    //                     bat_insert_error = true;
+    //                 }
+    //             }
+    //         }
+    //         if(bat_insert_error){
+    //             json["error"] = true;
+    //             json["message"] = "Error:Updating Bouquet!";
+    //         }else{
+    //             json["error"] = false;
+    //             json["message"] = "Bouquet updated successfully!";
+    //         }
+    //     }
+    //     return json; 
+    // }
+
+    Json::Value updateBATtable(){
+        Json::Value json;
+        BAT_VER = (BAT_VER == 31)? 0 : BAT_VER+1;
+        Json::Value json_batList =  db->getBATList();
+        json["error"]= false;
+        int bat_insert_error = 1;
+        if(json_batList["error"] == false)
+        {
+            unsigned short usBatLength[128];
+            unsigned short *pusBatLength = usBatLength;
+            unsigned char usBatSections[128][1200] = {0};
+            // unsigned char *pusBatSections = usBatSections;
+            int iBatsectionCount = TS_GenBATSection(usBatSections,pusBatLength,BAT_VER);
+            if(iBatsectionCount > 0)
+            {
+                for (int rmx_no = 0; rmx_no < RMX_COUNT ; ++rmx_no)
+                {
+                    int target =((0&0x3)<<8) | ((rmx_no&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+                    if(write32bCPU(0,0,target) != -1) 
+                    {
+                        for (int iSection = 0; iSection < iBatsectionCount; ++iSection)
+                        {
+                            unsigned char * ucSectionPayload = usBatSections[iSection];
+                            unsigned short usFullSectionLength = pusBatLength[iSection];
+                            
+                            
+                            int k = 0;
+                            unsigned short usPointer=0;
+                            while(usFullSectionLength)
+                            {
+                                int size_of_payload = (usFullSectionLength>256)? 256 : usFullSectionLength;
+                                int bat_resp = c1.insertTable(ucSectionPayload+=k,size_of_payload,usPointer,iSection,TABLE_BAT,TABLE_WRITE);
+                                usPointer += size_of_payload;
+                                usFullSectionLength -= size_of_payload;
+                                // printf(")) --> %d\n",nit_resp);
+                                k =size_of_payload;
+                                if(bat_resp != 1)
+                                {
+                                    break;
+                                }else
+                                {
+                                    bat_insert_error = 0;
+                                }
+                            }
+                           // printf("%0x:",*(ucSectionPayload++));    
+                            // printf("\n");
+                        }
+                        if(bat_insert_error==0){
+                            json["size"] = iBatsectionCount;
+                            if(!bat_insert_error){
+                                int bat_sec_len_resp = c1.setTableSectionLen(usBatLength,iBatsectionCount,TABLE_BAT,TABLE_SET_LEN);
+                                if(bat_sec_len_resp == 1){
+                                    int bat_activation_resp = c1.activateTable(TABLE_BAT,TABLE_ACTIVATE);
+                                    if(bat_activation_resp != 1){
+                                        bat_insert_error = 1;
+                                    }
+                                }else{
+                                    bat_insert_error = 1;
+                                }
+                            }  
+                        }
+                        if(bat_insert_error==1)
+                        {
+                            json["error"]= false;
+                            json["message"]= "Bouquet inserted partially!";
+                        }else{
+                            json["error"]= false;
+                            json["message"]= "Bouquet inserted!";
+                        }
+                    }else{
+                        json["error"]= true;
+                        json["message"]= "Connection error!!";
+                    }
+                }
+            }else{
+                json["error"]= true;
+                json["message"]= "No Bouquets!";
+            }
+        }else{
+            unsigned short usBatLen[0];
+            for (int rmx_no = 0; rmx_no < RMX_COUNT ; ++rmx_no)
+            {
+                int target =((0&0x3)<<8) | ((rmx_no&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+                if(write32bCPU(0,0,target) != -1) {
+                    int bat_sec_len_resp = c1.setTableSectionLen(usBatLen,0,TABLE_BAT,TABLE_SET_LEN);
+                    if(bat_sec_len_resp == 1){
+                        int bat_activation_resp = c1.activateTable(TABLE_BAT,TABLE_ACTIVATE);
+                        if(bat_activation_resp != 1){
+                            bat_insert_error = true;
+                        }
+                    }else{
+                        bat_insert_error = true;
+                    }
+                }
+            }
+            if(bat_insert_error){
+                json["error"] = true;
+                json["message"] = "Error:Updating Bouquet!";
+            }else{
+                json["error"] = false;
+                json["message"] = "Bouquet updated successfully!";
+            }
+        }
+        return json; 
+    }
+
+    /*****************************************************************************/
+    /*  Command    function deleteBouquet                          */
+    /*****************************************************************************/
+    void deleteBouquet(const Rest::Request& request, Net::Http::ResponseWriter response){
+        std::string str_bouquet_id,bouquet_name,str_version;
+        int channel_id,stream_id,service_id;
+        Json::Value json,programNumbers,outputs,rmxs,inputs;
+        Json::FastWriter fastWriter;
+        Json::Reader reader;
+        std::string para[] = {"bouquet_id"};
+        int error[ sizeof(para) / sizeof(para[0])];
+        bool all_para_valid=true,nit_insert_error = true;
+        addToLog("insertBATable",request.body());
+        std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
+        if(res=="0"){
+            str_bouquet_id =getParameter(request.body(),"bouquet_id");
+            if(verifyInteger(str_bouquet_id) == 1){
+                if(db->deleteBouquet(str_bouquet_id) > 0){
+                    json = updateBATtable();    
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Bouquet cannot delete Or does not exist!"; 
+                }
+            }else{
+                json["error"]= true;
+                json["message"]= "Invalid Bouquet Id!"; 
+            }                        
+        }else{
+            json["error"]= true;
+            json["message"]= res;
+        }
+
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
+    }
+    int TS_GenBATSection(unsigned char ucBatSections[128][1200],unsigned short *usBatLen ,unsigned char ucVersion) {   // 30300
+       unsigned short *pucServiceId=NULL,*pucChannelNumber=NULL,*pucHdChannelNumber,*pucServiceType=NULL,*pucServiceLcnId=NULL;
+       unsigned char* pucBouquetName;
+       unsigned short usOriginalNetworkId,ucCurrentTsId;
+       unsigned int uiNbServices,uiSymbol_rate;
+       unsigned char *pucSectionLength,*usLastSection;       // 2 keep section length pointer
+       unsigned char *pucDescriptorLength;    // 2 keep descriptor length pointer
+       unsigned char *pucTSLength;
+       unsigned char pucDescriptor[256];       // descriptor data
+       unsigned short usFullDescriptorLength=0; // descriptor length
+       unsigned short usFullTSLength=0;
+       unsigned short usDescriptorLength;     // descriptor length
+       unsigned short usFullSectionLength;
+       unsigned long val_crc;
+       unsigned short BAT_TAG_SEC_LEN3 = 3,BAT_NID_VER_LASTSEC_DESC_LENB7 = 7,TS_SECTION_LENB2 = 2,CRC32B4=4;
+       int section_count=0;
+       // generate required sections according to descriptors.
+        
+        Json::Value json_batList =  db->getBATList();
+        if(json_batList["error"] == false)
+        {
+            unsigned int uiBatCount = json_batList["list"].size(); 
+            for (int i = 0; i < uiBatCount; ++i)
+            {
+                int iSection=0;
+                usLastSection = 0;
+                int ts_cout=0;
+                std::string nibble_level_1, nibble_level_2, user_nibble1, user_nibble2;
+                unsigned short usBouquetId = std::stoi(json_batList["list"][i]["bouquet_id"].asString());
+                std::string bouquet_name = json_batList["list"][i]["bouquet_name"].asString();
+                Json::Value json_batServiceList =  db->getBATServiceList(json_batList["list"][i]["bouquet_id"].asString());
+                nibble_level_1 = json_batList["list"][i]["nibble_level_1"].asString();
+                nibble_level_2 = json_batList["list"][i]["nibble_level_2"].asString();
+                user_nibble1 = json_batList["list"][i]["user_nibble1"].asString();
+                user_nibble2 = json_batList["list"][i]["user_nibble2"].asString();
+                Json::Value json_servicelist_on_output;
+                if(json_batServiceList["error"] == false)
+                {
+                    for (int j = 0; j < json_batServiceList["list"].size(); ++j)
+                    {
+                        json_servicelist_on_output[json_batServiceList["list"][j]["rmx_id"].asString()+'_'+json_batServiceList["list"][j]["output"].asString()].append(json_batServiceList["list"][j]); 
+                    }
+                }
+                while(1) {
+                    usFullSectionLength = 0;
+
+                    printf("\n----Fisrt Section TS Start------------>%d\n ",ts_cout);
+                    // point to the first byte of the allocated array
+                    unsigned char *pucData; 
+                    pucData = ucBatSections[section_count];
+                    // first byte of the section
+                    *(pucData++) = 0x4A;
+                    //skip section length and keep pointer to
+                    pucSectionLength = pucData;
+                    pucData+=2;
+                    // insert network id
+                    *(pucData++) =  (unsigned char)(usBouquetId>>8);
+                    *(pucData++) =  (unsigned char)(usBouquetId&0xFF);
+                    // insert version number
+                    *(pucData++) =  0xC1 | (ucVersion<<1);
+                    // Insert section number
+                    *(pucData++) = section_count;
+                    // Jump last section number (don't know yet)
+                    usLastSection = pucData;
+                    *(pucData++) = 0;
+                    // Save descriptor length pointer and jump it
+                    pucDescriptorLength = pucData;
+                    pucData += 2;
+
+                    pucBouquetName =(unsigned char*) bouquet_name.c_str();
+                   
+                    // Add Bouquet Name descriptor
+                    usDescriptorLength = setBouquetNameDescriptor(pucData, pucBouquetName);
+                    usFullDescriptorLength = usDescriptorLength;
+                    pucData += usDescriptorLength;
+
+                     //Add content descriptor here
+                    if(nibble_level_1 != "-1" && nibble_level_2 != "-1"){
+                        std::cout<<"INSEDE content descriptor! ----------------->> "<<nibble_level_1<<endl;
+                        usDescriptorLength = setContentDescriptor(pucData,nibble_level_1,nibble_level_2,user_nibble1,user_nibble2);
+                        usFullDescriptorLength += usDescriptorLength;
+                        pucData += usDescriptorLength;
+                    }
+                   
+                    *(pucDescriptorLength++) =  0xF0 | (usFullDescriptorLength>>8);
+                    *(pucDescriptorLength++) =  (usFullDescriptorLength&0xFF);
+
+                    //to chech the length of full section
+                    usFullSectionLength = usFullDescriptorLength + BAT_NID_VER_LASTSEC_DESC_LENB7;
+
+                    //TS steams loop start here
+                      
+                    pucTSLength = pucData;
+                    pucData += 2;
+                    usFullTSLength = 0;
+                   
+                    for( auto itr = json_servicelist_on_output.begin() ; itr != json_servicelist_on_output.end() ; itr++ ) {
+
+                        std::string rmx_out_key = (itr.key()).asString();
+                        // std::cout << rmx_out_key.substr(2) << " | "<<rmx_out_key.substr(0,1)<<"\n";
+                        std::string rmx_no = rmx_out_key.substr(0,1);
+                        std::string output = rmx_out_key.substr(2);
+                        Json::Value json_network = db->getNetworkId(rmx_no,output);
+                        if(json_network["error"] == false){
+                            
+                            ucCurrentTsId = (unsigned short) std::stoi(json_network["ts_id"].asString());
+                            usOriginalNetworkId = (unsigned short) std::stoi(json_network["original_netw_id"].asString());
+                            std::cout<<json_network["ts_id"].asString()<<endl;
+                        }else{
+                            ucCurrentTsId = 0;
+                            usOriginalNetworkId = 0;
+                        }
+                        //transport stream loop len
+                        *(pucData++) = (ucCurrentTsId>>8);
+                        *(pucData++) = (ucCurrentTsId&0xFF);
+                        *(pucData++) = (usOriginalNetworkId>>8);
+                        *(pucData++) = (usOriginalNetworkId&0xFF);
+
+                        usFullDescriptorLength = 0;
+                        pucDescriptorLength = pucData;
+                        pucData += 2;
+
+                        uiNbServices =(unsigned int) json_servicelist_on_output[rmx_out_key].size();
+                        int iServiceCount = 0;
+                        pucServiceId =(short unsigned int*) new short[uiNbServices];
+                        pucServiceType =(short unsigned int*) new short[uiNbServices];
+                        for (int iServiceCount = 0; iServiceCount < uiNbServices; ++iServiceCount)
+                        {  
+                            int service_id = std::stoi(json_servicelist_on_output[rmx_out_key][iServiceCount]["service_id"].asString());
+                            pucServiceId[iServiceCount] = (unsigned short) std::stoi(json_servicelist_on_output[rmx_out_key][iServiceCount]["service_id"].asString());
+                            pucServiceType[iServiceCount] = (unsigned short) std::stoi(json_servicelist_on_output[rmx_out_key][iServiceCount]["service_type"].asString());//Get the service type from getProg INFO
+                        }
+                        //Add Service List Descriptor
+                        usDescriptorLength = setServiceListDescriptor(pucData, uiNbServices, pucServiceId,pucServiceType);
+                        usFullDescriptorLength = usDescriptorLength;
+                        pucData += usDescriptorLength;
+                        
+                        //END OF Descriptors
+                        *(pucDescriptorLength++) =  0xF0 | (usFullDescriptorLength>>8);
+                        *(pucDescriptorLength++) =  (usFullDescriptorLength&0xFF);
+                  
+                        // printf("--------usFullDescriptorLength-------->%d\n", usFullDescriptorLength+6);
+
+                        usFullSectionLength += usFullDescriptorLength+6;
+                        if(usFullSectionLength>1000){
+                            // printf("%d---- SECTION Full------------>%d\n ", ts_cout,usFullSectionLength);
+                            pucData = pucData-(usFullDescriptorLength+6);
+                            usFullSectionLength = usFullSectionLength - (usFullDescriptorLength+6);
+                            ts_cout = ts_cout-1;
+                            printf("%d---- SECTION Full------------>%d\n ", ts_cout,usFullSectionLength);
+                            break;
+                        }
+                             //Full TS length
+                             usFullTSLength += usFullDescriptorLength+6;
+                             // printf("--------usFullDescriptorLength-------->%d\n", usFullDescriptorLength+6);
+                             ts_cout++;
+                    }
+                    *(pucTSLength++) =  0xF0 | (usFullTSLength>>8);
+                    *(pucTSLength++) =  (usFullTSLength&0xFF);
+
+                    //add section len size
+                    usFullSectionLength += TS_SECTION_LENB2;
+                    usFullSectionLength += CRC32B4;
+
+                    *(pucSectionLength++) =  0xF0 | ((usFullSectionLength)>>8);
+                    *(pucSectionLength++) =  ((usFullSectionLength)&0xFF);
+                    
+                    if(json_servicelist_on_output.size() != ts_cout)
+                        *(usLastSection) =  iSection+1;
+                    else
+                        *(usLastSection) =  iSection;
+                    //usFullSectionLength+= BAT_TAG_SEC_LEN3;
+                    int j = 0;
+                    val_crc = crc32 (pucData-(usFullSectionLength+BAT_TAG_SEC_LEN3-CRC32B4), usFullSectionLength-CRC32B4+BAT_TAG_SEC_LEN3);
+                    *(pucData++) = val_crc>>24;
+                    *(pucData++) = val_crc>>16;
+                    *(pucData++) = val_crc>>8;
+                    *(pucData) = val_crc;
+                    usFullSectionLength +=BAT_TAG_SEC_LEN3;
+                    printf("\n");
+                    printf("----FULL SECTION LEN------------>%d\n", usFullSectionLength);
+                    // for(j = 0;j<usFullSectionLength;j++){
+                    //     //printf(" %d --> %x \t\t",j,pucNewSection[j]);
+                    //     printf("%x:",ucBatSections[section_count][j]);
+                    // }
+                    usBatLen[section_count]=usFullSectionLength; 
+                    // int k = 0;
+                    // unsigned short usPointer=0;
+                    // while(usFullSectionLength)
+                    // {
+                    //     int size_of_payload = (usFullSectionLength>256)? 256 : usFullSectionLength;
+                    //     int bat_resp = c1.insertTable(ucSectionPayload+=k,size_of_payload,usPointer,section_no,TABLE_BAT,TABLE_WRITE);
+                    //     usPointer += size_of_payload;
+                    //     usFullSectionLength -= size_of_payload;
+                    //     // printf(")) --> %d\n",nit_resp);
+                    //     k =size_of_payload;
+                    //     if(bat_resp != 1)
+                    //     {
+                    //         nit_insert_error = 1;
+                    //         break;
+                    //     }
+                    // }
+                    section_count++;
+                    if(json_servicelist_on_output.size() == ts_cout){
+                        std::cout<<"\n----------- TS SIZE "<<json_servicelist_on_output.size()<<"\n----------- TS COUNT "<<ts_cout<<endl;
+                        break;   
+                    }
+                    else{
+                        iSection++;
+                    }                    
+                    
+                }
+            }
+        }
+        return section_count;
+    }
+    // int TS_GenBATSection(unsigned short usBouquetId,unsigned char ucVersion, std::string bouquet_name,Json::Value json_servicelist_on_output, unsigned short* totalTableLen,unsigned short section_no,std::string nibble_level_1,std::string nibble_level_2,std::string user_nibble1,std::string user_nibble2) {   // 30300
+    //    unsigned short *pucServiceId=NULL,*pucChannelNumber=NULL,*pucHdChannelNumber,*pucServiceType=NULL,*pucServiceLcnId=NULL;
+    //    unsigned char* pucBouquetName;
+    //    unsigned short usOriginalNetworkId,ucCurrentTsId;
+    //    unsigned int uiNbServices,uiSymbol_rate;
+    //    unsigned char pucNewSection[1024];     // 1 section allocated array
+    //    unsigned char *pucData;                // byte pointer for NIT section composing
+    //    unsigned char *pucSectionLength;       // 2 keep section length pointer
+    //    unsigned char *pucDescriptorLength;    // 2 keep descriptor length pointer
+    //    unsigned char *pucTSLength;
+    //    unsigned char i = 0;                   // Current section increment
+    //    unsigned char pucDescriptor[256];       // descriptor data
+    //    unsigned short usFullDescriptorLength=0; // descriptor length
+    //    unsigned short usFullTSLength=0;
+    //    unsigned short usDescriptorLength;     // descriptor length
+    //    unsigned short usFullSectionLength;
+    //    unsigned long val_crc;
+    //    unsigned short sec_len, sec_len_desc, list_desc_len;
+    //    unsigned short BAT_TAG_SEC_LEN3 = 3,BAT_NID_VER_LASTSEC_DESC_LENB7 = 7,TS_SECTION_LENB2 = 2,CRC32B4=4;
+    //    unsigned int ts_size=0,uiFrequency;
+    //    unsigned char ucFec_Inner = 0,ucFec_Outer = 0,ucModulation;
+    //    int nit_insert_error = 0;
+    //    // generate required sections according to descriptors.
+    //     int ts_cout=0;
+    //     int section_count=0;
+    //     //     while(1) {
+    //             printf("\n----Fisrt Section TS Start------------>%d\n ",ts_cout);
+    //             pucNewSection[1024] = {0};
+    //             // point to the first byte of the allocated array
+    //             pucData = pucNewSection;
+    //             // first byte of the section
+    //             *(pucData++) = 0x4A;
+    //             //skip section length and keep pointer to
+    //             pucSectionLength = pucData;
+    //             pucData+=2;
+    //             // insert network id
+    //             *(pucData++) =  (unsigned char)(usBouquetId>>8);
+    //             *(pucData++) =  (unsigned char)(usBouquetId&0xFF);
+    //             // insert version number
+    //             *(pucData++) =  0xC1 | (ucVersion<<1);
+    //             // Insert section number
+    //             *(pucData++) = section_no;
+    //             // Jump last section number (don't know yet)
+    //             *(pucData++) = 0;
+    //             // Save descriptor length pointer and jump it
+    //             pucDescriptorLength = pucData;
+    //             pucData += 2;
+
+    //             pucBouquetName =(unsigned char*) bouquet_name.c_str();
+               
+    //             // Add Bouquet Name descriptor
+    //             usDescriptorLength = setBouquetNameDescriptor(pucData, pucBouquetName);
+    //             usFullDescriptorLength = usDescriptorLength;
+    //             pucData += usDescriptorLength;
+
+    //              //Add content descriptor here
+    //             if(nibble_level_1 != "-1" && nibble_level_2 != "-1"){
+    //                 std::cout<<"INSEDE content descriptor! ----------------->> "<<nibble_level_1<<endl;
+    //                 usDescriptorLength = setContentDescriptor(pucData,nibble_level_1,nibble_level_2,user_nibble1,user_nibble2);
+    //                 usFullDescriptorLength += usDescriptorLength;
+    //                 pucData += usDescriptorLength;
+    //             }
+               
+    //             *(pucDescriptorLength++) =  0xF0 | (usFullDescriptorLength>>8);
+    //             *(pucDescriptorLength++) =  (usFullDescriptorLength&0xFF);
+
+    //             //to chech the length of full section
+    //             usFullSectionLength = usFullDescriptorLength + BAT_NID_VER_LASTSEC_DESC_LENB7;
+
+    //             //TS steams loop start here
+                  
+    //             pucTSLength = pucData;
+    //             pucData += 2;
+    //             usFullTSLength = 0;
+               
+    //             for( auto itr = json_servicelist_on_output.begin() ; itr != json_servicelist_on_output.end() ; itr++ ) {
+
+    //                 std::string rmx_out_key = (itr.key()).asString();
+    //                 // std::cout << rmx_out_key.substr(2) << " | "<<rmx_out_key.substr(0,1)<<"\n";
+    //                 std::string rmx_no = rmx_out_key.substr(0,1);
+    //                 std::string output = rmx_out_key.substr(2);
+    //                 Json::Value json_network = db->getNetworkId(rmx_no,output);
+    //                 if(json_network["error"] == false){
+                        
+    //                     ucCurrentTsId = (unsigned short) std::stoi(json_network["ts_id"].asString());
+    //                     usOriginalNetworkId = (unsigned short) std::stoi(json_network["original_netw_id"].asString());
+    //                     std::cout<<json_network["ts_id"].asString()<<endl;
+    //                 }else{
+    //                     ucCurrentTsId = 0;
+    //                     usOriginalNetworkId = 0;
+    //                 }
+    //                 //transport stream loop len
+    //                 *(pucData++) = (ucCurrentTsId>>8);
+    //                 *(pucData++) = (ucCurrentTsId&0xFF);
+    //                 *(pucData++) = (usOriginalNetworkId>>8);
+    //                 *(pucData++) = (usOriginalNetworkId&0xFF);
+
+    //                 usFullDescriptorLength = 0;
+    //                 pucDescriptorLength = pucData;
+    //                 pucData += 2;
+
+    //                 uiNbServices =(unsigned int) json_servicelist_on_output[rmx_out_key].size();
+    //                 int iServiceCount = 0;
+    //                 pucServiceId =(short unsigned int*) new short[uiNbServices];
+    //                 pucServiceType =(short unsigned int*) new short[uiNbServices];
+    //                 for (int iServiceCount = 0; iServiceCount < uiNbServices; ++iServiceCount)
+    //                 {  
+    //                     int service_id = std::stoi(json_servicelist_on_output[rmx_out_key][iServiceCount]["service_id"].asString());
+    //                     pucServiceId[iServiceCount] = (unsigned short) std::stoi(json_servicelist_on_output[rmx_out_key][iServiceCount]["service_id"].asString());
+    //                     pucServiceType[iServiceCount] = (unsigned short) std::stoi(json_servicelist_on_output[rmx_out_key][iServiceCount]["service_type"].asString());//Get the service type from getProg INFO
+    //                 }
+    //                 //Add Service List Descriptor
+    //                 usDescriptorLength = setServiceListDescriptor(pucData, uiNbServices, pucServiceId,pucServiceType);
+    //                 usFullDescriptorLength += usDescriptorLength;
+    //                 pucData += usDescriptorLength;
+                    
+
+    //                 //END OF Descriptors
+    //                 *(pucDescriptorLength++) =  0xF0 | (usFullDescriptorLength>>8);
+    //                 *(pucDescriptorLength++) =  (usFullDescriptorLength&0xFF);
+              
+    //                 // printf("--------usFullDescriptorLength-------->%d\n", usFullDescriptorLength+6);
+
+    //                 usFullSectionLength += usFullDescriptorLength+6;
+    //                 if(usFullSectionLength>1000){
+    //                     // printf("%d---- SECTION Full------------>%d\n ", ts_cout,usFullSectionLength);
+    //                     pucData = pucData-(usFullDescriptorLength+6);
+    //                     usFullSectionLength = usFullSectionLength - (usFullDescriptorLength+6);
+    //                     // ts_cout = ts_cout-1;
+    //                     printf("%d---- SECTION Full------------>%d\n ", ts_cout,usFullSectionLength);
+    //                     return -1;
+    //                 }
+    //                      //Full TS length
+    //                      usFullTSLength += usFullDescriptorLength+6;
+    //                      // printf("--------usFullDescriptorLength-------->%d\n", usFullDescriptorLength+6);
+    //                      ts_cout++;
+    //             }
+    //             *(pucTSLength++) =  0xF0 | (usFullTSLength>>8);
+    //             *(pucTSLength++) =  (usFullTSLength&0xFF);
+
+    //             //add section len size
+    //             usFullSectionLength += TS_SECTION_LENB2;
+    //             usFullSectionLength += CRC32B4;
+
+    //             *(pucSectionLength++) =  0xF0 | ((usFullSectionLength)>>8);
+    //             *(pucSectionLength++) =  ((usFullSectionLength)&0xFF);
+                
+
+    //             //usFullSectionLength+= BAT_TAG_SEC_LEN3;
+    //             int j = 0;
+    //             val_crc = crc32 (pucData-(usFullSectionLength+BAT_TAG_SEC_LEN3-CRC32B4), usFullSectionLength-CRC32B4+BAT_TAG_SEC_LEN3);
+    //             *(pucData++) = val_crc>>24;
+    //             *(pucData++) = val_crc>>16;
+    //             *(pucData++) = val_crc>>8;
+    //             *(pucData) = val_crc;
+    //             usFullSectionLength +=BAT_TAG_SEC_LEN3;
+    //             printf("\n");
+    //             printf("----FULL SECTION LEN------------>%d\n", usFullSectionLength);
+    //             unsigned char * ucSectionPayload = pucNewSection;
+    //             for(j = 0;j<usFullSectionLength;j++){
+    //                 //printf(" %d --> %x \t\t",j,pucNewSection[j]);
+    //                 printf("%x:",pucNewSection[j]);
+    //             }
+    //             *(totalTableLen)=usFullSectionLength; 
+    //             int k = 0;
+    //             unsigned short usPointer=0;
+    //             while(usFullSectionLength)
+    //             {
+    //                 int size_of_payload = (usFullSectionLength>256)? 256 : usFullSectionLength;
+    //                 int bat_resp = c1.insertTable(ucSectionPayload+=k,size_of_payload,usPointer,section_no,TABLE_BAT,TABLE_WRITE);
+    //                 usPointer += size_of_payload;
+    //                 usFullSectionLength -= size_of_payload;
+    //                 // printf(")) --> %d\n",nit_resp);
+    //                 k =size_of_payload;
+    //                 if(bat_resp != 1)
+    //                 {
+    //                     nit_insert_error = 1;
+    //                     break;
+    //                 }
+    //             }
+                
+    //             if(nit_insert_error == 1)
+    //                 return -1;
+    //             section_count++;
+    //     // }
+    //     if(nit_insert_error == 0)
+    //         return 1;
+    //     else
+    //         return -1;
+    // }
+
     unsigned long crc_table[256] = {
   	0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9, 0x130476dc, 0x17c56b6b,
   	0x1a864db2, 0x1e475005, 0x2608edb8, 0x22c9f00f, 0x2f8ad6d6, 0x2b4bcb61,
@@ -14237,7 +15199,7 @@ private:
        unsigned char *pucPrivateData;
        unsigned short usDataSize;
        Json::Value json_private_data = db->getPrivateData();
-       std::cout<<json_private_data<<endl;
+       // std::cout<<json_private_data<<endl;
        unsigned short usPDataLength=0;
        std::string sPrivateData;
        if(json_private_data["error"] == false){
@@ -14336,13 +15298,223 @@ private:
 	    return list_desc_len;
 	}
 
-	// TS_GenNITSection section
+    unsigned short setBouquetNameDescriptor(unsigned char *pucDescriptor, unsigned char *pucName) {
+       unsigned char *pucData = pucDescriptor;
+       unsigned char length = strlen((char*)pucName);
 
-int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigned char *pucNetworkName,int iSectionCount) {	// 30300
+       *(pucData++) = 0x47; // Descriptor tag
+       *(pucData++) = length; // Descriptor tag
+       while(*pucName) {
+          *(pucData++) = *(pucName++); // Descriptor tag
+       }
+       return (unsigned short)length+2;
+    }
+
+    unsigned short setContentDescriptor(unsigned char *pucDescriptor, std::string nibble_level_1,std::string nibble_level_2,std::string user_nibble1,std::string user_nibble2) {
+       unsigned char *pucData = pucDescriptor;
+
+       *(pucData++) = 0x54; // Descriptor tag
+       *(pucData++) = 0x02; // Descriptor tag
+       *(pucData++) = (unsigned char)(getHexToLongDec(nibble_level_1) & 0x0F)<<4 | (getHexToLongDec(nibble_level_2) & 0x0F);
+       *(pucData++) = (unsigned char)(getHexToLongDec(user_nibble1) & 0x0F)<<4 | (getHexToLongDec(user_nibble2) & 0x0F);
+       return 4;
+    }
+
+	// TS_GenNITSection section
+int TS_GenNITSections(unsigned char usNitSections[16][1200],unsigned short *pusNitLength ,unsigned char ucVersion,unsigned short usNetworkId,unsigned char *pucNetworkName) {   // 30300
+       unsigned short *pucServiceId=NULL,*pucChannelNumber=NULL,*pucHdChannelNumber,*pucServiceType=NULL,*pucServiceLcnId=NULL;
+       unsigned short usOriginalNetworkId,ucCurrentTsId;
+       unsigned int uiNbServices,uiSymbol_rate;
+       unsigned char *pucSectionLength;       // 2 keep section length pointer
+       unsigned char *pucDescriptorLength;    // 2 keep descriptor length pointer
+       unsigned char *pucTSLength;
+       unsigned char pucDescriptor[256];       // descriptor data
+       unsigned short usFullDescriptorLength=0; // descriptor length
+       unsigned short usFullTSLength=0;
+       unsigned short usDescriptorLength;     // descriptor length
+       unsigned short usFullSectionLength;
+       unsigned long val_crc;
+       unsigned short NIT_TAG_SEC_LEN3 = 3,NIT_NID_VER_LASTSEC_DESC_LENB7 = 7,TS_SECTION_LENB2 = 2,CRC32B4=4;
+       unsigned int ts_size=0,uiFrequency;
+       unsigned char ucFec_Inner = 0,ucFec_Outer = 0,ucModulation;
+       // generate required sections according to descriptors.
+        int ts_cout=0;
+        int section_count=0;
+        Json::Value json_network_details = db->getNetworkDetailsForNIT(); 
+        ts_size = json_network_details["list"].size();
+          // std::cout<<json_network_details<<endl;
+        if(json_network_details["error"]==false){
+            while(1) {
+                printf("\n----Fisrt Section TS Start------------>%d\n ",section_count);
+                usFullSectionLength = 0;
+                // point to the first byte of the allocated array
+                unsigned char *pucData; 
+                pucData = usNitSections[section_count];
+                // first byte of the section
+                *(pucData++) = 0x40;
+                //skip section length and keep pointer to
+                pucSectionLength = pucData;
+                pucData+=2;
+                // insert network id
+                *(pucData++) =  (unsigned char)(usNetworkId>>8);
+                *(pucData++) =  (unsigned char)(usNetworkId&0xFF);
+                // insert version number
+                *(pucData++) =  0xC1 | (ucVersion<<1);
+                // Insert section number
+                *(pucData++) = section_count;
+                // Jump last section number (don't know yet)
+                *(pucData++) = 0x00;
+                // Save descriptor length pointer and jump it
+                pucDescriptorLength = pucData;
+                pucData += 2;
+                // Add Network Name descriptor
+                usDescriptorLength = setNetworkNameDescriptor(pucData, pucNetworkName);
+                usFullDescriptorLength = usDescriptorLength;
+                pucData += usDescriptorLength;
+
+                //Add linkage descriptor here
+                usDescriptorLength = setPrivateDataDescriptor(pucData);
+                usFullDescriptorLength += usDescriptorLength;
+                pucData += usDescriptorLength;
+                // printf("\n----      setPrivateDataDescriptor   ------------>%d\n ",usDescriptorLength);
+                
+                *(pucDescriptorLength++) =  0xF0 | (usFullDescriptorLength>>8);
+                *(pucDescriptorLength++) =  (usFullDescriptorLength&0xFF);
+
+                //to chech the length of full section
+                usFullSectionLength = usFullDescriptorLength + NIT_NID_VER_LASTSEC_DESC_LENB7;
+
+                //TS steams loop start here
+                pucTSLength = pucData;
+                pucData += 2;
+                usFullTSLength = 0;
+               
+                for (; ts_cout < json_network_details["list"].size(); ++ts_cout)
+                {
+                    // std::cout<<"---------------------------TS_COUNT ---------------"<<json_network_details["list"][ts_cout]["ts_id"]<<endl;
+                    std::string rmx_no = json_network_details["list"][ts_cout]["rmx_no"].asString();
+                    std::string output = json_network_details["list"][ts_cout]["output"].asString();
+
+                    ucCurrentTsId = (unsigned short) std::stoi(json_network_details["list"][ts_cout]["ts_id"].asString());
+                    usOriginalNetworkId = (unsigned short) std::stoi(json_network_details["list"][ts_cout]["original_netw_id"].asString());
+                    //transport stream loop len
+                    *(pucData++) = (ucCurrentTsId>>8);
+                    *(pucData++) = (ucCurrentTsId&0xFF);
+                    *(pucData++) = (usOriginalNetworkId>>8);
+                    *(pucData++) = (usOriginalNetworkId&0xFF);
+
+                    usFullDescriptorLength = 0;
+                    pucDescriptorLength = pucData;
+                    pucData += 2;
+
+                    ucModulation = (unsigned char) std::stoi(json_network_details["list"][ts_cout]["modulation"].asString());
+                    ucModulation+=1;
+                    uiFrequency = (unsigned int) std::stoi(json_network_details["list"][ts_cout]["frequency"].asString());
+                    uiSymbol_rate = ((unsigned int) std::stoi(json_network_details["list"][ts_cout]["symbol_rate"].asString()) / 1000);
+                    uiSymbol_rate = uiSymbol_rate*100;
+                    // printf("--------TS Start HERE--------> %d ----->> %d ----------------- >> %d \n", ts_cout,ucCurrentTsId,uiFrequency);
+                    //Add cable_delivery descriptor
+                    usDescriptorLength = setCableDeliverySystemDescriptor(pucData,uiFrequency,ucFec_Outer,ucModulation,uiSymbol_rate,ucFec_Inner);
+                    usFullDescriptorLength += usDescriptorLength;
+                    pucData += usDescriptorLength;
+                        //printf("-------CABLE DELE DESC LEN--------->%d\n", usDescriptorLength);
+
+                        Json::Value json_active_progs = db->getActivePrograms(output,rmx_no);
+                        // std::cout<<json_active_progs<<endl;
+                        if(json_active_progs["error"]==false){
+                            uiNbServices =(unsigned int) json_active_progs["list"].size();
+                            int iServiceCount = 0;
+                            pucServiceId =(short unsigned int*) new short[uiNbServices];
+                            pucServiceType =(short unsigned int*) new short[uiNbServices];
+                            for (int iServiceCount = 0; iServiceCount < uiNbServices; ++iServiceCount)
+                            {  
+                                int service_id = std::stoi(json_active_progs["list"][iServiceCount]["service_id"].asString());
+                                int orig_service_id =std::stoi(json_active_progs["list"][iServiceCount]["orig_service_id"].asString());
+                                pucServiceId[iServiceCount] = (unsigned short) (service_id != -1)? service_id : orig_service_id;    
+                                pucServiceType[iServiceCount] = std::stoi(json_active_progs["list"][iServiceCount]["service_type"].asString());;//Get the service type from getProg INFO
+                            }
+                            //Add Service List Descriptor
+                            usDescriptorLength = setServiceListDescriptor(pucData, uiNbServices, pucServiceId,pucServiceType);
+                            usFullDescriptorLength += usDescriptorLength;
+                            pucData += usDescriptorLength;
+                        }
+
+                        // // Add LCN Descriptor
+                        Json::Value json_prog_lcn_ids = db->getLcnIds(output,rmx_no);
+                        // std::cout<<json_prog_lcn_ids<<endl;
+                        if(json_prog_lcn_ids["error"]==false){
+                            uiNbServices =(unsigned int) json_prog_lcn_ids["list"].size();
+                            int iLcnCount = 0;
+                            pucServiceLcnId =(short unsigned int*) new short[uiNbServices];
+                            pucChannelNumber =(short unsigned int*) new short[uiNbServices];
+                            for (int iLcnCount = 0; iLcnCount < uiNbServices; ++iLcnCount)
+                            {
+                                pucServiceLcnId[iLcnCount] = (unsigned short)std::stoi(json_prog_lcn_ids["list"][iLcnCount]["service_id"].asString());  
+                                pucChannelNumber[iLcnCount] = (unsigned short)std::stoi(json_prog_lcn_ids["list"][iLcnCount]["lcn_id"].asString());
+                            }
+                            usDescriptorLength = setLcnDescriptor(pucData, uiNbServices, pucServiceId, pucChannelNumber, pucHdChannelNumber);
+                            usFullDescriptorLength += usDescriptorLength;
+                            pucData += usDescriptorLength;
+                        }
+
+                        //END OF Descriptors
+                        *(pucDescriptorLength++) =  0xF0 | (usFullDescriptorLength>>8);
+                        *(pucDescriptorLength++) =  (usFullDescriptorLength&0xFF);
+                  
+                    // printf("--------usFullDescriptorLength-------->%d\n", usFullDescriptorLength+6);
+                    usFullSectionLength += usFullDescriptorLength+6;
+                    if(usFullSectionLength>1000){
+                        // printf("%d---- SECTION Full------------>%d\n ", ts_cout,usFullSectionLength);
+                        pucData = pucData-(usFullDescriptorLength+6);
+                        usFullSectionLength = usFullSectionLength - (usFullDescriptorLength+6);
+                        // ts_cout = ts_cout-1;
+                        // printf("%d---- SECTION Full------------>%d\n ", ts_cout,usFullSectionLength);
+                        break;
+                    }
+                         //Full TS length
+                         usFullTSLength += usFullDescriptorLength+6;
+                         // printf("--------usFullDescriptorLength-------->%d\n", usFullDescriptorLength+6);
+                }
+                *(pucTSLength++) =  0xF0 | (usFullTSLength>>8);
+                *(pucTSLength++) =  (usFullTSLength&0xFF);
+
+                //add section len size
+                usFullSectionLength += TS_SECTION_LENB2;
+                usFullSectionLength += CRC32B4;
+
+                *(pucSectionLength++) =  0xF0 | ((usFullSectionLength)>>8);
+                *(pucSectionLength++) =  ((usFullSectionLength)&0xFF);
+                
+                //usFullSectionLength+= NIT_TAG_SEC_LEN3;
+                int j = 0;
+                val_crc = crc32 (pucData-(usFullSectionLength+NIT_TAG_SEC_LEN3-CRC32B4), usFullSectionLength-CRC32B4+NIT_TAG_SEC_LEN3);
+                *(pucData++) = val_crc>>24;
+                *(pucData++) = val_crc>>16;
+                *(pucData++) = val_crc>>8;
+                *(pucData) = val_crc;
+                usFullSectionLength +=NIT_TAG_SEC_LEN3;
+                printf("\n----FULL SECTION LEN------------>%d\n", usFullSectionLength);
+                for(j = 0;j<usFullSectionLength;j++){
+                    printf("%x:",usNitSections[section_count][j]);
+                }
+                pusNitLength[section_count] = usFullSectionLength;
+                section_count++;
+                std::cout<<ts_cout<<"------NIT ------>>"<<ts_size<<endl;
+                if(ts_cout==ts_size)
+                    break;
+            }
+            std::cout<<"------Section Count ------>>"<<section_count<<endl;  
+
+            return section_count;            
+        }else{
+            return -1;
+        }
+    }
+int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigned char *pucNetworkName,int iSectionCount,unsigned short* totalTableLen) {	// 30300
 	   unsigned short *pucServiceId=NULL,*pucChannelNumber=NULL,*pucHdChannelNumber,*pucServiceType=NULL,*pucServiceLcnId=NULL;
 	   unsigned short usOriginalNetworkId,ucCurrentTsId;
 	   unsigned int uiNbServices,uiSymbol_rate;
-	   unsigned char pucNewSection[1024];     // 1 section allocated array
+	   unsigned char pucNewSection[1500];     // 1 section allocated array
 	   unsigned char *pucData;                // byte pointer for NIT section composing
 	   unsigned char *pucSectionLength;       // 2 keep section length pointer
 	   unsigned char *pucDescriptorLength;    // 2 keep descriptor length pointer
@@ -14358,16 +15530,17 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
 	   unsigned short NIT_TAG_SEC_LEN3 = 3,NIT_NID_VER_LASTSEC_DESC_LENB7 = 7,TS_SECTION_LENB2 = 2,CRC32B4=4;
 	   unsigned int ts_size=0,uiFrequency;
 	   unsigned char ucFec_Inner = 0,ucFec_Outer = 0,ucModulation;
+       int nit_insert_error = 0;
 	   // generate required sections according to descriptors.
 	   	int ts_cout=0;
 	   	int section_count=0;
 	   	Json::Value json_network_details = db->getNetworkDetailsForNIT(); 
 	   	ts_size = json_network_details["list"].size();
-	      std::cout<<json_network_details<<endl;
+	      // std::cout<<json_network_details<<endl;
 	    if(json_network_details["error"]==false){
 	      	while(1) {
-	      		printf("\n----Fisrt Section TS Start------------>%d\n ",ts_cout);
-	      		pucNewSection[1024] = {0};
+	      		// printf("\n----Fisrt Section TS Start------------>%d\n ",ts_cout);
+	      		pucNewSection[1500] = {0};
 			    // point to the first byte of the allocated array
 			    pucData = pucNewSection;
 			    // first byte of the section
@@ -14491,7 +15664,7 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
 			            pucData = pucData-(usFullDescriptorLength+6);
 			            usFullSectionLength = usFullSectionLength - (usFullDescriptorLength+6);
 			            // ts_cout = ts_cout-1;
-			            printf("%d---- SECTION Full------------>%d\n ", ts_cout,usFullSectionLength);
+			            // printf("%d---- SECTION Full------------>%d\n ", ts_cout,usFullSectionLength);
 			            break;
 			        }
 			             //Full TS length
@@ -14507,7 +15680,7 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
 
 		        *(pucSectionLength++) =  0xF0 | ((usFullSectionLength)>>8);
 		        *(pucSectionLength++) =  ((usFullSectionLength)&0xFF);
-		        printf("----FULL SECTION LEN------------>%d\n", usFullSectionLength);
+		        
 
 			    //usFullSectionLength+= NIT_TAG_SEC_LEN3;
 			    int j = 0;
@@ -14518,41 +15691,52 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
 				*(pucData) = val_crc;
 				usFullSectionLength +=NIT_TAG_SEC_LEN3;
 				printf("\n");
+                printf("----FULL SECTION LEN------------>%d\n", usFullSectionLength);
 			    unsigned char * ucSectionPayload = pucNewSection;
-			    for(j = 0;j<usFullSectionLength;j++){
-			        // printf(" %d --> %x \t\t",j,pucNewSection[j]);
-			        printf("%x:",pucNewSection[j]);
-			    }
+			    // for(j = 0;j<usFullSectionLength;j++){
+			    //     // printf(" %d --> %x \t\t",j,pucNewSection[j]);
+			    //     printf("%x:",pucNewSection[j]);
+			    // }
+                *(totalTableLen++)=usFullSectionLength; 
 			    int k = 0;
 			    unsigned short usPointer=0;
 			    while(usFullSectionLength)
 			    {
 		        	int size_of_payload = (usFullSectionLength>256)? 256 : usFullSectionLength;
-		            c1.updateNITTable(ucSectionPayload+=k,size_of_payload,usPointer,section_count);
+		            int nit_resp = c1.insertTable(ucSectionPayload+=k,size_of_payload,usPointer,section_count,TABLE_NIT,TABLE_WRITE);
 		            usPointer += size_of_payload;
 		            usFullSectionLength -= size_of_payload;
-		            // printf(")) %d --> %d\n",k,size_of_payload);
+		            // printf(")) --> %d\n",nit_resp);
 		            k =size_of_payload;
+                    if(nit_resp != 1)
+                    {
+                        nit_insert_error = 1;
+                        break;
+                    }
+                    usleep(1000);
 		        }
-		        std::cout<<ts_cout<<"------NIT ------>>"<<ts_size;
+		        std::cout<<ts_cout<<"------NIT ------>>"<<ts_size<<endl;
 		        if(ts_cout==ts_size)
 					break;
-
+                if(nit_insert_error == 1)
+                    break;
 			    section_count++;
 		    }
 				
 		}
-	    return 1;
+        if(nit_insert_error == 0)
+	       return 1;
+        else
+            return -1;
 	}
 
-    int getCountSections() {   // 30300
-        unsigned short usNetworkId = 1;
-        unsigned char ucVersion = 1; 
-        unsigned char *pucNetworkName =(unsigned char *) "test";
-        unsigned short *pucServiceId=NULL,*pucChannelNumber=NULL,*pucHdChannelNumber,*pucServiceType=NULL,*pucServiceLcnId=NULL;
-        unsigned short usOriginalNetworkId,ucCurrentTsId;
-        unsigned int uiNbServices,uiSymbol_rate;
-        unsigned char pucNewSection[1024];     // 1 section allocated array
+    // TS_GenNITSection14_247 for firmware version 14.247 build
+
+int TS_GenNITSection14_247(unsigned short usNetworkId,unsigned char ucVersion, unsigned char *pucNetworkName,int iSectionCount) { // 30300
+       unsigned short *pucServiceId=NULL,*pucChannelNumber=NULL,*pucHdChannelNumber,*pucServiceType=NULL,*pucServiceLcnId=NULL;
+       unsigned short usOriginalNetworkId,ucCurrentTsId;
+       unsigned int uiNbServices,uiSymbol_rate;
+       unsigned char pucNewSection[1024];     // 1 section allocated array
        unsigned char *pucData;                // byte pointer for NIT section composing
        unsigned char *pucSectionLength;       // 2 keep section length pointer
        unsigned char *pucDescriptorLength;    // 2 keep descriptor length pointer
@@ -14576,8 +15760,218 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
           std::cout<<json_network_details<<endl;
         if(json_network_details["error"]==false){
             while(1) {
-                // printf("\n----Fisrt Section TS Start------------>%d\n ",ts_cout);
+                printf("\n----Fisrt Section TS Start------------>%d\n ",ts_cout);
                 pucNewSection[1024] = {0};
+                // point to the first byte of the allocated array
+                pucData = pucNewSection;
+                // first byte of the section
+                *(pucData++) = 0x40;
+                //skip section length and keep pointer to
+                pucSectionLength = pucData;
+                pucData+=2;
+                // insert network id
+                *(pucData++) =  (unsigned char)(usNetworkId>>8);
+                *(pucData++) =  (unsigned char)(usNetworkId&0xFF);
+                // insert version number
+                *(pucData++) =  0xC1 | (ucVersion<<1);
+                // Insert section number
+                *(pucData++) = section_count;
+                // Jump last section number (don't know yet)
+                *(pucData++) = iSectionCount;
+                // Save descriptor length pointer and jump it
+                pucDescriptorLength = pucData;
+                pucData += 2;
+                // Add Network Name descriptor
+                usDescriptorLength = setNetworkNameDescriptor(pucData, pucNetworkName);
+                usFullDescriptorLength = usDescriptorLength;
+                pucData += usDescriptorLength;
+
+                //Add linkage descriptor here
+                usDescriptorLength = setPrivateDataDescriptor(pucData);
+                usFullDescriptorLength += usDescriptorLength;
+                pucData += usDescriptorLength;
+                // printf("\n----      setPrivateDataDescriptor   ------------>%d\n ",usDescriptorLength);
+                
+                *(pucDescriptorLength++) =  0xF0 | (usFullDescriptorLength>>8);
+                *(pucDescriptorLength++) =  (usFullDescriptorLength&0xFF);
+
+                //to chech the length of full section
+                usFullSectionLength = usFullDescriptorLength + NIT_NID_VER_LASTSEC_DESC_LENB7;
+
+                //TS steams loop start here
+                  
+                pucTSLength = pucData;
+                pucData += 2;
+                usFullTSLength = 0;
+               
+                for (; ts_cout < json_network_details["list"].size(); ++ts_cout)
+                {
+                    
+                    // std::cout<<"---------------------------TS_COUNT ---------------"<<json_network_details["list"][ts_cout]["ts_id"]<<endl;
+                    std::string rmx_no = json_network_details["list"][ts_cout]["rmx_no"].asString();
+                    std::string output = json_network_details["list"][ts_cout]["output"].asString();
+
+                    ucCurrentTsId = (unsigned short) std::stoi(json_network_details["list"][ts_cout]["ts_id"].asString());
+                    usOriginalNetworkId = (unsigned short) std::stoi(json_network_details["list"][ts_cout]["original_netw_id"].asString());
+                    //transport stream loop len
+                    *(pucData++) = (ucCurrentTsId>>8);
+                    *(pucData++) = (ucCurrentTsId&0xFF);
+                    *(pucData++) = (usOriginalNetworkId>>8);
+                    *(pucData++) = (usOriginalNetworkId&0xFF);
+
+                    usFullDescriptorLength = 0;
+                    pucDescriptorLength = pucData;
+                    pucData += 2;
+
+                    ucModulation = (unsigned char) std::stoi(json_network_details["list"][ts_cout]["modulation"].asString());
+                    ucModulation+=1;
+                    uiFrequency = (unsigned int) std::stoi(json_network_details["list"][ts_cout]["frequency"].asString());
+                    uiSymbol_rate = ((unsigned int) std::stoi(json_network_details["list"][ts_cout]["symbol_rate"].asString()) / 1000);
+                    uiSymbol_rate = uiSymbol_rate*100;
+                    // printf("--------TS Start HERE--------> %d ----->> %d ----------------- >> %d \n", ts_cout,ucCurrentTsId,uiFrequency);
+                    //Add cable_delivery descriptor
+                    usDescriptorLength = setCableDeliverySystemDescriptor(pucData,uiFrequency,ucFec_Outer,ucModulation,uiSymbol_rate,ucFec_Inner);
+                    usFullDescriptorLength += usDescriptorLength;
+                    pucData += usDescriptorLength;
+                        //printf("-------CABLE DELE DESC LEN--------->%d\n", usDescriptorLength);
+
+                        Json::Value json_active_progs = db->getActivePrograms(output,rmx_no);
+                        // std::cout<<json_active_progs<<endl;
+                        if(json_active_progs["error"]==false){
+                            uiNbServices =(unsigned int) json_active_progs["list"].size();
+                            int iServiceCount = 0;
+                            pucServiceId =(short unsigned int*) new short[uiNbServices];
+                            pucServiceType =(short unsigned int*) new short[uiNbServices];
+                            for (int iServiceCount = 0; iServiceCount < uiNbServices; ++iServiceCount)
+                            {  
+                                int service_id = std::stoi(json_active_progs["list"][iServiceCount]["service_id"].asString());
+                                int orig_service_id =std::stoi(json_active_progs["list"][iServiceCount]["orig_service_id"].asString());
+                                pucServiceId[iServiceCount] = (unsigned short) (service_id != -1)? service_id : orig_service_id;    
+                                pucServiceType[iServiceCount] = std::stoi(json_active_progs["list"][iServiceCount]["service_type"].asString());;//Get the service type from getProg INFO
+                            }
+                            //Add Service List Descriptor
+                            usDescriptorLength = setServiceListDescriptor(pucData, uiNbServices, pucServiceId,pucServiceType);
+                            usFullDescriptorLength += usDescriptorLength;
+                            pucData += usDescriptorLength;
+                        }
+
+                        // // Add LCN Descriptor
+                        Json::Value json_prog_lcn_ids = db->getLcnIds(output,rmx_no);
+                        // std::cout<<json_prog_lcn_ids<<endl;
+                        if(json_prog_lcn_ids["error"]==false){
+                            uiNbServices =(unsigned int) json_prog_lcn_ids["list"].size();
+                            int iLcnCount = 0;
+                            pucServiceLcnId =(short unsigned int*) new short[uiNbServices];
+                            pucChannelNumber =(short unsigned int*) new short[uiNbServices];
+                            for (int iLcnCount = 0; iLcnCount < uiNbServices; ++iLcnCount)
+                            {
+                                pucServiceLcnId[iLcnCount] = (unsigned short)std::stoi(json_prog_lcn_ids["list"][iLcnCount]["service_id"].asString());  
+                                pucChannelNumber[iLcnCount] = (unsigned short)std::stoi(json_prog_lcn_ids["list"][iLcnCount]["lcn_id"].asString());
+                            }
+                            usDescriptorLength = setLcnDescriptor(pucData, uiNbServices, pucServiceId, pucChannelNumber, pucHdChannelNumber);
+                            usFullDescriptorLength += usDescriptorLength;
+                            pucData += usDescriptorLength;
+                        }
+
+                        //END OF Descriptors
+                        *(pucDescriptorLength++) =  0xF0 | (usFullDescriptorLength>>8);
+                        *(pucDescriptorLength++) =  (usFullDescriptorLength&0xFF);
+                  
+                    // printf("--------usFullDescriptorLength-------->%d\n", usFullDescriptorLength+6);
+
+                    usFullSectionLength += usFullDescriptorLength+6;
+                    if(usFullSectionLength>900){
+                        // printf("%d---- SECTION Full------------>%d\n ", ts_cout,usFullSectionLength);
+                        pucData = pucData-(usFullDescriptorLength+6);
+                        usFullSectionLength = usFullSectionLength - (usFullDescriptorLength+6);
+                        // ts_cout = ts_cout-1;
+                        printf("%d---- SECTION Full------------>%d\n ", ts_cout,usFullSectionLength);
+                        break;
+                    }
+                         //Full TS length
+                         usFullTSLength += usFullDescriptorLength+6;
+                         // printf("--------usFullDescriptorLength-------->%d\n", usFullDescriptorLength+6);
+                }
+                *(pucTSLength++) =  0xF0 | (usFullTSLength>>8);
+                *(pucTSLength++) =  (usFullTSLength&0xFF);
+
+                //add section len size
+                usFullSectionLength += TS_SECTION_LENB2;
+                usFullSectionLength += CRC32B4;
+
+                *(pucSectionLength++) =  0xF0 | ((usFullSectionLength)>>8);
+                *(pucSectionLength++) =  ((usFullSectionLength)&0xFF);
+                printf("----FULL SECTION LEN------------>%d\n", usFullSectionLength);
+
+                //usFullSectionLength+= NIT_TAG_SEC_LEN3;
+                int j = 0;
+                val_crc = crc32 (pucData-(usFullSectionLength+NIT_TAG_SEC_LEN3-CRC32B4), usFullSectionLength-CRC32B4+NIT_TAG_SEC_LEN3);
+                *(pucData++) = val_crc>>24;
+                *(pucData++) = val_crc>>16;
+                *(pucData++) = val_crc>>8;
+                *(pucData) = val_crc;
+                usFullSectionLength +=NIT_TAG_SEC_LEN3;
+                printf("\n");
+                unsigned char * ucSectionPayload = pucNewSection;
+                for(j = 0;j<usFullSectionLength;j++){
+                    // printf(" %d --> %x \t\t",j,pucNewSection[j]);
+                    printf("%x:",pucNewSection[j]);
+                }
+                int k = 0;
+                unsigned short usPointer=0;
+                while(usFullSectionLength)
+                {
+                    int size_of_payload = (usFullSectionLength>256)? 256 : usFullSectionLength;
+                    c1.updateNITTable(ucSectionPayload+=k,size_of_payload,usPointer,section_count);
+                    usPointer += size_of_payload;
+                    usFullSectionLength -= size_of_payload;
+                    // printf(")) %d --> %d\n",k,size_of_payload);
+                    k =size_of_payload;
+                }
+                std::cout<<ts_cout<<"------NIT ------>>"<<ts_size;
+                if(ts_cout==ts_size)
+                    break;
+
+                section_count++;
+            }
+                
+        }
+        return 1;
+    }
+
+    int getCountSections() {   // 30300
+        unsigned short usNetworkId = 1;
+        unsigned char ucVersion = 1; 
+        unsigned char *pucNetworkName =(unsigned char *) "test";
+        unsigned short *pucServiceId=NULL,*pucChannelNumber=NULL,*pucHdChannelNumber,*pucServiceType=NULL,*pucServiceLcnId=NULL;
+        unsigned short usOriginalNetworkId,ucCurrentTsId;
+        unsigned int uiNbServices,uiSymbol_rate;
+        unsigned char pucNewSection[1500];     // 1 section allocated array
+       unsigned char *pucData;                // byte pointer for NIT section composing
+       unsigned char *pucSectionLength;       // 2 keep section length pointer
+       unsigned char *pucDescriptorLength;    // 2 keep descriptor length pointer
+       unsigned char *pucTSLength;
+       unsigned char i = 0;                   // Current section increment
+       unsigned char pucDescriptor[256];       // descriptor data
+       unsigned short usFullDescriptorLength=0; // descriptor length
+       unsigned short usFullTSLength=0;
+       unsigned short usDescriptorLength;     // descriptor length
+       unsigned short usFullSectionLength;
+       unsigned long val_crc;
+       unsigned short sec_len, sec_len_desc, list_desc_len;
+       unsigned short NIT_TAG_SEC_LEN3 = 3,NIT_NID_VER_LASTSEC_DESC_LENB7 = 7,TS_SECTION_LENB2 = 2,CRC32B4=4;
+       unsigned int ts_size=0,uiFrequency;
+       unsigned char ucFec_Inner = 0,ucFec_Outer = 0,ucModulation;
+       // generate required sections according to descriptors.
+        int ts_cout=0;
+        int section_count=0;
+        Json::Value json_network_details = db->getNetworkDetailsForNIT(); 
+        ts_size = json_network_details["list"].size();
+          // std::cout<<json_network_details<<endl;
+        if(json_network_details["error"]==false){
+            while(1) {
+                // printf("\n----Fisrt Section TS Start------------>%d\n ",ts_cout);
+                pucNewSection[1500] = {0};
                 // point to the first byte of the allocated array
                 pucData = pucNewSection;
                 // first byte of the section
@@ -14670,7 +16064,7 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
 
                             // // Add LCN Descriptor
                             Json::Value json_prog_lcn_ids = db->getLcnIds(output,rmx_no);
-                            // std::cout<<json_prog_lcn_ids<<endl;
+
                             if(json_prog_lcn_ids["error"]==false){
                                 uiNbServices =(unsigned int) json_prog_lcn_ids["list"].size();
                                 int iLcnCount = 0;
@@ -14692,7 +16086,7 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
                       
                         usFullSectionLength += usFullDescriptorLength+6;
                         if(usFullSectionLength>900){
-                            // printf("%d---- SECTION Full------------>%d\n ", ts_cout,usFullSectionLength);
+                            printf("%d---- SECTION Full------------>%d\n ", ts_cout,usFullSectionLength);
                             pucData = pucData-(usFullDescriptorLength+6);
                             usFullSectionLength = usFullSectionLength - (usFullDescriptorLength+6);
                            
@@ -14739,613 +16133,650 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
         response.send(Http::Code::Ok, resp);
     }
     void runBootupscript(){
-        Json::Value json,NewService_names,network_details,lcn_json,high_prior_ser,pmt_alarm_json,active_progs,locked_progs,freeca_progs,input_mode_json,fifo_flags,table_ver_json,table_timeout_json,dvb_output_json,psisi_interval,serv_provider_json,nit_mode;
-        printf("\n\n Downloding Mxl 1 \n");
-        downloadMxlFW(1,0);
-        usleep(100);
-        printf("\n\n Downloding Mxl 2 \n");
-        downloadMxlFW(2,0);
-        usleep(100);
-        printf("\n\n Downloding Mxl 3 \n");
-        downloadMxlFW(3,0);
-        usleep(100);
-        printf("\n\n Downloding Mxl 4 \n");
-        downloadMxlFW(4,0);
-        usleep(100);
-        printf("\n\n Downloding Mxl 5 \n");
-        downloadMxlFW(5,0);
-        usleep(100);
-        printf("\n\n Downloding Mxl 6 \n");
-        downloadMxlFW(6,0);
-        printf("\n\n MXL Downlod Completed! \n\n");
-        usleep(100);
-
-        usleep(100);
-        //Intialize the RMX_FPGA's
-        int remx_bit[]= {0,4,1,5,2,6};
-        for (int rmx_no = 0; rmx_no < RMX_COUNT; ++rmx_no)
+        if(write32bCPU(0,0,0) != -1)
         {
-            int target =((0&0x3)<<8) | ((rmx_no&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-            if(write32bCPU(0,0,target) != -1) {
-            Json::Value core_json = callSetCore("0","0",std::to_string(remx_bit[rmx_no]),rmx_no+1);
-                    if(core_json["status"] == 1)
-                        std::cout<<remx_bit[rmx_no]<<std::endl;
-            }
-        }
+            Json::Value json,NewService_names,network_details,lcn_json,high_prior_ser,pmt_alarm_json,active_progs,locked_progs,freeca_progs,input_mode_json,fifo_flags,table_ver_json,table_timeout_json,dvb_output_json,psisi_interval,serv_provider_json,nit_mode;
+            printf("\n\n Downloding Mxl 1 \n");
+            downloadMxlFW(1,0);
+            usleep(100);
+            printf("\n\n Downloding Mxl 2 \n");
+            downloadMxlFW(2,0);
+            usleep(100);
+            printf("\n\n Downloding Mxl 3 \n");
+            downloadMxlFW(3,0);
+            usleep(100);
+            printf("\n\n Downloding Mxl 4 \n");
+            downloadMxlFW(4,0);
+            usleep(100);
+            printf("\n\n Downloding Mxl 5 \n");
+            downloadMxlFW(5,0);
+            usleep(100);
+            printf("\n\n Downloding Mxl 6 \n");
+            downloadMxlFW(6,0);
+            printf("\n\n MXL Downlod Completed! \n\n");
+            usleep(100);
 
-        Json::Value jsonAllegro = db->getConfAllegro();
-        if(jsonAllegro["error"] == false){
-            for(int i=0;i<jsonAllegro["list"].size();i++ ){
-                int target =((0&0x3)<<8) | ((0&0x7)<<5) | ((((std::stoi(jsonAllegro["list"][i]["mxl_id"].asString()))+6)&0xF)<<1) | (0&0x1);
-                if(write32bCPU(0,0,target) != -1){
-                    int address = std::stoi(jsonAllegro["list"][i]["address"].asString());
-                    callReadAllegro(address);
-                    usleep(500000);
-                    confAllegro8297(address,std::stoi(jsonAllegro["list"][i]["enable1"].asString()),std::stoi(jsonAllegro["list"][i]["volt1"].asString()),std::stoi(jsonAllegro["list"][i]["enable2"].asString()),std::stoi(jsonAllegro["list"][i]["volt2"].asString()));
-                    usleep(1000);
+            //Intialize the RMX_FPGA's
+            int remx_bit[]= {0,4,1,5,2,6};
+            for (int rmx_no = 0; rmx_no < RMX_COUNT; ++rmx_no)
+            {
+                int target =((0&0x3)<<8) | ((rmx_no&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+                if(write32bCPU(0,0,target) != -1) {
+                Json::Value core_json = callSetCore("0","0",std::to_string(remx_bit[rmx_no]),rmx_no+1);
+                        if(core_json["status"] == 1)
+                            std::cout<<remx_bit[rmx_no]<<std::endl;
                 }
-                
-            }   
-        }
-        
-        Json::Value jsonTuner = db->getRFTunerDetails();
-        if(jsonTuner["error"] == false){
-            for(int i=0;i<jsonTuner["list"].size();i++ ){
-                int rmx_no = std::stoi(jsonTuner["list"][i]["rmx_no"].asString());
-                int mxl_id = std::stoi(jsonTuner["list"][i]["mxl_id"].asString());
-                int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
-                if(connectI2Clines(target)){
-                    tuneMxl(std::stoi(jsonTuner["list"][i]["demod_id"].asString()),std::stoi(jsonTuner["list"][i]["lnb_id"].asString()),std::stoi(jsonTuner["list"][i]["dvb_standard"].asString()),std::stoi(jsonTuner["list"][i]["frequency"].asString()),std::stoi(jsonTuner["list"][i]["symbol_rate"].asString()),std::stoi(jsonTuner["list"][i]["modulation"].asString()),std::stoi(jsonTuner["list"][i]["fec"].asString()),std::stoi(jsonTuner["list"][i]["rolloff"].asString()),std::stoi(jsonTuner["list"][i]["pilots"].asString()),std::stoi(jsonTuner["list"][i]["spectrum"].asString()),std::stoi(jsonTuner["list"][i]["lo_frequency"].asString()),mxl_id,rmx_no,0);
+            }
+
+            Json::Value jsonAllegro = db->getConfAllegro();
+            if(jsonAllegro["error"] == false){
+                for(int i=0;i<jsonAllegro["list"].size();i++ ){
+                    int target =((0&0x3)<<8) | ((0&0x7)<<5) | ((((std::stoi(jsonAllegro["list"][i]["mxl_id"].asString()))+6)&0xF)<<1) | (0&0x1);
+                    if(write32bCPU(0,0,target) != -1){
+                        int address = std::stoi(jsonAllegro["list"][i]["address"].asString());
+                        callReadAllegro(address);
+                        usleep(500000);
+                        confAllegro8297(address,std::stoi(jsonAllegro["list"][i]["enable1"].asString()),std::stoi(jsonAllegro["list"][i]["volt1"].asString()),std::stoi(jsonAllegro["list"][i]["enable2"].asString()),std::stoi(jsonAllegro["list"][i]["volt2"].asString()));
+                        usleep(1000);
+                    }
+                    
+                }   
+            }
+            
+            Json::Value jsonTuner = db->getRFTunerDetails();
+            if(jsonTuner["error"] == false){
+                for(int i=0;i<jsonTuner["list"].size();i++ ){
+                    int rmx_no = std::stoi(jsonTuner["list"][i]["rmx_no"].asString());
+                    int mxl_id = std::stoi(jsonTuner["list"][i]["mxl_id"].asString());
+                    int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | (((mxl_id+6)&0xF)<<1) | (0&0x1);
+                    if(connectI2Clines(target)){
+                        int demod_id = std::stoi(jsonTuner["list"][i]["demod_id"].asString());
+                        tuneMxl(demod_id,std::stoi(jsonTuner["list"][i]["lnb_id"].asString()),std::stoi(jsonTuner["list"][i]["dvb_standard"].asString()),std::stoi(jsonTuner["list"][i]["frequency"].asString()),std::stoi(jsonTuner["list"][i]["symbol_rate"].asString()),std::stoi(jsonTuner["list"][i]["modulation"].asString()),std::stoi(jsonTuner["list"][i]["fec"].asString()),std::stoi(jsonTuner["list"][i]["rolloff"].asString()),std::stoi(jsonTuner["list"][i]["pilots"].asString()),std::stoi(jsonTuner["list"][i]["spectrum"].asString()),std::stoi(jsonTuner["list"][i]["lo_frequency"].asString()),mxl_id,rmx_no,0);
+                        usleep(1000);
+                        setMpegMode(demod_id,1,MXL_HYDRA_MPEG_CLK_CONTINUOUS,MXL_HYDRA_MPEG_CLK_IN_PHASE,104,MXL_HYDRA_MPEG_CLK_PHASE_SHIFT_0_DEG,1,1,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_MODE_SERIAL_3_WIRE,MXL_HYDRA_MPEG_ERR_INDICATION_DISABLED);
+                        usleep(1000);
+                        updateServiceToDB(demod_id,rmx_no);
+                    }
+                }   
+            }
+            
+            Json::Value jsonIPTuner = db->getIPTunerDetails();
+            if(jsonIPTuner["error"] == false){
+                for(int i=0;i<jsonIPTuner["list"].size();i++ ){
+                    int rmx_no = std::stoi(jsonIPTuner["list"][i]["rmx_no"].asString());
+                    int control_fpga =ceil(double(rmx_no)/2);
+                    int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
+                    if(write32bCPU(0,0,target) != -1){
+                        int channel_no = std::stoi(jsonIPTuner["list"][i]["input_channel"].asString());
+                        int controller_of_rmx = (rmx_no % 2 == 0)?1:0;
+                        int ch_no = ((controller_of_rmx)*8)+channel_no;
+                        Json::Value json = callSetEthernetIn(ch_no,std::stoul(jsonIPTuner["list"][i]["ip_address"].asString()),std::stoi(jsonIPTuner["list"][i]["port"].asString()),rmx_no,std::stoi(jsonIPTuner["list"][i]["type"].asString()));
+                        if(json["error"] == false)
+                            std::cout<<"-------------------IP Input success------------------------------- "<<std::endl;
+                        else
+                            std::cout<<"--------------------IP Input FAILED-------------------------------- "<<std::endl;
+                    }
                     usleep(1000);
-                    setMpegMode(std::stoi(jsonTuner["list"][i]["demod_id"].asString()),1,MXL_HYDRA_MPEG_CLK_CONTINUOUS,MXL_HYDRA_MPEG_CLK_IN_PHASE,104,MXL_HYDRA_MPEG_CLK_PHASE_SHIFT_0_DEG,1,1,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_MODE_SERIAL_3_WIRE,MXL_HYDRA_MPEG_ERR_INDICATION_DISABLED);
-                    usleep(1000);
-                }
-            }   
-        }
-        
-        Json::Value jsonIPTuner = db->getIPTunerDetails();
-        if(jsonIPTuner["error"] == false){
-            for(int i=0;i<jsonIPTuner["list"].size();i++ ){
-                int rmx_no = std::stoi(jsonIPTuner["list"][i]["rmx_no"].asString());
-                int control_fpga =ceil(double(rmx_no)/2);
+                }   
+            }
+            usleep(1000);
+            //Setting Input tuner type for each input channels (RF or IP IN)
+            for (int control_fpga = 1; control_fpga <= 3; ++control_fpga)
+            {
                 int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1){
-                    int channel_no = std::stoi(jsonIPTuner["list"][i]["input_channel"].asString());
-                    int controller_of_rmx = (rmx_no % 2 == 0)?1:0;
-                    int ch_no = ((controller_of_rmx)*8)+channel_no;
-                    Json::Value json = callSetEthernetIn(ch_no,std::stoul(jsonIPTuner["list"][i]["ip_address"].asString()),std::stoi(jsonIPTuner["list"][i]["port"].asString()),std::stoi(jsonIPTuner["list"][i]["type"].asString()));
-                    if(json["error"] == false)
-                        std::cout<<"-------------------IP Input success------------------------------- "<<std::endl;
-                    else
-                        std::cout<<"--------------------IP Input FAILED-------------------------------- "<<std::endl;
+                    int tuner_ch = db->getTunerChannelType(control_fpga);
+                    if(write32bI2C(4,0,tuner_ch) == -1){
+                        std::cout<<"Failed to configure MUX IN!"<<std::endl;
+                    }else{
+                        std::cout<<"-------------------Success MUX IN!--------------------------------------"<<std::endl;
+                    }
                 }
                 usleep(1000);
-            }   
-        }
-        usleep(1000);
-        //Setting Input tuner type for each input channels (RF or IP IN)
-        for (int control_fpga = 1; control_fpga <= 3; ++control_fpga)
-        {
-            int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
-            if(write32bCPU(0,0,target) != -1){
-                int tuner_ch = db->getTunerChannelType(control_fpga);
-                if(write32bI2C(4,0,tuner_ch) == -1){
-                    std::cout<<"Failed to configure MUX IN!"<<std::endl;
-                }else{
-                    std::cout<<"-------------------Success MUX IN!--------------------------------------"<<std::endl;
-                }
             }
-            usleep(1000);
-        }
-        
-        for (int mux_id = 1; mux_id <= 3; ++mux_id)
-        {   
-            Json::Value jsonIPTuner = db->getSPTSIPTuners(mux_id);
-            int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((mux_id-1)&0xF)<<1) | (0&0x1);
-            if(write32bCPU(0,0,target) != -1){
-                if(jsonIPTuner["error"] == false){
-                    for(int i=0;i<jsonIPTuner["list"].size();i++ ){
-                         Json::Value json = callSetEthernetIn(std::stoi(jsonIPTuner["list"][i]["channel_no"].asString()),std::stoul(jsonIPTuner["list"][i]["ip_address"].asString()),std::stoi(jsonIPTuner["list"][i]["port"].asString()),std::stoi(jsonIPTuner["list"][i]["type"].asString()));
-                        std::cout<<"-------------------SPTS IP IN!--------------------------------------"<<jsonIPTuner["list"][i]["ip_address"].asString()<<std::endl;
-                    }
-                }
-            }
-            usleep(1000);
-        }
-
-        Json::Value jsonSPTSControl = db->getSPTSControl();
-        if(jsonSPTSControl["error"] == false){
-            for(int i=0;i<jsonSPTSControl["list"].size();i++ ){
-                int mux_id = std::stoi(jsonSPTSControl["list"][i]["mux_id"].asString());
+            
+            for (int mux_id = 1; mux_id <= 3; ++mux_id)
+            {   
+                Json::Value jsonIPTuner = db->getSPTSIPTuners(mux_id);
+                int rmx_no = (mux_id == 1)?1:((mux_id == 2)?3 : 5);
                 int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((mux_id-1)&0xF)<<1) | (0&0x1);
                 if(write32bCPU(0,0,target) != -1){
-                    unsigned long custom_line =std::stoul(jsonSPTSControl["list"][i]["custom_line"].asString());
-                    int is_enable =std::stoi(jsonSPTSControl["list"][i]["is_enable"].asString());
-                    if(is_enable == 1)
-                    {
-                        custom_line = custom_line | 65536;
-                    }
-                    if(write32bI2C(5,0,custom_line) == -1){
-                        std::cout<<"-------------------Failed MUX OUT!"<<std::endl;
-                    }
-                    std::cout<<"-------------------SPTS IP(getSPTSControl)!--------------------------------------"<<custom_line<<std::endl;
-                }
-                usleep(100);
-            }
-        }
-        usleep(1000);
-        Json::Value jsonIPOUT = db->getIPOutputChannels();
-        if(jsonIPOUT["error"] == false){
-            std::cout<<jsonIPOUT["list"].size()<<std::endl;
-            for(int i=0;i<jsonIPOUT["list"].size();i++ ){
-                int rmx_no = std::stoi(jsonIPOUT["list"][i]["rmx_no"].asString());
-                int channel_no  = std::stoi(jsonIPOUT["list"][i]["output_channel"].asString());
-                int port  = std::stoi(jsonIPOUT["list"][i]["port"].asString());
-                int rmx_no_of_controller = (rmx_no % 2 == 0)?1:0;
-                int ch_no = ((rmx_no_of_controller)*8)+channel_no;
-                unsigned long int ip_address = std::stoul(jsonIPOUT["list"][i]["ip_address"].asString());
-                int control_fpga =ceil(double(rmx_no)/2);
-                int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
-                if(write32bCPU(0,0,target) != -1){
-                    std::cout<<ch_no<<port<<ip_address;
-                    Json::Value jsonipout = callSetEthernetOut(ip_address,port,ch_no);
-                    if(jsonipout["error"] == false){
-                         std::cout<<"IP OUT Success"<<std::endl;
-                    }else{
-                        std::cout<<"IP OUT FAILED"<<std::endl;
-                    }
-                }
-            }
-        }
-
-        usleep(100);
-
-        for (int rmx = 1; rmx <= RMX_COUNT; rmx++)
-        {
-            for(int input=0;input<4;input++){
-                Json::Value iojson =callGetProgramList(input,rmx);
-                if(iojson["error"] == false)
-                    std::cout<<"-----------Services has been restored from channel RMX "<<rmx<<">---------------->CH "<<input<<std::endl;
-            }
-        }
-        usleep(1000);
-        for (int i = 0; i <= RMX_COUNT; ++i)
-        {
-            for (int j = 0; j <= INPUT_COUNT; ++j)
-            {
-                for (int k = 0; k <= OUTPUT_COUNT; ++k)
-                {
-                    active_progs = db->getActivePrograms("-1",std::to_string(j),std::to_string(k),std::to_string(i+1));                    
-                    if(active_progs["error"]==false){
-                        // std::cout<<active_progs["list"].size();
-                        Json::Value json = callSetKeepProg(active_progs["list"],std::to_string(j),std::to_string(k),i+1);
-                        if(json["error"]==false){
-                            std::cout<<"------------------Active Prog has been restored--------------------- "<<std::endl;
+                    if(jsonIPTuner["error"] == false){
+                        for(int i=0;i<jsonIPTuner["list"].size();i++ ){
+                             Json::Value json = callSetEthernetIn(std::stoi(jsonIPTuner["list"][i]["channel_no"].asString()),std::stoul(jsonIPTuner["list"][i]["ip_address"].asString()),std::stoi(jsonIPTuner["list"][i]["port"].asString()),rmx_no,std::stoi(jsonIPTuner["list"][i]["type"].asString()));
+                            std::cout<<"-------------------SPTS IP IN!--------------------------------------"<<jsonIPTuner["list"][i]["ip_address"].asString()<<std::endl;
                         }
-                    }   
+                    }
+                }
+                usleep(1000);
+            }
+
+            Json::Value jsonSPTSControl = db->getSPTSControl();
+            if(jsonSPTSControl["error"] == false){
+                for(int i=0;i<jsonSPTSControl["list"].size();i++ ){
+                    int mux_id = std::stoi(jsonSPTSControl["list"][i]["mux_id"].asString());
+                    int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((mux_id-1)&0xF)<<1) | (0&0x1);
+                    if(write32bCPU(0,0,target) != -1){
+                        unsigned long custom_line =std::stoul(jsonSPTSControl["list"][i]["custom_line"].asString());
+                        int is_enable =std::stoi(jsonSPTSControl["list"][i]["is_enable"].asString());
+                        if(is_enable == 1)
+                        {
+                            custom_line = custom_line | 65536;
+                        }
+                        if(write32bI2C(5,0,custom_line) == -1){
+                            std::cout<<"-------------------Failed MUX OUT!"<<std::endl;
+                        }
+                        std::cout<<"-------------------SPTS IP(getSPTSControl)!--------------------------------------"<<custom_line<<std::endl;
+                    }
+                    usleep(100);
                 }
             }
-        }
-        
-        usleep(100);
-        NewService_names = db->getServiceNewnames();
-        if(NewService_names["error"]==false){
-            for (int i = 0; i < NewService_names["list"].size(); ++i)
-            {
-                Json::Value json = callSetServiceName(NewService_names["list"][i]["channel_name"].asString(),NewService_names["list"][i]["channel_number"].asString(),NewService_names["list"][i]["input_channel"].asString(),std::stoi(NewService_names["list"][i]["rmx_no"].asString()));
-                if(json["error"]==false){
-                    std::cout<<"------------------ Service name's restored successfully ------------------"<<std::endl;
+            usleep(1000);
+            Json::Value jsonIPOUT = db->getIPOutputChannels();
+            if(jsonIPOUT["error"] == false){
+                std::cout<<jsonIPOUT["list"].size()<<std::endl;
+                for(int i=0;i<jsonIPOUT["list"].size();i++ ){
+                    int rmx_no = std::stoi(jsonIPOUT["list"][i]["rmx_no"].asString());
+                    int channel_no  = std::stoi(jsonIPOUT["list"][i]["output_channel"].asString());
+                    int port  = std::stoi(jsonIPOUT["list"][i]["port"].asString());
+                    int rmx_no_of_controller = (rmx_no % 2 == 0)?1:0;
+                    int ch_no = ((rmx_no_of_controller)*8)+channel_no;
+                    unsigned long int ip_address = std::stoul(jsonIPOUT["list"][i]["ip_address"].asString());
+                    int control_fpga =ceil(double(rmx_no)/2);
+                    int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((control_fpga-1)&0xF)<<1) | (0&0x1);
+                    if(write32bCPU(0,0,target) != -1){
+                        std::cout<<ch_no<<port<<ip_address;
+                        Json::Value jsonipout = callSetEthernetOut(ip_address,port,ch_no);
+                        if(jsonipout["error"] == false){
+                             std::cout<<"IP OUT Success"<<std::endl;
+                        }else{
+                            std::cout<<"IP OUT FAILED"<<std::endl;
+                        }
+                    }
                 }
-            }    
-        }
-        usleep(100);
-        for (int rmx = 1; rmx <= RMX_COUNT; ++rmx)
-        {
-            for (int input = 0; input <= INPUT_COUNT; ++input)
-            {
+            }
 
-                Json::Value new_service_ids,old_service_ids,NewService_ids;
-                NewService_ids = db->getServiceIds(rmx,input);
-                // std::cout<<NewService_ids<<endl;
-                if(NewService_ids["error"]==false){
-                    Json::Value iojson=callSetInputOutput(std::to_string(input),"0",rmx);
-                    if(iojson["error"] == false){
-                        for (int i = 0; i < NewService_ids["list"].size(); ++i)
-                        {
-                            new_service_ids[i] = NewService_ids["list"][i]["service_id"].asString();
-                            old_service_ids[i] = NewService_ids["list"][i]["channel_number"].asString();
+            usleep(100);
+
+            for (int rmx = 1; rmx <= RMX_COUNT; rmx++)
+            {
+                for(int input=0;input<4;input++){
+                    Json::Value iojson =callGetProgramList(input,rmx);
+                    if(iojson["error"] == false)
+                        std::cout<<"-----------Services has been restored from channel RMX "<<rmx<<">---------------->CH "<<input<<std::endl;
+                }
+            }
+            usleep(1000);
+            for (int i = 0; i <= RMX_COUNT; ++i)
+            {
+                for (int j = 0; j <= INPUT_COUNT; ++j)
+                {
+                    for (int k = 0; k <= OUTPUT_COUNT; ++k)
+                    {
+                        active_progs = db->getActivePrograms("-1",std::to_string(j),std::to_string(k),std::to_string(i+1));                    
+                        if(active_progs["error"]==false){
+                            // std::cout<<active_progs["list"].size();
+                            Json::Value json = callSetKeepProg(active_progs["list"],std::to_string(j),std::to_string(k),i+1);
+                            if(json["error"]==false){
+                                std::cout<<"------------------Active Prog has been restored--------------------- "<<std::endl;
+                            }
                         }   
-                        Json::Value json = callSetServiceID(old_service_ids,new_service_ids,rmx);
-                        if(json["error"]==false){
-                            std::cout<<"------------------ Service ID's restored successfully ------------------"<<std::endl;
-                        } 
-                    }else{
-                        std::cout<<"------------------ "<<iojson["message"].asString()<<"------------------"<<std::endl;
+                    }
+                }
+            }
+
+            usleep(1000);
+            for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
+            {
+                for (int input = 0; input <= INPUT_COUNT; ++input)
+                {
+               
+                    Json::Value json = callsetEncryptedServices(std::to_string(input),rmx_no);
+                    if(json["error"]==false){
+                        std::cout<<"------------------Encrypted services has been restored--------------------- "<<std::endl;
+                    }
+                }
+            }
+            
+            usleep(100);
+            NewService_names = db->getServiceNewnames();
+            if(NewService_names["error"]==false){
+                for (int i = 0; i < NewService_names["list"].size(); ++i)
+                {
+                    Json::Value json = callSetServiceName(NewService_names["list"][i]["channel_name"].asString(),NewService_names["list"][i]["channel_number"].asString(),NewService_names["list"][i]["input_channel"].asString(),std::stoi(NewService_names["list"][i]["rmx_no"].asString()));
+                    if(json["error"]==false){
+                        std::cout<<"------------------ Service name's restored successfully ------------------"<<std::endl;
                     }
                 }    
             }
-        }
-        usleep(100);
-        network_details = db->getNetworkDetails();
-        if(network_details["error"]==false){
-            for (int i = 0; i < network_details["list"].size(); ++i)
+            usleep(100);
+            for (int rmx = 1; rmx <= RMX_COUNT; ++rmx)
             {
-                if(network_details["list"][i]["ts_id"].asString()!="-1"){
-                    Json::Value tsJason;
-                    tsJason = callSetTsId(network_details["list"][i]["ts_id"].asString(),network_details["list"][i]["network_id"].asString(),network_details["list"][i]["original_netw_id"].asString(),network_details["list"][i]["output"].asString(),std::stoi(network_details["list"][i]["rmx_no"].asString()));  
-                    if(tsJason["error"]==false){
-                        std::cout<<"------------------TS details has been restored--------------------- "<<std::endl;
+                for (int input = 0; input <= INPUT_COUNT; ++input)
+                {
+
+                    Json::Value new_service_ids,old_service_ids,NewService_ids;
+                    NewService_ids = db->getServiceIds(rmx,input);
+                    // std::cout<<NewService_ids<<endl;
+                    if(NewService_ids["error"]==false){
+                        Json::Value iojson=callSetInputOutput(std::to_string(input),"0",rmx);
+                        if(iojson["error"] == false){
+                            for (int i = 0; i < NewService_ids["list"].size(); ++i)
+                            {
+                                new_service_ids[i] = NewService_ids["list"][i]["service_id"].asString();
+                                old_service_ids[i] = NewService_ids["list"][i]["channel_number"].asString();
+                            }   
+                            Json::Value json = callSetServiceID(old_service_ids,new_service_ids,rmx);
+                            if(json["error"]==false){
+                                std::cout<<"------------------ Service ID's restored successfully ------------------"<<std::endl;
+                            } 
+                        }else{
+                            std::cout<<"------------------ "<<iojson["message"].asString()<<"------------------"<<std::endl;
+                        }
+                    }    
+                }
+            }
+            usleep(100);
+            network_details = db->getNetworkDetails();
+            if(network_details["error"]==false){
+                for (int i = 0; i < network_details["list"].size(); ++i)
+                {
+                    if(network_details["list"][i]["ts_id"].asString()!="-1"){
+                        Json::Value tsJason;
+                        tsJason = callSetTsId(network_details["list"][i]["ts_id"].asString(),network_details["list"][i]["network_id"].asString(),network_details["list"][i]["original_netw_id"].asString(),network_details["list"][i]["output"].asString(),std::stoi(network_details["list"][i]["rmx_no"].asString()));  
+                        if(tsJason["error"]==false){
+                            std::cout<<"------------------TS details has been restored--------------------- "<<std::endl;
+                        }
+                    }
+                    if(network_details["list"][i]["network_name"].asString()!="-1"){
+                        Json::Value setNetJson;
+                        setNetJson = callSetNetworkName(network_details["list"][i]["network_name"].asString(),network_details["list"][i]["output"].asString(),std::stoi(network_details["list"][i]["rmx_no"].asString()));
+                        if(setNetJson["error"]==false){
+                            std::cout<<"------------------Network name has been restored--------------------- "<<std::endl;
+                        }
+                    }
+
+                }
+            } 
+            usleep(100);
+            Json::Value json_cetnter_frequency = db->getCenterFrequency();
+            if(json_cetnter_frequency["error"] == false){
+                for (int i = 0; i < json_cetnter_frequency["list"].size(); ++i)
+                {
+                    Json::Value json = callsetCenterFrequency(json_cetnter_frequency["list"][i]["center_frequency"].asString(),json_cetnter_frequency["list"][i]["rmx_no"].asString());
+                    if(json["error"]==false){
+                        std::cout<<"------------------ Center Frequency has been restored --------------------- "<<std::endl;
+                    }   
+                }
+            }
+            usleep(100);
+            Json::Value json_sr = db->getSymbolRates();
+            if(json_sr["error"] == false){
+                for (int i = 0; i < json_sr["list"].size(); ++i)
+                {
+                    Json::Value json = callSetFSymbolRate(json_sr["list"][i]["rmx_no"].asString(),json_sr["list"][i]["output"].asString(),json_sr["list"][i]["roll_off"].asString(),json_sr["list"][i]["symbol_rate"].asString());
+                    if(json["error"]==false){
+                        std::cout<<"------------------ Symbol rate has been restored --------------------- "<<std::endl;
+                    }   
+                }
+            }
+            usleep(100);
+            lcn_json = db->getLcnNumbers();
+            if(lcn_json["error"]==false){
+                for (int i = 0; i < lcn_json["list"].size(); ++i)
+                {
+                    Json::Value json = callSetLcn(lcn_json["list"][i]["program_number"].asString(),lcn_json["list"][i]["channel_number"].asString(),"0",std::stoi(lcn_json["list"][i]["rmx_no"].asString()),lcn_json["list"][i]["input_channel"].asString(),1);
+                    if(json["error"]==false){
+                        std::cout<<"------------------LCN Numbers has been restored--------------------- "<<std::endl;
                     }
                 }
-                if(network_details["list"][i]["network_name"].asString()!="-1"){
-                    Json::Value setNetJson;
-                    setNetJson = callSetNetworkName(network_details["list"][i]["network_name"].asString(),network_details["list"][i]["output"].asString(),std::stoi(network_details["list"][i]["rmx_no"].asString()));
-                    if(setNetJson["error"]==false){
-                        std::cout<<"------------------Network name has been restored--------------------- "<<std::endl;
+            }
+            usleep(100);
+            high_prior_ser = db->getHighPriorityServices();
+            if(high_prior_ser["error"]==false){
+                std::cout<<"------------------====="<<high_prior_ser["list"].size()<<std::endl;
+                for (int i = 0; i < high_prior_ser["list"].size(); ++i)
+                {
+                    //std::cout<<high_prior_ser["list"][i]["program_number"].asString()<<std::endl;
+                    Json::Value json = callSetHighPriorityServices(high_prior_ser["list"][i]["program_number"].asString(),high_prior_ser["list"][i]["input_channel"].asString(),1);
+                    if(json["error"]==false){
+                        std::cout<<"------------------High priority services has been restored--------------------- "<<std::endl;
                     }
                 }
-
             }
-        } 
-        usleep(100);
-        Json::Value json_cetnter_frequency = db->getCenterFrequency();
-        if(json_cetnter_frequency["error"] == false){
-            for (int i = 0; i < json_cetnter_frequency["list"].size(); ++i)
-            {
-                Json::Value json = callsetCenterFrequency(json_cetnter_frequency["list"][i]["center_frequency"].asString(),json_cetnter_frequency["list"][i]["rmx_no"].asString());
-                if(json["error"]==false){
-                    std::cout<<"------------------ Center Frequency has been restored --------------------- "<<std::endl;
-                }   
-            }
-        }
-        usleep(100);
-        Json::Value json_sr = db->getSymbolRates();
-        if(json_sr["error"] == false){
-            for (int i = 0; i < json_sr["list"].size(); ++i)
-            {
-                Json::Value json = callSetFSymbolRate(json_sr["list"][i]["rmx_no"].asString(),json_sr["list"][i]["output"].asString(),json_sr["list"][i]["roll_off"].asString(),json_sr["list"][i]["symbol_rate"].asString());
-                if(json["error"]==false){
-                    std::cout<<"------------------ Symbol rate has been restored --------------------- "<<std::endl;
-                }   
-            }
-        }
-        usleep(100);
-        lcn_json = db->getLcnNumbers();
-        if(lcn_json["error"]==false){
-            for (int i = 0; i < lcn_json["list"].size(); ++i)
-            {
-                Json::Value json = callSetLcn(lcn_json["list"][i]["program_number"].asString(),lcn_json["list"][i]["channel_number"].asString(),"0",std::stoi(lcn_json["list"][i]["rmx_no"].asString()),lcn_json["list"][i]["input_channel"].asString(),1);
-                if(json["error"]==false){
-                    std::cout<<"------------------LCN Numbers has been restored--------------------- "<<std::endl;
-                }
-            }
-        }
-        usleep(100);
-        high_prior_ser = db->getHighPriorityServices();
-        if(high_prior_ser["error"]==false){
-            std::cout<<"------------------====="<<high_prior_ser["list"].size()<<std::endl;
-            for (int i = 0; i < high_prior_ser["list"].size(); ++i)
-            {
-                //std::cout<<high_prior_ser["list"][i]["program_number"].asString()<<std::endl;
-                Json::Value json = callSetHighPriorityServices(high_prior_ser["list"][i]["program_number"].asString(),high_prior_ser["list"][i]["input_channel"].asString(),1);
-                if(json["error"]==false){
-                    std::cout<<"------------------High priority services has been restored--------------------- "<<std::endl;
-                }
-            }
-        }
-        usleep(100);
-        pmt_alarm_json = db->getPmtalarm();
-        if(pmt_alarm_json["error"]==false){
-            
-            for (int i = 0; i < pmt_alarm_json["list"].size(); ++i)
-            {
-                std::cout<<pmt_alarm_json["list"].size()<<std::endl;
-                Json::Value json = callSetPmtAlarm(pmt_alarm_json["list"][i]["program_number"].asString(),pmt_alarm_json["list"][i]["alarm_enable"].asString(),pmt_alarm_json["list"][i]["input"].asString(),std::stoi(pmt_alarm_json["list"][i]["rmx_no"].asString()));
-                //std::cout<<"------------------PMT alarm call--------------------- "<<json["message"]<<std::endl;
-                if(json["error"]==false){
-                    std::cout<<"------------------PMT alarm has been restored--------------------- "<<pmt_alarm_json["list"][i]["input"].asString()<<std::endl;
-                }
-            }
-        }
-
-        usleep(100);
-        std::cout<<"-------------------------END PMT-------------------------------"<<std::endl;
-        locked_progs = db->getLockedPids();
-        if(locked_progs["error"]==false){
-            for (int i = 0; i < locked_progs["list"].size(); ++i)
-            {
-                Json::Value json = callSetLockedPIDs(locked_progs["list"][i]["program_number"].asString(),locked_progs["list"][i]["input_channel"].asString(),std::stoi(locked_progs["list"][i]["rmx_no"].asString()));
-                if(json["error"]==false){
-                    std::cout<<"------------------Locked services has been restored--------------------- "<<json["message"]<<std::endl;
-                }
-            }
-        }
-        std::cout<<"-------------------------END Locking Pid-------------------------------"<<std::endl;
-
-        usleep(100);
-        freeca_progs = db->getFreeCAModePrograms();
-        if(freeca_progs["error"]==false){
-
-            for (int i = 0; i < freeca_progs["list"].size(); ++i)
-            {
-                Json::Value json = callSetEraseCAMod(freeca_progs["list"][i]["program_number"].asString(),freeca_progs["list"][i]["input_channel"].asString(),freeca_progs["list"][i]["output_channel"].asString(),std::stoi(freeca_progs["list"][i]["rmx_no"].asString()));
-                std::cout<<"-------------------------"<<json["message"]<<freeca_progs["list"][i]["output_channel"].asString()<<std::endl;
-                if(json["error"]==false){
-                    std::cout<<"------------------Free CA has been restored--------------------- "<<json["message"]<<std::endl;
-                }
-            }
-        }
-        std::cout<<"-------------------------Free CA END-------------------------------"<<std::endl; 
-
-        usleep(100);
-        input_mode_json = db->getInputMode();
-        if(input_mode_json["error"]==false){
-
-            for (int i = 0; i < input_mode_json["list"].size(); ++i)
-            {
-                Json::Value json = callSetInputMode(input_mode_json["list"][i]["is_spts"].asString(),input_mode_json["list"][i]["pmt"].asString(),input_mode_json["list"][i]["sid"].asString(),input_mode_json["list"][i]["rise"].asString(),input_mode_json["list"][i]["master"].asString(),input_mode_json["list"][i]["in_select"].asString(),input_mode_json["list"][i]["bitrate"].asString(),input_mode_json["list"][i]["input"].asString(),std::stoi(input_mode_json["list"][i]["rmx_no"].asString()));
-                //std::cout<<"-------------------------"<<json["message"]<<input_mode_json["list"][i]["input"].asString()<<std::endl;
-                if(json["error"]==false){
-                    std::cout<<"------------------INPUT mode has been restored--------------------- "<<json["message"]<<std::endl;
-                }
-            }
-        }
-        std::cout<<"-------------------------INPUT mode END-------------------------------"<<std::endl; 
-        
-        usleep(100);
-        Json::Value lcn_provider = db->getLcnProviderId();
-        if(lcn_provider["error"]==false){
-            Json::Value json = callSetLcnProvider(lcn_provider["provider_id"].asString(),std::stoi(lcn_provider["rmx_no"].asString()));
-            //std::cout<<"-------------------------"<<json["message"]<<std::endl;
-            if(json["error"]==false){
-                std::cout<<"------------------LCN provider id has been restored--------------------- "<<json["message"]<<std::endl;
-            }
-        }
-        std::cout<<"-------------------------LCN provider id END-------------------------------"<<std::endl;
-        
-        usleep(100);
-        fifo_flags = db->getAlarmFlags();
-        if(fifo_flags["error"]==false){
-            for (int i = 0; i < fifo_flags["list"].size(); ++i)
-            {
-                Json::Value json = callCreateAlarmFlags(fifo_flags["list"][i]["level1"].asString(),fifo_flags["list"][i]["level2"].asString(),fifo_flags["list"][i]["level3"].asString(),fifo_flags["list"][i]["level4"].asString(),fifo_flags["list"][i]["mode"].asString(),std::stoi(fifo_flags["list"][i]["mode"].asString()));
-                //std::cout<<"-------------------------"<<json["error"]<<std::endl;
-                if(json["error"]==false){
-                    std::cout<<"------------------Creating alarm flags has been restored--------------------- "<<json["message"]<<std::endl;
-                }
-            }
-        }
-        std::cout<<"-------------------------Creating alarm flags END-------------------------------"<<std::endl;
-
-        usleep(100);
-        table_ver_json = db->getTablesVersions();
-        if(table_ver_json["error"]==false){
-            for (int i = 0; i < table_ver_json["list"].size(); ++i)
-            {
-                Json::Value json = callSetTablesVersion(table_ver_json["list"][i]["pat_ver"].asString(),table_ver_json["list"][i]["pat_isenable"].asString(),table_ver_json["list"][i]["sdt_ver"].asString(),table_ver_json["list"][i]["sdt_isenable"].asString(),table_ver_json["list"][i]["nit_ver"].asString(),table_ver_json["list"][i]["nit_isenable"].asString(),table_ver_json["list"][i]["output"].asString(),std::stoi(table_ver_json["list"][i]["rmx_no"].asString()));
-                //std::cout<<"-------------------------"<<json["error"]<<std::endl;
-                if(json["error"]==false){
-                    std::cout<<"------------------Table versions has been restored--------------------- "<<json["message"]<<std::endl;
-                }
-            }
-        }
-        std::cout<<"-------------------------Table versions END-------------------------------"<<std::endl;
-        
-    //     usleep(100);
-    //     nit_mode = db->getNITmode();
-    //     if(nit_mode["error"]==false){
-    //         for (int i = 0; i < nit_mode["list"].size(); ++i)
-    //         {
-    //         	 Json::Value iojson=callSetInputOutput("0",nit_mode["list"][i]["output"].asString(),std::stoi(nit_mode["list"][i]["rmx_no"].asString()));
-    //             if(iojson["error"]==false){
-    //             	if(std::stoi(nit_mode["list"][i]["mode"].asString()) != 1){
-				// 		Json::Value json = callSetNITmode(nit_mode["list"][i]["mode"].asString(),nit_mode["list"][i]["output"].asString(),std::stoi(nit_mode["list"][i]["rmx_no"].asString()));
-		  //               //std::cout<<"-------------------------"<<json["message"]<<std::endl;
-			 //            if(json["error"]==false){
-		  //                   std::cout<<"------------------NIT mode has been restored for output--------------------- "<<nit_mode["list"][i]["output"]<<std::endl;
-		  //               }
-		  //           }
-				// }else{
-    //                 json["error"]= true;
-    //                 json["message"]= "Error while selecting output!";     
-    //             }
+            usleep(100);
+            pmt_alarm_json = db->getPmtalarm();
+            if(pmt_alarm_json["error"]==false){
                 
-    //         }
-    //     }
+                for (int i = 0; i < pmt_alarm_json["list"].size(); ++i)
+                {
+                    std::cout<<pmt_alarm_json["list"].size()<<std::endl;
+                    Json::Value json = callSetPmtAlarm(pmt_alarm_json["list"][i]["program_number"].asString(),pmt_alarm_json["list"][i]["alarm_enable"].asString(),pmt_alarm_json["list"][i]["input"].asString(),std::stoi(pmt_alarm_json["list"][i]["rmx_no"].asString()));
+                    //std::cout<<"------------------PMT alarm call--------------------- "<<json["message"]<<std::endl;
+                    if(json["error"]==false){
+                        std::cout<<"------------------PMT alarm has been restored--------------------- "<<pmt_alarm_json["list"][i]["input"].asString()<<std::endl;
+                    }
+                }
+            }
 
-        usleep(100);
-        table_timeout_json = db->getNITtableTimeout();
-        if(table_timeout_json["error"]==false){
-            for (int i = 0; i < table_timeout_json["list"].size(); ++i)
-            {
-                Json::Value json = callSetTableTimeout(table_timeout_json["list"][i]["table_id"].asString(),table_timeout_json["list"][i]["timeout"].asString(),std::stoi(table_timeout_json["list"][i]["rmx_no"].asString()));
-                //std::cout<<"-------------------------"<<json["error"]<<std::endl;
+            usleep(100);
+            std::cout<<"-------------------------END PMT-------------------------------"<<std::endl;
+            locked_progs = db->getLockedPids();
+            if(locked_progs["error"]==false){
+                for (int i = 0; i < locked_progs["list"].size(); ++i)
+                {
+                    Json::Value json = callSetLockedPIDs(locked_progs["list"][i]["program_number"].asString(),locked_progs["list"][i]["input_channel"].asString(),std::stoi(locked_progs["list"][i]["rmx_no"].asString()));
+                    if(json["error"]==false){
+                        std::cout<<"------------------Locked services has been restored--------------------- "<<json["message"]<<std::endl;
+                    }
+                }
+            }
+            std::cout<<"-------------------------END Locking Pid-------------------------------"<<std::endl;
+
+            usleep(100);
+            freeca_progs = db->getFreeCAModePrograms();
+            if(freeca_progs["error"]==false){
+
+                for (int i = 0; i < freeca_progs["list"].size(); ++i)
+                {
+                    Json::Value json = callSetEraseCAMod(freeca_progs["list"][i]["program_number"].asString(),freeca_progs["list"][i]["input_channel"].asString(),freeca_progs["list"][i]["output_channel"].asString(),std::stoi(freeca_progs["list"][i]["rmx_no"].asString()));
+                    std::cout<<"-------------------------"<<json["message"]<<freeca_progs["list"][i]["output_channel"].asString()<<std::endl;
+                    if(json["error"]==false){
+                        std::cout<<"------------------Free CA has been restored--------------------- "<<json["message"]<<std::endl;
+                    }
+                }
+            }
+            std::cout<<"-------------------------Free CA END-------------------------------"<<std::endl; 
+
+            usleep(100);
+            input_mode_json = db->getInputMode();
+            if(input_mode_json["error"]==false){
+
+                for (int i = 0; i < input_mode_json["list"].size(); ++i)
+                {
+                    Json::Value json = callSetInputMode(input_mode_json["list"][i]["is_spts"].asString(),input_mode_json["list"][i]["pmt"].asString(),input_mode_json["list"][i]["sid"].asString(),input_mode_json["list"][i]["rise"].asString(),input_mode_json["list"][i]["master"].asString(),input_mode_json["list"][i]["in_select"].asString(),input_mode_json["list"][i]["bitrate"].asString(),input_mode_json["list"][i]["input"].asString(),std::stoi(input_mode_json["list"][i]["rmx_no"].asString()));
+                    //std::cout<<"-------------------------"<<json["message"]<<input_mode_json["list"][i]["input"].asString()<<std::endl;
+                    if(json["error"]==false){
+                        std::cout<<"------------------INPUT mode has been restored--------------------- "<<json["message"]<<std::endl;
+                    }
+                }
+            }
+            std::cout<<"-------------------------INPUT mode END-------------------------------"<<std::endl; 
+            
+            usleep(100);
+            Json::Value lcn_provider = db->getLcnProviderId();
+            if(lcn_provider["error"]==false){
+                Json::Value json = callSetLcnProvider(lcn_provider["provider_id"].asString(),std::stoi(lcn_provider["rmx_no"].asString()));
+                //std::cout<<"-------------------------"<<json["message"]<<std::endl;
                 if(json["error"]==false){
-                    std::cout<<"------------------NIT table timeout has been restored--------------------- "<<json["message"]<<std::endl;
+                    std::cout<<"------------------LCN provider id has been restored--------------------- "<<json["message"]<<std::endl;
                 }
             }
-        }
-        std::cout<<"-------------------------NIT table timeout END-------------------------------"<<std::endl;
-
-        usleep(100);
-        dvb_output_json = db->getDVBspiOutputMode();
-        if(dvb_output_json["error"]==false){
-            for (int i = 0; i < dvb_output_json["list"].size(); ++i)
-            {
-                Json::Value json = callSetDvbSpiOutputMode(dvb_output_json["list"][i]["bit_rate"].asString(),dvb_output_json["list"][i]["falling"].asString(),dvb_output_json["list"][i]["mode"].asString(),dvb_output_json["list"][i]["output"].asString(),std::stoi(dvb_output_json["list"][i]["rmx_no"].asString()));
-                //std::cout<<"-------------------------"<<json["error"]<<std::endl;
-                if(json["error"]==false){
-                    std::cout<<"------------------DVB output mode has been restored--------------------- "<<json["message"]<<std::endl;
+            std::cout<<"-------------------------LCN provider id END-------------------------------"<<std::endl;
+            
+            usleep(100);
+            fifo_flags = db->getAlarmFlags();
+            if(fifo_flags["error"]==false){
+                for (int i = 0; i < fifo_flags["list"].size(); ++i)
+                {
+                    Json::Value json = callCreateAlarmFlags(fifo_flags["list"][i]["level1"].asString(),fifo_flags["list"][i]["level2"].asString(),fifo_flags["list"][i]["level3"].asString(),fifo_flags["list"][i]["level4"].asString(),fifo_flags["list"][i]["mode"].asString(),std::stoi(fifo_flags["list"][i]["mode"].asString()));
+                    //std::cout<<"-------------------------"<<json["error"]<<std::endl;
+                    if(json["error"]==false){
+                        std::cout<<"------------------Creating alarm flags has been restored--------------------- "<<json["message"]<<std::endl;
+                    }
                 }
             }
-        }
+            std::cout<<"-------------------------Creating alarm flags END-------------------------------"<<std::endl;
 
-        usleep(100);
-        std::cout<<"-------------------------DVB output mode END-------------------------------"<<std::endl;
-        psisi_interval = db->getPsiSiInterval();
-        if(psisi_interval["error"]==false){
-            for (int i = 0; i < psisi_interval["list"].size(); ++i)
-            {
-                Json::Value json = callSetPsiSiInterval(psisi_interval["list"][i]["pat_int"].asString(),psisi_interval["list"][i]["sdt_int"].asString(),psisi_interval["list"][i]["nit_int"].asString(),psisi_interval["list"][i]["output"].asString(),std::stoi(psisi_interval["list"][i]["rmx_no"].asString()));
-                //std::cout<<"-------------------------"<<json["error"]<<std::endl;
-                if(json["error"]==false){
-                    std::cout<<"------------------PSI SI Interval has been restored--------------------- "<<json["message"]<<std::endl;
+            usleep(100);
+            table_ver_json = db->getTablesVersions();
+            if(table_ver_json["error"]==false){
+                for (int i = 0; i < table_ver_json["list"].size(); ++i)
+                {
+                    Json::Value json = callSetTablesVersion(table_ver_json["list"][i]["pat_ver"].asString(),table_ver_json["list"][i]["pat_isenable"].asString(),table_ver_json["list"][i]["sdt_ver"].asString(),table_ver_json["list"][i]["sdt_isenable"].asString(),table_ver_json["list"][i]["nit_ver"].asString(),table_ver_json["list"][i]["nit_isenable"].asString(),table_ver_json["list"][i]["output"].asString(),std::stoi(table_ver_json["list"][i]["rmx_no"].asString()));
+                    //std::cout<<"-------------------------"<<json["error"]<<std::endl;
+                    if(json["error"]==false){
+                        std::cout<<"------------------Table versions has been restored--------------------- "<<json["message"]<<std::endl;
+                    }
                 }
             }
-        }
-
-        std::cout<<"-------------------------PSI SI Interval END-------------------------------"<<std::endl;
-
-        usleep(100);
-        serv_provider_json = db->getNewProviderName();
-        if(serv_provider_json["error"]==false){
-            for (int i = 0; i < serv_provider_json["list"].size(); ++i)
-            {
-                Json::Value json = callSetServiceProvider(serv_provider_json["list"][i]["service_name"].asString(),serv_provider_json["list"][i]["service_number"].asString(),serv_provider_json["list"][i]["input_channel"].asString(),std::stoi(serv_provider_json["list"][i]["rmx_no"].asString()));
-               // std::cout<<"-------------------------"<<json["error"]<<std::endl;
-                if(json["error"]==false){
-                    std::cout<<"------------------Provider names has been restored--------------------- "<<json["message"]<<std::endl;
-                }
-            }
-        }
-        updateCATCADescriptor("-1");
-        
-        usleep(100);
-        for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
-        {
-        	Json::Value json_qam_ids = db->getQAM(rmx_no);
-        	std::cout<<json_qam_ids["error"].asString()<<std::endl;
-	        if(json_qam_ids["error"] == false){
-	    		int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
-                if(write32bCPU(0,0,target) != -1) {
-                	for (int i = 0; i < json_qam_ids["list"].size(); ++i)
-                	{
-                		int qam_id =std::stoi(json_qam_ids["list"][i]["qam_id"].asString());
-                		if(qam_id != 2){
-		                	int output_channel = std::stoi(json_qam_ids["list"][i]["output_channel"].asString());
-		                    int value = ((qam_id&0xF)<<1) | (0&0x0);
-		                    json = callSetCore(std::to_string(DVBC_OUTPUT_CS[output_channel]),std::to_string(QAM_ADDR),std::to_string(value),rmx_no);
-		                    if(json["error"] == false)
-		                		std::cout<<"----------------QAM ADDED! -----------------------"<<std::endl;    	
-		                }
-
-                	}
-                	
-                }else{
-                    std::cout<<"----------------Error while connection! -----------------------"<<std::endl;
-                }    	
-	        }
-        }
-       
-       usleep(100);
-        // //Initializing DVBCSA to the core
-        for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
-        {
-        	callSetInputOutput("0","0",rmx_no);
-        	// std::cout <<rmx_no<<std::endl;
-        	callinitCsa(rmx_no);
-        }
-
-        usleep(100);
-        // //Updating CA Descriptor to the PMT 
-        for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
-        {
-        	 for (int input = 0; input <= OUTPUT_COUNT; ++input)
-	        {
-	        	Json::Value auth_outputs,ecm_pids,JSON_CA_System_id,service_pids,private_data_list;
-	        	Json::Value JSON_ecm_desc = db->getECMDescriptors(std::to_string(rmx_no),std::to_string(input));
-		        // std::cout<<"-------------------------------------------------------------------------------";
-		        if (JSON_ecm_desc["error"] == false)
-		        {
-		        	for (int i = 0; i < JSON_ecm_desc["ca_system_ids"].size(); ++i)
-		        	{
-
-		                std::string system_id = JSON_ecm_desc["ca_system_ids"][i].asString();
-
-		                system_id = system_id.substr(2,system_id.length()-6);
-		                // std::cout<<system_id;
-		        		JSON_CA_System_id.append(std::to_string(getHexToLongDec(system_id)));
-		        		auth_outputs.append("255");
-		        		service_pids.append(JSON_ecm_desc["service_pids"][i].asString());
-
-		        		ecm_pids.append(JSON_ecm_desc["ecm_pids"][i].asString());
-
-		        	}
-		        	json = callSetPMTCADescriptor(service_pids,JSON_CA_System_id,ecm_pids,private_data_list,rmx_no,std::to_string(input),std::to_string(input));
-		        	if(json["error"] == false){
-		           		std::cout<<"-----------------------Successfully Added ECM Descriptor!----------------------------";
-		           	}
-		           	else{
-		           		std::cout<<"-----------------------Failed to add ECM Descriptor!----------------------------";
-		           	}
-		        	// Json::Value customPid = callsetCustomPids(ecm_pids,auth_outputs,rmx_no,std::to_string(output));
-		         //   	if(customPid["error"] == false){
-		         //   		std::cout<<"-----------------------Successfully enabled ECM PID!----------------------------";
-		         //   	}
-		           	// else{
-		           	// 	std::cout<<"-----------------------Failed to enabled ECM PID!----------------------------";
-		           	// }
-		        }
-	        }
-        }
-
-        usleep(100);
-       //Initializing CUSTOM PIDS to the core
-        for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
-        {
-            for (int output = 0; output <= OUTPUT_COUNT; ++output)
-            {
-                Json::Value json_pids = db->getCustomPids(std::to_string(rmx_no));
-                if(json_pids["error"] == false){
-                    json = callsetCustomPids(json_pids["pids"],json_pids["output_auths"],rmx_no,std::to_string(output));
-                }else{
-                    json["error"]= true;
-                    json["message"]= "No record found!";
-                }
-            }
-
-        }
-
-        usleep(100);
-        //Insert NIT insertion 
-        Json::Value json_nit = db->getNITDetails();
-       	if(json_nit["error"] == false){
-            if(json_nit["mode"] == "2"){
-           		std::string networkid = json_nit["network_id"].asString();
-    			std::string networkName =json_nit["network_name"].asString();
-                NIT_VER = std::stoi(json_nit["nit_version"].asString());
-
-                Json::Value json_nit =  callInsertNITable(networkid,networkName);
-                if(json_nit["error"] == false)
-                    std::cout<<"-----------------------NIT Updated successfully!----------------------------";
-                else
-                    std::cout<<"-----------------------Error Updating NIT!       ----------------------------";
-            }else{
-                std::cout<<"----------------------NIT in disabled mode!----------------------------";
-            }
-       	}
-       	else{
-       		std::cout<<"-----------------------NO NIT!----------------------------";
-       	}
-
-        usleep(100);
-        // Json::Value jsonRfauth = db->getRFauthorizedRmx();
-        // int rmx_no =0;
-        // if(jsonRfauth["error"] == false){
-        //     std::cout<<jsonRfauth["list"].size()<<std::endl;
-        //     for(int i=0;i<jsonRfauth["list"].size();i++ ){
-        //          rmx_no = std::stoi(jsonRfauth["list"][0].asString());
+            std::cout<<"-------------------------Table versions END-------------------------------"<<std::endl;
+            
+        //     usleep(100);
+        //     nit_mode = db->getNITmode();
+        //     if(nit_mode["error"]==false){
+        //         for (int i = 0; i < nit_mode["list"].size(); ++i)
+        //         {
+        //         	 Json::Value iojson=callSetInputOutput("0",nit_mode["list"][i]["output"].asString(),std::stoi(nit_mode["list"][i]["rmx_no"].asString()));
+        //             if(iojson["error"]==false){
+        //             	if(std::stoi(nit_mode["list"][i]["mode"].asString()) != 1){
+    				// 		Json::Value json = callSetNITmode(nit_mode["list"][i]["mode"].asString(),nit_mode["list"][i]["output"].asString(),std::stoi(nit_mode["list"][i]["rmx_no"].asString()));
+    		  //               //std::cout<<"-------------------------"<<json["message"]<<std::endl;
+    			 //            if(json["error"]==false){
+    		  //                   std::cout<<"------------------NIT mode has been restored for output--------------------- "<<nit_mode["list"][i]["output"]<<std::endl;
+    		  //               }
+    		  //           }
+    				// }else{
+        //                 json["error"]= true;
+        //                 json["message"]= "Error while selecting output!";     
+        //             }
+                    
+        //         }
         //     }
-        // }
-        RFauthorization(1);
-        usleep(100);
-        RFauthorization(63);
-	
-        std::cout<<"----------------END OF EMMG INITIALIZATION! -----------------------"<<std::endl;
 
-        std::cout<<"-------------------------Provider names END-------------------------------"<<std::endl;
+            usleep(100);
+            table_timeout_json = db->getNITtableTimeout();
+            if(table_timeout_json["error"]==false){
+                for (int i = 0; i < table_timeout_json["list"].size(); ++i)
+                {
+                    Json::Value json = callSetTableTimeout(table_timeout_json["list"][i]["table_id"].asString(),table_timeout_json["list"][i]["timeout"].asString(),std::stoi(table_timeout_json["list"][i]["rmx_no"].asString()));
+                    //std::cout<<"-------------------------"<<json["error"]<<std::endl;
+                    if(json["error"]==false){
+                        std::cout<<"------------------NIT table timeout has been restored--------------------- "<<json["message"]<<std::endl;
+                    }
+                }
+            }
+            std::cout<<"-------------------------NIT table timeout END-------------------------------"<<std::endl;
 
-        std::cout<<"-------------------------END of Bootup Scrip-------------------------------------"<<std::endl;
+            usleep(100);
+            dvb_output_json = db->getDVBspiOutputMode();
+            if(dvb_output_json["error"]==false){
+                for (int i = 0; i < dvb_output_json["list"].size(); ++i)
+                {
+                    Json::Value json = callSetDvbSpiOutputMode(dvb_output_json["list"][i]["bit_rate"].asString(),dvb_output_json["list"][i]["falling"].asString(),dvb_output_json["list"][i]["mode"].asString(),dvb_output_json["list"][i]["output"].asString(),std::stoi(dvb_output_json["list"][i]["rmx_no"].asString()));
+                    //std::cout<<"-------------------------"<<json["error"]<<std::endl;
+                    if(json["error"]==false){
+                        std::cout<<"------------------DVB output mode has been restored--------------------- "<<json["message"]<<std::endl;
+                    }
+                }
+            }
+
+            usleep(100);
+            std::cout<<"-------------------------DVB output mode END-------------------------------"<<std::endl;
+            psisi_interval = db->getPsiSiInterval();
+            if(psisi_interval["error"]==false){
+                for (int i = 0; i < psisi_interval["list"].size(); ++i)
+                {
+                    Json::Value json = callSetPsiSiInterval(psisi_interval["list"][i]["pat_int"].asString(),psisi_interval["list"][i]["sdt_int"].asString(),psisi_interval["list"][i]["nit_int"].asString(),psisi_interval["list"][i]["output"].asString(),std::stoi(psisi_interval["list"][i]["rmx_no"].asString()));
+                    //std::cout<<"-------------------------"<<json["error"]<<std::endl;
+                    if(json["error"]==false){
+                        std::cout<<"------------------PSI SI Interval has been restored--------------------- "<<json["message"]<<std::endl;
+                    }
+                }
+            }
+
+            std::cout<<"-------------------------PSI SI Interval END-------------------------------"<<std::endl;
+
+            usleep(100);
+            serv_provider_json = db->getNewProviderName();
+            if(serv_provider_json["error"]==false){
+                for (int i = 0; i < serv_provider_json["list"].size(); ++i)
+                {
+                    Json::Value json = callSetServiceProvider(serv_provider_json["list"][i]["service_name"].asString(),serv_provider_json["list"][i]["service_number"].asString(),serv_provider_json["list"][i]["input_channel"].asString(),std::stoi(serv_provider_json["list"][i]["rmx_no"].asString()));
+                   // std::cout<<"-------------------------"<<json["error"]<<std::endl;
+                    if(json["error"]==false){
+                        std::cout<<"------------------Provider names has been restored--------------------- "<<json["message"]<<std::endl;
+                    }
+                }
+            }
+            updateCATCADescriptor("-1");
+            
+            usleep(100);
+            for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
+            {
+            	Json::Value json_qam_ids = db->getQAM(rmx_no);
+            	std::cout<<json_qam_ids["error"].asString()<<std::endl;
+    	        if(json_qam_ids["error"] == false){
+    	    		int target =((0&0x3)<<8) | (((rmx_no-1)&0x7)<<5) | ((0&0xF)<<1) | (0&0x1);
+                    if(write32bCPU(0,0,target) != -1) {
+                    	for (int i = 0; i < json_qam_ids["list"].size(); ++i)
+                    	{
+                    		int qam_id =std::stoi(json_qam_ids["list"][i]["qam_id"].asString());
+                    		if(qam_id != 2){
+    		                	int output_channel = std::stoi(json_qam_ids["list"][i]["output_channel"].asString());
+    		                    int value = ((qam_id&0xF)<<1) | (0&0x0);
+    		                    json = callSetCore(std::to_string(DVBC_OUTPUT_CS[output_channel]),std::to_string(QAM_ADDR),std::to_string(value),rmx_no);
+    		                    if(json["error"] == false)
+    		                		std::cout<<"----------------QAM ADDED! -----------------------"<<std::endl;    	
+    		                }
+
+                    	}
+                    	
+                    }else{
+                        std::cout<<"----------------Error while connection! -----------------------"<<std::endl;
+                    }    	
+    	        }
+            }
+           
+           usleep(100);
+            // //Initializing DVBCSA to the core
+            for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
+            {
+            	callSetInputOutput("0","0",rmx_no);
+            	// std::cout <<rmx_no<<std::endl;
+            	callinitCsa(rmx_no);
+            }
+
+            usleep(100);
+            // //Updating CA Descriptor to the PMT 
+            for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
+            {
+            	 for (int input = 0; input <= OUTPUT_COUNT; ++input)
+    	        {
+    	        	Json::Value auth_outputs,ecm_pids,JSON_CA_System_id,service_pids,private_data_list;
+    	        	Json::Value JSON_ecm_desc = db->getECMDescriptors(std::to_string(rmx_no),std::to_string(input));
+    		        // std::cout<<"-------------------------------------------------------------------------------";
+    		        if (JSON_ecm_desc["error"] == false)
+    		        {
+    		        	for (int i = 0; i < JSON_ecm_desc["ca_system_ids"].size(); ++i)
+    		        	{
+
+    		                std::string system_id = JSON_ecm_desc["ca_system_ids"][i].asString();
+
+    		                system_id = system_id.substr(2,system_id.length()-6);
+    		                // std::cout<<system_id;
+    		        		JSON_CA_System_id.append(std::to_string(getHexToLongDec(system_id)));
+    		        		auth_outputs.append("255");
+    		        		service_pids.append(JSON_ecm_desc["service_pids"][i].asString());
+
+    		        		ecm_pids.append(JSON_ecm_desc["ecm_pids"][i].asString());
+
+    		        	}
+    		        	json = callSetPMTCADescriptor(service_pids,JSON_CA_System_id,ecm_pids,private_data_list,rmx_no,std::to_string(input),std::to_string(input));
+    		        	if(json["error"] == false){
+    		           		std::cout<<"-----------------------Successfully Added ECM Descriptor!----------------------------";
+    		           	}
+    		           	else{
+    		           		std::cout<<"-----------------------Failed to add ECM Descriptor!----------------------------";
+    		           	}
+    		        	// Json::Value customPid = callsetCustomPids(ecm_pids,auth_outputs,rmx_no,std::to_string(output));
+    		         //   	if(customPid["error"] == false){
+    		         //   		std::cout<<"-----------------------Successfully enabled ECM PID!----------------------------";
+    		         //   	}
+    		           	// else{
+    		           	// 	std::cout<<"-----------------------Failed to enabled ECM PID!----------------------------";
+    		           	// }
+    		        }
+    	        }
+            }
+
+            usleep(100);
+           //Initializing CUSTOM PIDS to the core
+            for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
+            {
+                for (int output = 0; output <= OUTPUT_COUNT; ++output)
+                {
+                    Json::Value json_pids = db->getCustomPids(std::to_string(rmx_no));
+                    if(json_pids["error"] == false){
+                        json = callsetCustomPids(json_pids["pids"],json_pids["output_auths"],rmx_no,std::to_string(output));
+                    }else{
+                        json["error"]= true;
+                        json["message"]= "No record found!";
+                    }
+                }
+
+            }
+
+            usleep(100);
+            //Insert NIT insertion 
+            Json::Value json_nit = db->getNITDetails();
+           	if(json_nit["error"] == false){
+                if(json_nit["mode"] == "2"){
+               		std::string networkid = json_nit["network_id"].asString();
+        			std::string networkName =json_nit["network_name"].asString();
+                    NIT_VER = std::stoi(json_nit["nit_version"].asString());
+
+                    Json::Value json_nit =  callInsertNITable14_247(networkid,networkName);
+                    if(json_nit["error"] == false)
+                        std::cout<<"-----------------------NIT Updated successfully!----------------------------";
+                    else
+                        std::cout<<"-----------------------Error Updating NIT!       ----------------------------";
+                }else{
+                    std::cout<<"----------------------NIT in disabled mode!----------------------------";
+                }
+           	}
+           	else{
+           		std::cout<<"-----------------------NO NIT!----------------------------";
+           	}
+           	
+           //  usleep(100);
+           //  updateBATtable();
+
+            usleep(100);
+            // Json::Value jsonRfauth = db->getRFauthorizedRmx();
+            // int rmx_no =0;
+            // if(jsonRfauth["error"] == false){
+            //     std::cout<<jsonRfauth["list"].size()<<std::endl;
+            //     for(int i=0;i<jsonRfauth["list"].size();i++ ){
+            //          rmx_no = std::stoi(jsonRfauth["list"][0].asString());
+            //     }
+            // }
+
+            
+            RFauthorization(63);
+
+            // rebootStatusRegister();
+            // usleep(100);
+            // //creating thread to the status register watch dog
+            // if(STATUS_THREAD_CREATED==0){
+            //     err = pthread_create(&tid, 0,&StatsEndpoint::createThreadToCheckStatus, this);
+            //     if (err != 0){
+            //         printf("\ncan't create thread :[%s]", strerror(err));
+            //     }else{
+            //         STATUS_THREAD_CREATED=1;
+            //         printf("\n Thread created successfully\n");
+            //     }
+            // }
+    	
+
+            std::cout<<"----------------END OF EMMG INITIALIZATION! -----------------------"<<std::endl;
+
+            std::cout<<"-------------------------Provider names END-------------------------------"<<std::endl;
+
+            std::cout<<"-------------------------END of Bootup Scrip-------------------------------------"<<std::endl;
+        }else{
+            std::cout<<"------------ Connection Error! Please check ETH connection to the board! ------------------"<<std::endl;
+        }
     }
     
    
@@ -15763,6 +17194,12 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
     std::shared_ptr<Net::Http::Endpoint> httpEndpoint;
     Rest::Router router;
     
+    static void* createThreadToCheckStatus(void *args)
+    {
+         StatsEndpoint *_this=static_cast<StatsEndpoint *>(args);
+        _this->checkRebootStatusRegister();
+    }
+
     static void* cwProvision(void *args)
     {
          StatsEndpoint *_this=static_cast<StatsEndpoint *>(args);
@@ -15808,6 +17245,7 @@ int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigne
     
 };
 int StatsEndpoint::CW_THREAD_CREATED=0;
+int StatsEndpoint::STATUS_THREAD_CREATED=0;
 
 
 
