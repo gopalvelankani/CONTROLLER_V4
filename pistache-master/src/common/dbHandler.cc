@@ -3202,6 +3202,45 @@ int dbHandler :: deleteBouquet(std::string bouquet_id){
 	 	}
 	 	return isDeleted;
 	}
+int dbHandler :: flushOldServices(std::string rmx_no,int input){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+		std::string query;
+		int isDeleted=0;
+		query="DELETE FROM channel_list WHERE rmx_id = '"+rmx_no+"' AND input_channel = '"+std::to_string(input)+"';";
+		std::cout<<query<<endl;
+		mysql_query (connect,query.c_str());
+		if(mysql_affected_rows(connect)){
+			query="DELETE FROM active_service_list WHERE rmx_id = '"+rmx_no+"' AND in_channel = '"+std::to_string(input)+"';";
+			std::cout<<query<<endl;
+			mysql_query (connect,query.c_str());
+			if(mysql_affected_rows(connect))
+			{
+				isDeleted = 1;
+		 	}	
+	 	}
+	 	return isDeleted;
+	}
+int dbHandler :: servicesUpdated(std::string rmx_no,std::string input){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+		std::string query;
+		int isExist = 0;
+		query="SELECT COUNT(*) FROM channel_list WHERE rmx_id = '"+rmx_no+"' AND input_channel = '"+input+"';";
+		std::cout<<query<<endl;
+		mysql_query (connect,query.c_str());
+		res_set = mysql_store_result(connect);
+		if(mysql_num_rows(res_set))
+		{
+			row= mysql_fetch_row(res_set);
+		 	if(atoi(row[0]) > 0){
+		 		isExist = 1;
+		 	}
+	 	}
+	 	return isExist;
+	}
 // int rmx_no = 6;
 // 		int frequency = 462;
 // 		for (int i = 0; i < 8; ++i)

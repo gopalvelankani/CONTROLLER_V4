@@ -175,6 +175,8 @@ public:
 	Json::Value getBATList();
 	Json::Value getBATServiceList(std::string bouquet_id);
 	int deleteBouquet(std::string bouquet_id);
+	int flushOldServices(std::string rmx_no,int input);
+	int servicesUpdated(std::string rmx_no,std::string input);
 };	
 // This is the content of the .h file, which is where the declarations go
 
