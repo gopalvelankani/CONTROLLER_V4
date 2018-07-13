@@ -66,6 +66,14 @@
 #define CMD_SET_TDTTOT			0x3B
 #define CMD_NITBATSDT			0x1F
 
+#define CMD_VER_BOOTLOADER  	0x00
+#define CMD_BIG_ENDIAN			0x01
+#define CMD_LITTLE_ENDIAN		0x02
+#define CMD_BL_JUMP				0x03
+#define CMD_BL_ADDRESS			0x04
+#define CMD_BL_TRANSFER			0x05
+#define CMD_BL_RD_DDR			0x06
+
 #define MMSB_32_8(x)		(x&0xFF000000)>>24
 #define MLSB_32_8(x)		0xFF&((x&0x00FF0000)>>16)
 #define LMSB_32_8(x)		0xFF&((x&0x0000FF00)>>8)
@@ -118,4 +126,5 @@ class Callcommand{
 	int setTableSectionLen(unsigned short *ucSecLenList,int usSecCount,TABLE_TYPE table_type,TABLE_COMMAND_TYPE command_type);
 	int activateTable(TABLE_TYPE table_type,TABLE_COMMAND_TYPE command_type);
 	int updateNITTable(unsigned char *ucSectiobData, unsigned short usPayloadLen,unsigned short usPointer,unsigned short usSectionNo);
+	int callCommand2(int cmd,unsigned char* RxBuffer,Json::Value json,unsigned int* puiData,int length);
 };

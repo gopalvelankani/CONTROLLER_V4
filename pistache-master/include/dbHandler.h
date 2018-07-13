@@ -177,6 +177,10 @@ public:
 	int deleteBouquet(std::string bouquet_id);
 	int flushOldServices(std::string rmx_no,int input);
 	int servicesUpdated(std::string rmx_no,std::string input);
+	int addMainBAT(std::string bouquet_id,std::string bouquet_name,Json::Value bouquet_list);
+	Json::Value getSubGengres(unsigned short usBouquetId);
+	void addToSQLLog(std::string fname,std::string msg);
+	int isServiceExist(int service_id,int input);
 };	
 // This is the content of the .h file, which is where the declarations go
 

@@ -1033,12 +1033,101 @@
 				msgBuf[10] = ETX;
 				}
 		    	break;
+		case 87:{
+	    		len = 5;
+	    		msgBuf[0] = STX;
+				msgBuf[1] = 0x00;
+				msgBuf[2] = 0x05;
+				msgBuf[3] = 0x05;
+				msgBuf[4] = 0x01;
+				msgBuf[5] = 0x00;
+				msgBuf[6] = 0x00;
+				msgBuf[7] = 0x00;
+				msgBuf[8] = 0x00;
+				msgBuf[9] = ETX;
+				}
+		    	break;
+		case 100:
+			    msgBuf[0] = STX;
+			    msgBuf[1] = (unsigned char) (len>>8);
+			    msgBuf[2] = (unsigned char) len;				
+			    msgBuf[3] = CMD_VER_FIMWARE;
+			    msgBuf[4] = ETX;
+	    		break;
+
+			case 102:
+				len=2*4;
+			    msgBuf[0] = STX;
+			    msgBuf[1] = (unsigned char) (len>>8);
+			    msgBuf[2] = (unsigned char) len;				
+			    msgBuf[3] = CMD_BL_ADDRESS;
+			    msgBuf[4] = 0x00;
+			    msgBuf[5] = 0x00;
+			    msgBuf[6] = 0x00;
+			    msgBuf[7] = 0x00;
+			    msgBuf[8] = 0x00;
+			    msgBuf[9] = 0x00;
+			    msgBuf[10] = 0x00;
+			    msgBuf[11] = 0x00;
+			    msgBuf[12] = ETX;
+	    		break;
+
+			case 103:
+				len=2*4;
+			    msgBuf[0] = STX;
+			    msgBuf[1] = (unsigned char) (len>>8);
+			    msgBuf[2] = (unsigned char) len;				
+			    msgBuf[3] = CMD_BL_ADDRESS;
+			    msgBuf[4] = (0x1486064>>24)&0xFF;;
+			    msgBuf[5] = (0x1486064>>16)&0xFF;;
+			    msgBuf[6] = (0x1486064>>8)&0xFF;;
+			    msgBuf[7] = (0x1486064>>0)&0xFF;;
+			    msgBuf[8] = 0x00;
+			    msgBuf[9] = 0x00;
+			    msgBuf[10] = 0x00;
+			    msgBuf[11] = 0x00;
+			    msgBuf[12] = ETX;
+	    		break;
+
+	    	case 105:
+		        msgBuf[0] = STX;
+		        msgBuf[1] = (unsigned char)(len >> 8);
+		        msgBuf[2] = (unsigned char)len;
+		        msgBuf[3] = 0x03;
+		        msgBuf[4] = ETX;
+        		break;
+
+        	case 106:
+        	        len = 5;
+			        msgBuf[0]  = STX;
+			        msgBuf[1]  = (unsigned char) (len>>8);
+			        msgBuf[2]  = (unsigned char) len;
+			        msgBuf[3]  = CMD_BL_TRANSFER;
+			        msgBuf[4]  = 0x01;
+			        msgBuf[5]  = (0x2097152>>24)&0xFF;
+			        msgBuf[6]  = (0x2097152>>16)&0xFF;
+			        msgBuf[7]  = (0x2097152>>8)&0xFF;
+			        msgBuf[8]  = (0x2097152>>0)&0xFF;
+			        msgBuf[len+4] = ETX;
+			        break;
+
+        	case 107:
+        	        len = 0;
+			        msgBuf[0]  = STX;
+			        msgBuf[1]  = (unsigned char) (len>>8);
+			        msgBuf[2]  = (unsigned char) len;
+			        msgBuf[3]  = CMD_BL_TRANSFER;
+			        msgBuf[len+4] = ETX;
+			        break;
 	    }
 		len += 5; 
 		int count;
 		int send_resp = sendto(socketHandle,msgBuf, len, 0,(struct sockaddr*)&serverAddress, sizeof(serverAddress));
 		if(send_resp!=0){
 			std::cout << "sent "<<send_resp<<" bytes of the msg\n";
+			if(cmd==105){
+				return 1;
+			}
 			int serv_addr_size = sizeof(clientAddress);
 			count=recvfrom(socketHandle,RxBuffer,rx_len, 0, (struct sockaddr*)&clientAddress,(socklen_t*) &serv_addr_size);
 			if(count<0)
@@ -1246,6 +1335,107 @@ int Callcommand :: insertTable(unsigned char *ucSectiobData, unsigned short usPa
       close(socketHandle);
       return count;
  }
+
+int Callcommand :: callCommand2(int cmd,unsigned char* RxBuffer,Json::Value json,unsigned int* puiData,int length)
+{
+		//std::cout<<"callCommand2\n";
+		Json::Reader reader;
+		unsigned char *msgBuf;
+		unsigned short len=0;
+		unsigned short uProg;
+		std::string strProg;
+		int up;
+		port = 4660;
+		struct timeval tv;
+		tv.tv_sec = 0;  /* 0.3 Secs Timeout */
+		tv.tv_usec = 500000;
+		int reuse_sockt=1;
+		SOCKET_TYPE socketHandle = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP/* or 0? */);
+		setsockopt(socketHandle, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
+		if(setsockopt(socketHandle, SOL_SOCKET, SO_REUSEADDR, &reuse_sockt,sizeof(reuse_sockt)) == -1){
+			std::cerr << "Set socket option failed\n";
+	        return 0;	
+		}
+	    if (SOCKET_INVALID(socketHandle))
+	    {
+	        std::cerr << "could not make socket\n";
+	        return 0;
+	    }
+	    memset(&serverAddress, 0, sizeof(serverAddress));
+	    memset(&clientAddress, 0, sizeof(clientAddress));
+	    serverAddress.sin_family = AF_INET;
+	    serverAddress.sin_port = htons(port);
+	    serverAddress.sin_addr.s_addr = inet_addr("192.168.1.20");
+	    clientAddress.sin_family = AF_INET;
+		clientAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+	    clientAddress.sin_port = htons(port);
+		if(bind(socketHandle,(struct sockaddr*)&clientAddress,sizeof(clientAddress)) == -1){
+			std ::cout << "bind failed\n";
+			return 0;
+		}
+
+		// std::cout << sizeof(RxBuffer);
+		len = 0;
+	    int i;
+
+	    switch(cmd)
+	    {
+	    	case 101:
+		        msgBuf = (unsigned char *) malloc(length*4+5);
+		        //Send command
+		        len = length*4;
+		        msgBuf[0] = STX;
+		        msgBuf[1] = (unsigned char) (len>>8);
+		        msgBuf[2] = (unsigned char) len;
+		        msgBuf[3] = CMD_LITTLE_ENDIAN;
+		        for(i = 0; i<length;i++) {
+		            msgBuf[4 + i * 4 + 0] = (puiData[i] >> 24) & 0xFF;
+		            msgBuf[4 + i * 4 + 1] = (puiData[i] >> 16) & 0xFF;
+		            msgBuf[4 + i * 4 + 2] = (puiData[i] >> 8) & 0xFF;
+		            msgBuf[4 + i * 4 + 3] = (puiData[i] >> 0) & 0xFF;
+		        }
+		        
+		        msgBuf[len+4] = ETX;
+		        break;
+
+	    	case 104:
+		        msgBuf = (unsigned char *) malloc(length*4+5);
+		        //Send command
+		        len = length*4;
+		        msgBuf[0] = STX;
+		        msgBuf[1] = (unsigned char) (len>>8);
+		        msgBuf[2] = (unsigned char) len;
+		        msgBuf[3] = CMD_BIG_ENDIAN;
+		        for(i = 0; i<length;i++) {
+		          msgBuf[4+i*4+0] = (puiData[i]>>24)&0xFF;
+		          msgBuf[4+i*4+1] = (puiData[i]>>16)&0xFF;
+		          msgBuf[4+i*4+2] = (puiData[i]>>8)&0xFF;
+		          msgBuf[4+i*4+3] = (puiData[i]>>0)&0xFF;
+		       }
+		
+		        msgBuf[len+4] = ETX;
+		        break;		      
+    	} 
+
+    	len += 5;
+		int count;
+		int send_resp = sendto(socketHandle,msgBuf, len, 0,(struct sockaddr*)&serverAddress, sizeof(serverAddress));
+		if(send_resp!=0){
+			//std::cout << "sent "<<send_resp<<" bytes of the msg\n";
+			int serv_addr_size = sizeof(clientAddress);
+			count=recvfrom(socketHandle,RxBuffer,200, 0, (struct sockaddr*)&clientAddress,(socklen_t*) &serv_addr_size);
+			if(count<0)
+				std ::cout <<"FAILED"<<"\n";
+			//std::cout << "RMX Command "+std::to_string(msgBuf[3])+" ";
+			//std::cout << "done\n\n";
+		}else{
+			count =-1;
+		}
+	    close(socketHandle);
+		shutdown(socketHandle,2);
+		//std::cout<<count<<"\n";
+	    return count;
+}
 int Callcommand :: leftShifting(int val,int noofbit,int isenable){
         val=val<<noofbit;
         return val | isenable;
