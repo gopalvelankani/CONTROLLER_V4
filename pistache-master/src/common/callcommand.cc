@@ -9,8 +9,6 @@
 #include <sstream>
 #include "callcommand.h"
 
-	
-	//int rmx_ports[]={4660,4660,4660,4660,4660,4660};
 	Callcommand:: Callcommand(){    
 		
 	}

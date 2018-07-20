@@ -106,7 +106,7 @@ public:
         updateEMMChannelsInRedis();
         updateECMChannelsInRedis();
         updateECMStreamsInRedis();
-        // runBootupscript();
+        runBootupscript(); 
         // downloadMxlFW(1,0);
     }
     void start() {
@@ -535,7 +535,7 @@ private:
                             usleep(1000000);
                             db->flushOldServices(str_rmx_no,demod_id);
                             if(locked)
-                                updateServiceToDB(demod_id,rmx_no);
+                                callGetServiceTypeAndStatus(str_rmx_no,str_demod_id);
                             // RFauthorization(rmx_no);
                             // write32bCPU(0,0,12);
                             // write32bI2C(32, 0 ,std::stoi(auth_bit));
@@ -2704,34 +2704,43 @@ private:
         response.send(Http::Code::Ok, resp);
         
     }
-    Json::Value callGetServiceName(int rmx_no,std::string progNumber){
+    Json::Value callGetServiceName(int rmx_no,std::string progNumber,int input = -1){
         unsigned char RxBuffer[100]={0};
         Json::Value json,jsonInput;
         Json::Reader reader;
         unsigned char *name;
         jsonInput["uProg"] = progNumber;
-        int uLen = c1.callCommand(19,RxBuffer,100,8,jsonInput,0);
-
-        if (!uLen || RxBuffer[0] != STX || RxBuffer[3] != 0x19) {
-            json["error"]= true;
-            json["message"]= "STATUS COMMAND ERROR!";
-            addToLog("getServiceName","Error");
-        }else{
-            uLen = ((RxBuffer[1] << 8) | RxBuffer[2]);
-            name = (unsigned char *)malloc(uLen + 1);
-            json["error"] = false;
-            json["message"] = "GET Channel name!";
-            std::string nName="";
-            for (int i = 0; i<uLen; i++) {
-                name[i] = RxBuffer[4 + i];
-                nName=nName+getDecToHex((int)RxBuffer[4 + i]);
-            }
-            if(nName == "")
-                json["nName"] = -1;
-            else
-                json["nName"] = hex_to_string(nName);
-            addToLog("getServiceName","Success");
-        }
+        std::string serviceName= "-1";
+        if(input != -1)
+        	serviceName = db->getServiceNewName(progNumber, rmx_no, input);
+        if(serviceName == "-1")
+        {
+	        int uLen = c1.callCommand(19,RxBuffer,100,8,jsonInput,0);
+	        if (!uLen || RxBuffer[0] != STX || RxBuffer[3] != 0x19) {
+	            json["error"]= true;
+	            json["message"]= "STATUS COMMAND ERROR!";
+	            addToLog("getServiceName","Error");
+	        }else{
+	            uLen = ((RxBuffer[1] << 8) | RxBuffer[2]);
+	            name = (unsigned char *)malloc(uLen + 1);
+	            json["error"] = false;
+	            json["message"] = "GET Channel name!";
+	            std::string nName="";
+	            for (int i = 0; i<uLen; i++) {
+	                name[i] = RxBuffer[4 + i];
+	                nName=nName+getDecToHex((int)RxBuffer[4 + i]);
+	            }
+	            if(nName == "")
+	                json["nName"] = -1;
+	            else
+	                json["nName"] = hex_to_string(nName);
+	            addToLog("getServiceName","Success");
+	        }
+	    }else{
+	    	json["error"] = false;
+	        json["message"] = "GET Channel name!";
+			json["nName"] = serviceName;
+	    }
        return json;
     }
     void getServicename(const Rest::Request& request, Net::Http::ResponseWriter response){
@@ -2766,7 +2775,7 @@ private:
             if(all_para_valid){
                 iojson=callSetInputOutput(input,output,std::stoi(str_rmx_no));
                 if(iojson["error"]==false){
-                    json = callGetServiceName(std::stoi(str_rmx_no),progNumber);
+                    json = callGetServiceName(std::stoi(str_rmx_no),progNumber,std::stoi(input));
                 }else{
                     json = iojson;
                 }
@@ -3423,13 +3432,13 @@ private:
                             std::string progNumber = std::to_string(progList["progNums"][i].asInt());
                             progDetails["input"] = input;
                             progDetails["progNum"] = progNumber;
-                            progName= callGetProgramOriginalName(progNumber,rmx_no);
+                            progName= callGetProgramOriginalName(progNumber,rmx_no,input);
                             if(progName["error"]==false){
                                 progDetails["originalName"] = progName["name"];
                             }else{
                                 progDetails["originalName"] = "NoName";
                             }
-                            progProvider = callGetProgramOriginalProviderName(progNumber,rmx_no);
+                            progProvider = callGetProgramOriginalProviderName(progNumber,rmx_no,input);
                             if(progProvider["error"]==false){
                                 progDetails["providerName"] = progProvider["name"];
                             }else{
@@ -3533,13 +3542,9 @@ private:
                         band[i] = (((RxBuffer[8 + i * 4 + 2] & 0x7F) << 8) | RxBuffer[8 + i * 4 + 3]);
                         // uiShared[2 + i] = ((RxBuffer[8 + i * 4 + 2] & 0x80) >> 7);
                         uishared[i] = ((RxBuffer[8 + i * 4 + 2] & 0x80) >> 7);
-                        Json::Value prog_name =  callGetProgramOriginalName(std::to_string(pnumber),rmx_no);
+                        Json::Value prog_name =  callGetProgramOriginalName(std::to_string(pnumber),rmx_no,input);
                         if(prog_name["error"] == false){
-                           std::string str_name = prog_name["name"].asString();
-                           str_name = 'S'+str_name;
-                           str_name.erase(std::remove_if(str_name.begin(), str_name.end(),[](char c) {
-                                   if(!isalnum(c) && c != ' ' && !isalpha(c)){return true;}}),str_name.end());
-                           ProgNames.append( str_name);
+                           ProgNames.append(prog_name["name"].asString());
                        }else{
                            ProgNames.append("NoName");
                        }
@@ -3547,7 +3552,7 @@ private:
                     }
                     // callGetServiceTypeAndStatus(std::to_string(rmx_no),std::to_string(input));
                     if(!db->servicesUpdated(std::to_string(rmx_no),std::to_string(input))){
-                    	updateServiceToDB(input,rmx_no);
+                    	callGetServiceTypeAndStatus(std::to_string(rmx_no),std::to_string(input),-1);
                     }
                     json["prog_names"] = ProgNames;
                     json["progNums"] = ProgNum;
@@ -3589,9 +3594,46 @@ private:
                 json[para[i]]= (i!=0)? "Require Integer between 0-3!" : "Require Integer between 1-6!";
             }
             if(all_para_valid){
-            	// db->getProgramList(input,str_rmx);
-            	// if()
-               	json = callGetProgramList(std::stoi(input),std::stoi(str_rmx_no));
+            	int rmx_no = std::stoi(str_rmx_no);
+            	Json::Value ProgNames;
+            	Json::Value json_prog_list = db->getProgramList(input,str_rmx_no);
+            	if(json_prog_list["error"] == false){
+            		
+            		iojson=callSetInputOutput(input,"0",rmx_no);
+            		if(iojson["error"]==false)  {
+	            		for (int i = 0; i < json_prog_list["original_service_id"].size(); ++i)
+	            		{
+
+	            			if(json_prog_list["original_service_name"][i].asString() == "NULL"){
+	            				// std::cout<<"-------------------- SERVICE NULL-----------"<<json_prog_list["original_service_name"][i].asString()<<endl;
+	            				Json::Value prog_name =  callGetProgramOriginalName(std::to_string(json_prog_list["original_service_id"][i].asInt()),rmx_no,std::stoi(input));
+		                        if(prog_name["error"] == false){
+		                           ProgNames.append(prog_name["name"].asString());
+		                       	}else{
+		                           ProgNames.append("NoName");
+		                       	}
+	            			}else{
+	            				ProgNames.append(json_prog_list["original_service_name"][i].asString());
+	            			}
+	            		}
+	            		json["error"]= false;
+            			json["message"]= "Program List!";
+            		}else{
+           				json = iojson;
+            		}
+            		json["prog_names"] = ProgNames;
+                    json["progNums"] = json_prog_list["original_service_id"];
+                    json["uband"] = json_prog_list["bandwidth"];
+                    json["service_id"]=json_prog_list["service_id"];
+					json["service_name"]=json_prog_list["service_name"];
+					json["lcn"]=json_prog_list["lcn"];
+					json["service_type"]=json_prog_list["service_type"];
+					json["encrypted_flag"]=json_prog_list["encrypted_flag"];
+                    json["status"] = 1;
+            	}else{
+            			// std::cout<<"-------------------- BOARD-----------"<<endl;
+               		json = callGetProgramList(std::stoi(input),std::stoi(str_rmx_no));
+               	}
             }      
         }else{
             json["error"]= true;
@@ -3635,7 +3677,7 @@ private:
                             service_type[i] = RxBuffer[4 + i * 4 + 2];
                             encrypted_flag[i] = RxBuffer[4 + i * 4 + 3];
                         }
-                        std::cout<<"Services Types!"<<endl;
+                        std::cout<<"Services Types!"<<progNum<<endl;
                     if(progNum.size() > 0){
                         db->updateServiceType(std::to_string(rmx_no),std::to_string(input),progNum,service_type,encrypted_flag);
                         std::cout<<"Services Types update to DB successfully!"<<endl;
@@ -3773,14 +3815,17 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
-    Json::Value callGetServiceTypeAndStatus(std::string rmx_no,std::string input){
+    Json::Value callGetServiceTypeAndStatus(std::string rmx_no,std::string input,int selectIO = 1){
         unsigned char RxBuffer[1024]={0};
         
         Json::Value json,iojson;
         Json::Value progNum;
         Json::Value service_type,encrypted_flag;
+        if(selectIO != -1)
+        	iojson=callSetInputOutput(input,"0",std::stoi(rmx_no));
+        else
+        	iojson["error"] = false;
 
-        iojson=callSetInputOutput(input,"0",std::stoi(rmx_no));
         if(iojson["error"]==false){
             int uLen = c1.callCommand(33,RxBuffer,1024,5,json,0);
 
@@ -3805,6 +3850,7 @@ private:
                             encrypted_flag[i] = RxBuffer[4 + i * 4 + 3];
                         }
                     if(progNum.size() > 0){
+                    	// std::cout<<"--------------"<<progNum<<endl;
                         db->updateServiceType(rmx_no,input,progNum,service_type,encrypted_flag);
                     }
                     json["progNums"] = progNum;
@@ -3813,6 +3859,7 @@ private:
                     // addToLog("callGetServiceTypeAndStatus","Success");
                 }
             }
+            // updateServiceToDB(std::stoi(input),std::stoi(rmx_no));
         }else{
                 json = iojson;
             }
@@ -3894,7 +3941,7 @@ private:
                 iojson=callSetInputOutput(input,output,rmx_no);
                 Json::Value grog_info_json;
                 if(iojson["error"]==false){
-                    grog_info_json = callGetProgramOriginalProviderName(progNumber,rmx_no);
+                    grog_info_json = callGetProgramOriginalProviderName(progNumber,rmx_no,std::stoi(input));
                     if(grog_info_json["error"]==false){
                         json["original_provider_name"] = grog_info_json["name"];
                     }
@@ -3921,7 +3968,7 @@ private:
                         json["l204"] = grog_info_json["l204"];
                         json["error"] = grog_info_json["error"];
                     }
-                    grog_info_json = callGetServiceProvider(rmx_no,progNumber);
+                    grog_info_json = callGetServiceProvider(rmx_no,progNumber,std::stoi(input));
                     if(grog_info_json["error"]==false){
                         json["provider_name"] = grog_info_json["pName"];
                     }
@@ -4491,7 +4538,6 @@ private:
             uLen = ((RxBuffer[1] << 8) | RxBuffer[2]);
             num_prog = uLen/2;
             Json::Value jsonNewIds;
-            jsonNewIds = callGetServiceID(rmx_no);
 
             int progIndex = 0;
             for(int i=0; i<num_prog; i++) {
@@ -4501,22 +4547,22 @@ private:
                 int pnum = (RxBuffer[2*i+4]<<8)|RxBuffer[2*i+5];
                 // Json::Value input_rate = callGetDataflowRates(rmx_no);
                 // if(db->isServiceExist(pnum,input) > 0 && input_rate["uInuputRate"] > 0){
-	                jpnames = callGetProgramOriginalName(std::to_string(pnum),rmx_no);
+	                jpnames = callGetProgramOriginalName(std::to_string(pnum),rmx_no,input);
 	                if(jpnames["error"] == false){
 	                    if(jpnames["name"] != ""){
-	                    	std::string str_name = jpnames["name"].asString();
-	                           str_name = 'S'+str_name;
-	                        str_name.erase(std::remove_if(str_name.begin(), str_name.end(),[](char c) {
-	                       if(!isalnum(c) && c != ' ' && !isalpha(c)){return true;}}),str_name.end());
-	                        jsondata["original_name"] = str_name;
-	                        jservName = callGetServiceName(rmx_no,std::to_string(pnum));
+	                    	// std::string str_name = jpnames["name"].asString();
+	                     //       str_name = 'S'+str_name;
+	                     //    str_name.erase(std::remove_if(str_name.begin(), str_name.end(),[](char c) {
+	                     //   if(!isalnum(c) && c != ' ' && !isalpha(c)){return true;}}),str_name.end());
+	                        jsondata["original_name"] = jpnames["name"].asString();
+	                        jservName = callGetServiceName(rmx_no,std::to_string(pnum),input);
 	                        if(jservName["error"]==false){
 	                            jsondata["new_name"] = jservName["nName"];
 	                        }else{
 	                            jsondata["new_name"] = -1;
 	                        }
 	                        jsondata["original_service_id"] = pnum;
-	                        jsondata["new_service_id"] = getNewServiceIdIfExists(jsonNewIds,pnum);
+	                        jsondata["new_service_id"] = db->getServiceNewId(std::to_string(pnum),rmx_no,input);
 	                    }else{
 	                        continue;
 	                    }
@@ -5379,28 +5425,47 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
-    Json::Value callGetProgramOriginalName(std::string uProg,int rmx_no){
+    Json::Value callGetProgramOriginalName(std::string uProg,int rmx_no,int input =-1){
         unsigned char RxBuffer[1024]= {0};
         char *name;
         int uLen;
         Json::Value json;
         Json::Value jsonMsg;
-        jsonMsg["uProg"] = uProg;
-        uLen = c1.callCommand(60,RxBuffer,1024,8,jsonMsg,0);
-        
-        if (!uLen|| RxBuffer[0] != STX || RxBuffer[3] != 0x60 ) {
-            json["error"]= true;
-            json["message"]= "STATUS COMMAND ERROR!";
-            addToLog("getProgramOriginalName","Error"); 
+        std::string service_name="-1";
+        if(input != -1)
+        	service_name = db->getOrignalServiceName(std::stoi(uProg),rmx_no,input);
+
+        if(service_name == "-1" || service_name == "NULL")
+        {
+
+        	jsonMsg["uProg"] = uProg;
+	        uLen = c1.callCommand(60,RxBuffer,1024,8,jsonMsg,0);
+	        
+	        if (!uLen|| RxBuffer[0] != STX || RxBuffer[3] != 0x60 ) {
+	            json["error"]= true;
+	            json["message"]= "STATUS COMMAND ERROR!";
+	            addToLog("getProgramOriginalName","Error"); 
+	        }else{
+	            uLen = ((RxBuffer[1]<<8) | RxBuffer[2]);
+	            name = (char *)malloc(uLen);
+	            sprintf(name, "%s", (char*) &RxBuffer[4]);
+	            json["error"]= false;
+	            json["message"]= "get the name";
+	            std::string str_name = name;
+               	str_name = 'S'+str_name;
+               	str_name.erase(std::remove_if(str_name.begin(), str_name.end(),[](char c) {
+                       if(!isalnum(c) && c != ' ' && !isalpha(c)){return true;}}),str_name.end());
+	            json["name"] = str_name; 
+	            if(input != -1)
+	            	db->addOriginalServiceName(str_name,uProg,rmx_no,input);
+	            addToLog("getProgramOriginalName","Success"); 
+	        }	
         }else{
-            uLen = ((RxBuffer[1]<<8) | RxBuffer[2]);
-            name = (char *)malloc(uLen);
-            sprintf(name, "%s", (char*) &RxBuffer[4]);
-            json["error"]= false;
+        	json["error"]= false;
             json["message"]= "get the name";
-            json["name"] = name; 
-            addToLog("getProgramOriginalName","Success"); 
+            json["name"] = service_name;
         }
+        
         return json;
     }
     void getProgramOriginalname(const Rest::Request& request, Net::Http::ResponseWriter response){
@@ -5433,7 +5498,7 @@ private:
             if(all_para_valid){
                 iojson=callSetInputOutput(input,"0",std::stoi(str_rmx_no));
                 if(iojson["error"]==false){
-                    json = callGetProgramOriginalName(progNumber,std::stoi(str_rmx_no));
+                    json = callGetProgramOriginalName(progNumber,std::stoi(str_rmx_no),std::stoi(input));
                 }else{
                     json = iojson;
                 }
@@ -5469,7 +5534,7 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
-    Json::Value callGetProgramOriginalProviderName(std::string uProg,int rmx_no){
+    Json::Value callGetProgramOriginalProviderName(std::string uProg,int rmx_no,int input = -1){
         unsigned char RxBuffer[1024]= {0};
         unsigned char* ss;
         char *name;
@@ -5477,22 +5542,36 @@ private:
         Json::Value json;
         Json::Value jsonMsg;
         jsonMsg["uProg"] = uProg;
-
-        uLen = c1.callCommand(61,RxBuffer,1024,8,jsonMsg,0);
-        
-        if (!uLen|| RxBuffer[0] != STX || RxBuffer[3] != 0x61 ) {
-            json["error"]= true;
-            json["message"]= "STATUS COMMAND ERROR!";
-            addToLog("getProgramOriginalProviderName","Error"); 
-        }else{
-            uLen = ((RxBuffer[1]<<8) | RxBuffer[2]);
-            name = (char *)malloc(uLen);
-            sprintf(name, "%s", (char*) &RxBuffer[4]);
-            json["error"]= false;
+        std::string providerName="-1";
+        if(input != -1)
+        	providerName = db->getOrignalProviderName(std::stoi(uProg),rmx_no,input);
+        if(providerName == "-1" || providerName == "NULL"){
+	        uLen = c1.callCommand(61,RxBuffer,1024,8,jsonMsg,0);
+	        
+	        if (!uLen|| RxBuffer[0] != STX || RxBuffer[3] != 0x61 ) {
+	            json["error"]= true;
+	            json["message"]= "STATUS COMMAND ERROR!";
+	            addToLog("getProgramOriginalProviderName","Error"); 
+	        }else{
+	            uLen = ((RxBuffer[1]<<8) | RxBuffer[2]);
+	            name = (char *)malloc(uLen);
+	            sprintf(name, "%s", (char*) &RxBuffer[4]);
+	            json["error"]= false;
+	            json["message"]= "Get Program Original Provider Name!";
+	            std::string str_name = name;
+               	str_name = 'S'+str_name;
+               	str_name.erase(std::remove_if(str_name.begin(), str_name.end(),[](char c) {
+                       if(!isalnum(c) && c != ' ' && !isalpha(c)){return true;}}),str_name.end());
+	            json["name"] = str_name; 
+	            if(input != -1)
+	            	db->addOriginalProviderName(str_name,uProg,rmx_no,input);
+	            addToLog("getProgramOriginalProviderName","Success"); 
+	        }
+	    }else{
+	    	json["error"]= false;
             json["message"]= "Get Program Original Provider Name!";
-            json["name"] = name; 
-            addToLog("getProgramOriginalProviderName","Success"); 
-        }
+            json["name"] = providerName; 
+	    }
         return json;
     }
     void getProgramOriginalProvidername(const Rest::Request& request, Net::Http::ResponseWriter response){
@@ -5525,7 +5604,7 @@ private:
             if(all_para_valid){
                 iojson=callSetInputOutput(input,output,std::stoi(str_rmx_no));
                 if(iojson["error"]==false){
-                    json = callGetProgramOriginalProviderName(progNumber,std::stoi(str_rmx_no));
+                    json = callGetProgramOriginalProviderName(progNumber,std::stoi(str_rmx_no),std::stoi(input));
                 }else{
                     json = iojson;
                 }
@@ -7775,7 +7854,7 @@ private:
                 if(all_para_valid){
                     json = callSetServiceProvider(providerName,serviceNumber,input,std::stoi(rmx_no),std::stoi(addFlag));
                     if(json["error"] == false)
-                        db->addNewProviderName(serviceNumber,providerName,rmx_no,addFlag);        
+                        db->addNewProviderName(serviceNumber,providerName,rmx_no,input,addFlag);        
                 }
             }else{
                 json["error"] = false;
@@ -7811,12 +7890,13 @@ private:
                 if (uLen != 1 ) {
                     json["error"]= true;
                     json["message"]= "STATUS COMMAND ERROR!";
-                    addToLog("callSetServiceProvider","Error");
+                    // addToLog("callSetServiceProvider","Error");
                 }else{
                     json["status"] = RxBuffer[4];
                     json["error"]= false;
-                    json["message"]= "set provider name";  
-                    addToLog("callSetServiceProvider","Success");
+                    json["message"]= "set provider name"; 
+
+                    // addToLog("callSetServiceProvider","Success");
                 }
             }
         }else{
@@ -7848,38 +7928,47 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
-    Json::Value callGetServiceProvider(int rmx_no,std::string serviceNumber){
+    Json::Value callGetServiceProvider(int rmx_no,std::string serviceNumber,int input = -1){
         unsigned char RxBuffer[100]={0};
         Json::Value json;
         Json::Value jsonInput;
         unsigned char *name;
         jsonInput["uProg"] = serviceNumber;
         addToLog("getNewProvName",serviceNumber);
-
-        int uLen = c1.callCommand(26,RxBuffer,100,8,jsonInput,0);
-        
-        if (!uLen || RxBuffer[0]!= STX || RxBuffer[3] != 0x1A) {
-            json["error"]= true;
-            json["message"]= "STATUS COMMAND ERROR!";
-            addToLog("getNewProvName","Error");
-        }else{
-            uLen = ((RxBuffer[1] << 8) | RxBuffer[2]);
-            name = (unsigned char *)malloc(uLen + 1);
-            json["error"] = false;
-            json["message"] = "GET Service provider name!";
-            std::string nName="";
-            if(uLen>0){
-                for (int i = 0; i<uLen; i++) {
-                    name[i] = RxBuffer[4 + i];
-                    nName=nName+getDecToHex((int)RxBuffer[4 + i]);
-                }
-                json["pName"] = hex_to_string(nName);
-            }else{
-                json["pName"] = "-1";
-            }
-            
-            addToLog("getNewProvName","Success");
-        }
+        std::string serviceProvider = "-1";
+        if(input != -1)
+        	serviceProvider = db->getProviderName(std::stoi(serviceNumber),rmx_no,input);
+        if(serviceProvider == "-1" || serviceProvider == "NULL")
+        {
+	        int uLen = c1.callCommand(26,RxBuffer,100,8,jsonInput,0);
+	        
+	        if (!uLen || RxBuffer[0]!= STX || RxBuffer[3] != 0x1A) {
+	            json["error"]= true;
+	            json["message"]= "STATUS COMMAND ERROR!";
+	            addToLog("getNewProvName","Error");
+	        }else{
+	            uLen = ((RxBuffer[1] << 8) | RxBuffer[2]);
+	            name = (unsigned char *)malloc(uLen + 1);
+	            json["error"] = false;
+	            json["message"] = "GET Service provider name!";
+	            std::string nName="";
+	            if(uLen>0){
+	                for (int i = 0; i<uLen; i++) {
+	                    name[i] = RxBuffer[4 + i];
+	                    nName=nName+getDecToHex((int)RxBuffer[4 + i]);
+	                }
+	                json["pName"] = hex_to_string(nName);
+	            }else{
+	                json["pName"] = "-1";
+	            }
+	            
+	            addToLog("getNewProvName","Success");
+	        }
+	    }else{
+	    	json["error"] = false;
+	        json["message"] = "GET Service provider name!";
+			json["pName"] = serviceProvider;
+	    }
         return json;
     }
     void getServiceProvider(const Rest::Request& request, Net::Http::ResponseWriter response){
@@ -7912,7 +8001,7 @@ private:
             if(all_para_valid){
                 iojson=callSetInputOutput(input,"0",std::stoi(str_rmx_no));
                 if(iojson["error"]==false){
-                    json = callGetServiceProvider(std::stoi(str_rmx_no),serviceNumber);
+                    json = callGetServiceProvider(std::stoi(str_rmx_no),serviceNumber,std::stoi(input));
                 }else{
                     json = iojson;
                 }
@@ -8848,18 +8937,6 @@ private:
                     json["error"]= true;
                     json["message"]= "STATUS COMMAND ERROR 2!";
                 }else{
-                    // Json::Value pnameList;
-                    // if(includeFlag){
-                    //     for(int i = 0; i<programNumbers.size();i++){
-                    //         Json::Value jpnames = callGetProgramOriginalName(programNumbers[i].asString(),rmx_no);
-                    //         if(jpnames["error"] == false){
-                    //             pnameList[programNumbers[i].asString()] = jpnames["name"];
-                    //         }else{
-                    //             pnameList[programNumbers[i].asString()] = -1;
-                    //         }
-                    //     }
-                    // }
-                    // json["names"] = pnameList;
                 	json["error"]= false;
 					addToLog("addEncryptedPrograms","Success");
                     db->addEncryptedPrograms(input,output,programNumbers,rmx_no,includeFlag,prog_nos_str,keyIDS);
@@ -9308,18 +9385,7 @@ private:
                     json["error"]= true;
                     json["message"]= "STATUS COMMAND ERROR!";
                 }else{
-                    // Json::Value pnameList;
-                    // if(includeFlag){
-                    //     for(int i = 0; i<programNumbers.size();i++){
-                    //         Json::Value jpnames = callGetProgramOriginalName(programNumbers[i].asString(),rmx_no);
-                    //         if(jpnames["error"] == false){
-                    //             pnameList[programNumbers[i].asString()] = jpnames["name"];
-                    //         }else{
-                    //             pnameList[programNumbers[i].asString()] = -1;
-                    //         }
-                    //     }
-                    // }
-                    // json["names"] = pnameList;
+                    
                     json["error"]= false;
                     addToLog("setKeepProg","Success");
                     db->addActivatedPrograms(input,output,programNumbers,rmx_no,includeFlag,prog_nos_str);
@@ -9935,7 +10001,7 @@ private:
                         json["error"]= true;
                         json["message"]= "Failed MUX OUT!";
                     }
-                    updateServiceToDB(std::stoi(channel_no)-1,rmx_no);
+                    callGetServiceTypeAndStatus(str_rmx_no,std::to_string(std::stoi(channel_no)-1));
                     json["tuner_ch"] = tuner_ch;
                     json["target"] = target;
                     json["control_fpga"] = control_fpga;
@@ -10241,7 +10307,7 @@ private:
                     if(json["error"] == false){
                         db->addSPTSIPInputChannels(std::to_string(control_fpga),channel_no,std::to_string(ip_addr),port,str_type);
                     }
-                    updateServiceToDB(std::stoi(channel_no)-1,rmx_no);
+                    callGetServiceTypeAndStatus(str_rmx_no,std::to_string(std::stoi(channel_no)-1));
                     // json["tuner_ch"] = tuner_ch;
                     // json["target"] = target;
                     // json["control_fpga"] = control_fpga;
@@ -17364,7 +17430,7 @@ int TS_GenNITSection14_247(unsigned short usNetworkId,unsigned char ucVersion, u
                         usleep(1000);
                         setMpegMode(demod_id,1,MXL_HYDRA_MPEG_CLK_CONTINUOUS,MXL_HYDRA_MPEG_CLK_IN_PHASE,104,MXL_HYDRA_MPEG_CLK_PHASE_SHIFT_0_DEG,1,1,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_ACTIVE_HIGH,MXL_HYDRA_MPEG_MODE_SERIAL_3_WIRE,MXL_HYDRA_MPEG_ERR_INDICATION_DISABLED);
                         usleep(1000);
-                        updateServiceToDB(demod_id,rmx_no);
+                        // callGetServiceTypeAndStatus(demod_id,rmx_no);
                     }
                 }   
             }
@@ -17381,7 +17447,7 @@ int TS_GenNITSection14_247(unsigned short usNetworkId,unsigned char ucVersion, u
                         int ch_no = ((controller_of_rmx)*8)+channel_no;
                         Json::Value json = callSetEthernetIn(ch_no,std::stoul(jsonIPTuner["list"][i]["ip_address"].asString()),std::stoi(jsonIPTuner["list"][i]["port"].asString()),std::stoi(jsonIPTuner["list"][i]["type"].asString()));
                         if(json["error"] == false){
-                        	updateServiceToDB(channel_no-1,rmx_no);
+                        	// callGetServiceTypeAndStatus(channel_no-1,rmx_no);
                             std::cout<<"-------------------IP Input success------------------------------- "<<std::endl;
                         }
                         else

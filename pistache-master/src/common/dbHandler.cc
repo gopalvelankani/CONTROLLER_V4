@@ -207,6 +207,7 @@ using namespace std;
 		}else{
 			query = "UPDATE channel_list SET service_id = '-1' WHERE channel_number = '"+orig_service_id+"' AND rmx_id = '"+rmx_no+"' AND input_channel = '"+input+"';";   
 		}
+		std::cout<<query<<endl;
 		//addToSQLLog("addServiceId",query);
 		mysql_query (connect,query.c_str());
 		if(mysql_affected_rows(connect)){
@@ -355,15 +356,16 @@ using namespace std;
 		//addToSQLLog("dbHandler",query);
 		return mysql_affected_rows(connect);
 	}
-	int dbHandler :: addNewProviderName(std::string service_number,std::string serviceName,std::string rmx_no,std::string addFlag) 
+	int dbHandler :: addNewProviderName(std::string service_number,std::string serviceName,std::string rmx_no,std::string input,std::string addFlag) 
 	{
 		string query = "";
 		if(std::stoi(addFlag))
-			query = "Insert into service_providers (service_number,provider_name,rmx_id) VALUES ('"+service_number+"','"+serviceName+"','"+rmx_no+"') ON DUPLICATE KEY UPDATE provider_name = '"+serviceName+"';";  
+			query = "UPDATE channel_list SET provider_name = '"+serviceName+"' WHERE channel_number ='"+service_number+"' AND rmx_id = '"+rmx_no+"' AND input_channel = '"+input+"';";  
 		else
-			query = "DELETE FROM service_providers WHERE service_number = '"+service_number+"' AND rmx_id = '"+rmx_no+"';";  
+			query ="UPDATE channel_list SET provider_name = NULL WHERE channel_number ='"+service_number+"' AND rmx_id = '"+rmx_no+"' AND input_channel = '"+input+"';"; 
 		mysql_query (connect,query.c_str());
-		addToSQLLog("dbHandler",query);
+		// std::cout<<query<<endl;
+		// addToSQLLog("dbHandler",query);
 		return mysql_affected_rows(connect);
 	}
 	int dbHandler :: addInputMode(std::string SPTS,std::string PMT,std::string SID,std::string RISE,std::string MASTER,std::string INSELECT,std::string BITRATE,std::string input,int rmx_no){
@@ -3493,37 +3495,170 @@ void dbHandler :: addToSQLLog(std::string fname,std::string msg){
             fclose (pFile);
         } 
     }
-// Json::Value dbHandler :: getProgramList(std::string input,std::string str_rmx_no){
-// 	MYSQL_RES *res_set;
-// 	MYSQL_ROW row;
-// 	Json::Value jsonList;
-// 	std::string query;
-// 	std::string indexValue;
 
-// 	query="SELECT sub_bouquet_id FROM bouquet_subgenre_list WHERE main_bouquet_id = '"+std::to_string(usBouquetId)+"'";
-// 	// std::cout<<query<<std::endl;
-// 	mysql_query (connect,query.c_str());
-// //addToSQLLog("dbHandler",query);
-// 	unsigned int i =0;
-// 	res_set = mysql_store_result(connect);
-// 	if(res_set){
-// 		unsigned int numrows = mysql_num_rows(res_set);
-// 		if(numrows>0)
-// 		{
-// 			jsonArray["error"] = false;
-// 			while (((row= mysql_fetch_row(res_set)) !=NULL ))
-// 			{ 
-// 				jsonList.append(std::atoi(row[i]));
-// 			}
-// 		}else{	
-// 			jsonArray["error"] = true;
-// 		}
-// 		jsonArray["list"]=jsonList;
-// 	}else{ 		
-// 		jsonArray["error"] = true;
-// 	}
-//  	return jsonArray;
-// }
+Json::Value dbHandler :: getProgramList(std::string input,std::string rmx_no){
+	MYSQL_RES *res_set;
+	MYSQL_ROW row;
+	Json::Value jsonOriginalServiceName,jsonOriginalServiceId,jsonServiceId,jsonServiceName,jsonLcn,jsonBw,jsonServiceType,jsonEncryption;
+	std::string query;
+	std::string indexValue;
+
+	query="SELECT channel_number,original_service_name,band,service_id,service_name,lcn_id,service_type,encrypted_flag FROM channel_list WHERE input_channel = '"+input+"' AND rmx_id = '"+rmx_no+"'";
+	// std::cout<<query<<std::endl;
+	mysql_query (connect,query.c_str());
+//addToSQLLog("dbHandler",query);
+	unsigned int i =0;
+	res_set = mysql_store_result(connect);
+	if(res_set){
+		unsigned int numrows = mysql_num_rows(res_set);
+		if(numrows>0)
+		{
+			jsonArray["error"] = false;
+			while (((row= mysql_fetch_row(res_set)) !=NULL ))
+			{
+				jsonOriginalServiceId.append(std::atoi(row[i]));
+				std::string service_orig_name = (row[i+1] == NULL)? "NULL" : row[i+1];
+				jsonOriginalServiceName.append(service_orig_name);
+				jsonBw.append(std::atoi(row[i+2]));
+				jsonServiceId.append(std::atoi(row[i+3]));
+				jsonServiceName.append(row[i+4]);
+				jsonLcn.append(std::atoi(row[i+5]));
+				jsonServiceType.append(std::atoi(row[i+6]));
+				jsonEncryption.append(std::atoi(row[i+7]));
+			}
+		}else{	
+			jsonArray["error"] = true;
+		}
+		jsonArray["original_service_id"]=jsonOriginalServiceId;
+		jsonArray["original_service_name"]=jsonOriginalServiceName;
+		jsonArray["bandwidth"]=jsonBw;
+		jsonArray["service_id"]=jsonServiceId;
+		jsonArray["service_name"]=jsonServiceName;
+		jsonArray["lcn"]=jsonLcn;
+		jsonArray["service_type"]=jsonServiceType;
+		jsonArray["encrypted_flag"]=jsonEncryption;
+	}else{ 		
+		jsonArray["error"] = true;
+	}
+ 	return jsonArray;
+}
+std::string dbHandler :: getOrignalServiceName(int uProg,int rmx_no,int input)	
+	{
+		if(input != -1){
+			string query = "select original_service_name from channel_list where channel_number = '"+std::to_string(uProg)+"' AND rmx_id = '"+std::to_string(rmx_no)+"' AND input_channel = '"+std::to_string(input)+"';";
+			mysql_query (connect,query.c_str());
+			//addToSQLLog("dbHandler",query);
+			// std::cout<<query<<std::endl;
+			res_set = mysql_store_result(connect);
+			if(mysql_num_rows(res_set))
+			{
+				row= mysql_fetch_row(res_set);
+				return (row[0] == NULL)? "NULL" : row[0];
+			 	// return reinterpret_cast<char*>(service_name);
+		 	}else{
+		 		return "-1";
+		 	}
+		 }else{
+		 	return "-1";
+		 }
+	}
+std::string dbHandler :: getOrignalProviderName(int uProg,int rmx_no,int input)	
+	{
+		if(input != -1){
+			string query = "select original_provider_name from channel_list where channel_number = '"+std::to_string(uProg)+"' AND rmx_id = '"+std::to_string(rmx_no)+"' AND input_channel = '"+std::to_string(input)+"';";
+			mysql_query (connect,query.c_str());
+			//addToSQLLog("dbHandler",query);
+			res_set = mysql_store_result(connect);
+			if(mysql_num_rows(res_set))
+			{
+				row= mysql_fetch_row(res_set);
+				return (row[0] == NULL)? "NULL" : row[0];
+			 	// return reinterpret_cast<char*>(service_pname);
+		 	}else{
+		 		return "-1";
+		 	}
+		 }else{
+		 	return "-1";
+		 }
+	}
+
+std::string dbHandler :: getProviderName(int uProg,int rmx_no,int input)	
+	{
+		if(input != -1){
+			string query = "select provider_name from channel_list where channel_number = '"+std::to_string(uProg)+"' AND rmx_id = '"+std::to_string(rmx_no)+"' AND input_channel = '"+std::to_string(input)+"';";
+			// std::cout<<query<<endl;
+			mysql_query (connect,query.c_str());
+			//addToSQLLog("dbHandler",query);
+			res_set = mysql_store_result(connect);
+			if(mysql_num_rows(res_set))
+			{
+				row= mysql_fetch_row(res_set);
+				return (row[0] == NULL)? "NULL" : row[0];
+			 	// return reinterpret_cast<char*>(service_pname);
+		 	}else{
+		 		return "-1";
+		 	}
+		 }else{
+		 	return "-1";
+		 }
+	}
+int dbHandler :: addOriginalServiceName(std::string name,std::string service_number,int rmx_no,int input)
+	{
+		if(input != -1){
+			string query = "UPDATE channel_list SET original_service_name = '"+name+"' WHERE channel_number = '"+service_number+"' AND rmx_id = '"+std::to_string(rmx_no)+"' AND input_channel = '"+std::to_string(input)+"';";
+			mysql_query (connect,query.c_str());
+			// std::cout<<query<<endl;
+			return 1;
+		}
+		return 0;
+	}
+
+std::string dbHandler :: getServiceNewName(std::string service_number,int rmx_no,int input){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+		std::string query="SELECT service_name FROM channel_list c WHERE channel_number = '"+service_number+"' AND rmx_id = '"+std::to_string(rmx_no)+"' AND input_channel = '"+std::to_string(input)+"';";
+		mysql_query (connect,query.c_str());
+//addToSQLLog("dbHandler",query);
+		res_set = mysql_store_result(connect);
+		if(mysql_num_rows(res_set))
+		{
+			row= mysql_fetch_row(res_set);
+			auto service_name = row[0];
+		 	return reinterpret_cast<char*>(service_name);
+	 	}else{
+	 		return "-1";
+	 	}
+	}
+
+int dbHandler :: addOriginalProviderName(std::string name,std::string service_number,int rmx_no,int input)
+	{
+		if(input != -1){
+			string query = "UPDATE channel_list SET original_provider_name = '"+name+"' WHERE channel_number = '"+service_number+"' AND rmx_id = '"+std::to_string(rmx_no)+"' AND input_channel = '"+std::to_string(input)+"';";
+			mysql_query (connect,query.c_str());
+			// std::cout<<query<<endl;
+			return 1;
+		}
+		return 0;
+	}
+
+
+int dbHandler :: getServiceNewId(std::string service_number,int rmx_no,int input){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+		std::string query="SELECT service_id FROM channel_list c WHERE channel_number = '"+service_number+"' AND rmx_id = '"+std::to_string(rmx_no)+"' AND input_channel = '"+std::to_string(input)+"';";
+		mysql_query (connect,query.c_str());
+//addToSQLLog("dbHandler",query);
+		res_set = mysql_store_result(connect);
+		if(mysql_num_rows(res_set))
+		{
+			row= mysql_fetch_row(res_set);
+			return std::atoi(row[0]);
+	 	}else{
+	 		return -1;
+	 	}
+	}
 // int rmx_no = 6;
 // 		int frequency = 462;
 // 		for (int i = 0; i < 8; ++i)

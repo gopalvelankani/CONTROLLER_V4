@@ -51,7 +51,7 @@ public:
 	int addfreeCAModePrograms(std::string programNumber,std::string input,std::string output,int rmx_no); 
 	int addHighPriorityServices(std::string program_number,std::string input,int rmx_no);
 	int addLockedPrograms(std::string program_number,std::string input,int rmx_no);
-	int addNewProviderName(std::string program_number,std::string NewName,std::string rmx_no,std::string addFlag);
+	int addNewProviderName(std::string program_number,std::string NewName,std::string rmx_no,std::string input,std::string addFlag);
 	int addLcnProviderid(int provider_id,int rmx_no);
 	int deletefreeCAModePrograms();
 	int deleteLockedPrograms();
@@ -181,6 +181,14 @@ public:
 	Json::Value getSubGengres(unsigned short usBouquetId);
 	void addToSQLLog(std::string fname,std::string msg);
 	int isServiceExist(int service_id,int input);
+	Json::Value getProgramList(std::string input,std::string str_rmx_no);
+	std::string getOrignalServiceName(int uProg,int rmx_no,int input);
+	std::string getOrignalProviderName(int uProg,int rmx_no,int input);
+	std::string getProviderName(int uProg,int rmx_no,int input);
+	int addOriginalServiceName(std::string name,std::string service_number,int rmx_no,int input);
+	std::string getServiceNewName(std::string progNumber,int rmx_no,int input);
+	int addOriginalProviderName(std::string name,std::string service_number,int rmx_no,int input);
+	int getServiceNewId(std::string service_number,int rmx_no,int input);
 };	
 // This is the content of the .h file, which is where the declarations go
 
