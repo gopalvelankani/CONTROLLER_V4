@@ -1,1 +1,1 @@
-/usr/bin/c++    -std=c++11   CMakeFiles/rest_server.dir/rest_server.cc.o  -o rest_server -rdynamic ../src/libnet_static.a -lmysqlclient -ljsoncpp -lhiredis -lpthread 
+/usr/bin/c++    -std=c++11 -g   CMakeFiles/rest_server.dir/rest_server.cc.o  -o rest_server -rdynamic ../src/libnet_static.a -lmysqlclient -ljsoncpp -lhiredis -lpthread 

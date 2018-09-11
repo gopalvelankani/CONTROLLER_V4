@@ -9,7 +9,7 @@ C_DEFINES = -Dnet_EXPORTS
 
 C_INCLUDES = -I/home/user/Videos/CONTROLLER_V4/pistache-master/include 
 
-CXX_FLAGS =  -std=c++11 -fPIC  
+CXX_FLAGS =  -std=c++11 -g -fPIC  
 
 CXX_DEFINES = -Dnet_EXPORTS
 

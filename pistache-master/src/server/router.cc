@@ -222,9 +222,10 @@ RouterHandler::onRequest(
         const Http::Request& req,
         Http::ResponseWriter response)
 {
+    // std::cout<<req.body()<<std::endl;
     auto resp = response.clone();
     auto result = router.route(req, std::move(resp));
-    // std::cout<<req.body()<<std::endl;
+    
     /* @Feature: add support for a custom NotFound handler */
     if (result == Router::Status::NotFound)
         response.send(Http::Code::Not_Found, "Could not find a matching route");

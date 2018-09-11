@@ -127,4 +127,5 @@ class Callcommand{
 	int activateTable(TABLE_TYPE table_type,TABLE_COMMAND_TYPE command_type);
 	int updateNITTable(unsigned char *ucSectiobData, unsigned short usPayloadLen,unsigned short usPointer,unsigned short usSectionNo);
 	int callCommand2(int cmd,unsigned char* RxBuffer,Json::Value json,unsigned int* puiData,int length);
+	// void signal_callback_handler(int signum)
 };

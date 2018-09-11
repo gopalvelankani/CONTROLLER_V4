@@ -8,7 +8,7 @@
 #include <jsoncpp/json/json.h>
 #include <sstream>
 #include "callcommand.h"
-
+#include <signal.h>
 	Callcommand:: Callcommand(){    
 		
 	}
@@ -49,7 +49,6 @@
 			std ::cout << "bind failed\n";
 			return 0;
 		}
-
 		// std::cout << sizeof(RxBuffer);
 		len = 0;
 	    msgBuf[0] = STX;
@@ -705,6 +704,13 @@
 				    msgBuf[3] = CMD_ENCRYPT_PROG_STATE;
 				    msgBuf[4] = ETX;
 				    std::cout<<"------------------------READ ENCRY -------------"<<std::endl;
+				}else if(readWriteMode==2){
+					len = 1;
+				    msgBuf[1] = (unsigned char) (len>>8);
+				    msgBuf[2] = (unsigned char) len;
+				    msgBuf[3] = CMD_ENCRYPT_PROG_STATE;
+				    msgBuf[4] = 0;
+				    msgBuf[5] = ETX;
 				}else{
 					
 					unsigned short length=json["programNumbers"].size();
@@ -1038,6 +1044,20 @@
 				msgBuf[2] = 0x05;
 				msgBuf[3] = 0x05;
 				msgBuf[4] = 0x01;
+				msgBuf[5] = 0x00;
+				msgBuf[6] = 0x00;
+				msgBuf[7] = 0x00;
+				msgBuf[8] = 0x00;
+				msgBuf[9] = ETX;
+				}
+		    	break;
+		case 88:{
+	    		len = 5;
+	    		msgBuf[0] = STX;
+				msgBuf[1] = 0x00;
+				msgBuf[2] = 0x05;
+				msgBuf[3] = 0x05;
+				msgBuf[4] = 0x00;
 				msgBuf[5] = 0x00;
 				msgBuf[6] = 0x00;
 				msgBuf[7] = 0x00;
@@ -1482,4 +1502,8 @@ std::string Callcommand :: getCurrentTime()
         ss << result;
         return ss.str();
     }
-
+// void Callcommand :: signal_callback_handler(int signum)
+// {
+//    printf("Caught SININT %d\n",signum);
+   
+// }

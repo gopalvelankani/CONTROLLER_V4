@@ -1,1 +1,1 @@
-/usr/bin/c++    -std=c++11   CMakeFiles/http_server.dir/http_server.cc.o  -o http_server -rdynamic ../src/libnet_static.a -lpthread 
+/usr/bin/c++    -std=c++11 -g   CMakeFiles/http_server.dir/http_server.cc.o  -o http_server -rdynamic ../src/libnet_static.a -lpthread 

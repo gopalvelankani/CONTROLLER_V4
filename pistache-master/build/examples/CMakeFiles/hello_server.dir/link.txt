@@ -1,1 +1,1 @@
-/usr/bin/c++    -std=c++11   CMakeFiles/hello_server.dir/hello_server.cc.o  -o hello_server -rdynamic ../src/libnet_static.a -lpthread 
+/usr/bin/c++    -std=c++11 -g   CMakeFiles/hello_server.dir/hello_server.cc.o  -o hello_server -rdynamic ../src/libnet_static.a -lpthread 

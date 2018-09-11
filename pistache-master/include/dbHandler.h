@@ -39,6 +39,7 @@ public:
 	int flushServiceNames();
 	int addServiceId(std::string channel_number,std::string service_id,std::string rmx_no,std::string input,int addFlag);
 	int removeServiceIdName(std::string channel_number,std::string rmx_no,std::string input);
+	Json::Value  removeServiceIdName(std::string rmx_no,std::string input);
 	int flushServiceId();
 	int isServiceActivated(std::string channel_number,std::string rmx_no,std::string input);
 	int addNetworkname(std::string network_name,std::string output,int rmx_no);
@@ -159,21 +160,24 @@ public:
 	int isNetworkExists();
 	Json::Value getNITHostMode();
 	Json::Value getLcnIds(std::string output,std::string rmx_no);
+	Json::Value getLcnIds(std::string output,std::string rmx_no,unsigned short bouquet_id);
 	int addLcnIds(std::string service_id,std::string lcn_id,std::string input, std::string output,std::string rmx_no);
 	int unsetLcnId(std::string service_id,std::string input, std::string output,std::string rmx_no);
 	int isLcnIdExists(std::string lcn_id);
 	Json::Value getNetworkId(std::string rmx_no,std::string output);
 	Json::Value getPrivateData();
 	Json::Value getPrivateData(int withId);
-	int addPrivateData(std::string sPrivateData,std::string private_data_id,int addFlag);
+	Json::Value getSecondLoopPrivateData(int tableType);
+	int addPrivateData(std::string sPrivateData,std::string private_data_id,string loop,Json::Value outputs,string table_type, int addFlag);
 	int disableHostNIT();
 	int updateServiceType(std::string rmx_no,std::string input,Json::Value service_id,Json::Value service_type,Json::Value encryption);
 	int checkDuplicateServiceId(std::string newprognum ,std::string orig_service_id);
 	int recreateDatabase();
 	int checkDatabaseContains();
-	int addBATServiceList(std::string bouquet_id,std::string bouquet_name,Json::Value service_list,Json::Value outputs,Json::Value rmx_nos,Json::Value inputs);
+	int addBATServiceList(std::string bouquet_id,std::string bouquet_name,Json::Value service_list);
 	Json::Value getBATList();
 	Json::Value getBATServiceList(std::string bouquet_id);
+	int clearBouquet(std::string bouquet_id);
 	int deleteBouquet(std::string bouquet_id);
 	int flushOldServices(std::string rmx_no,int input);
 	int servicesUpdated(std::string rmx_no,std::string input);
@@ -189,6 +193,15 @@ public:
 	std::string getServiceNewName(std::string progNumber,int rmx_no,int input);
 	int addOriginalProviderName(std::string name,std::string service_number,int rmx_no,int input);
 	int getServiceNewId(std::string service_number,int rmx_no,int input);
+	int updateInputTable(std::string rmx_no,std::string input,int val);
+	int getTunerInputType(int rmx_no,int channel_no);
+	int isRFinputSame(std::string mxl_id,std::string rmx_no,std::string demod_id,std::string lnb_id,std::string dvb_standard,std::string frequency,std::string symbol_rate,std::string mod,std::string fec,std::string rolloff,std::string pilots,std::string spectrum,std::string lo_frequency);
+	int isIPinputSame(std::string str_rmx_no,std::string channel_no,std::string ip_addr,std::string port,std::string str_type);
+	int removeServiceEncryption(std::string rmx_no,std::string input);
+	int clearServicesFromDB(std::string rmx_no,std::string input);
+	long long int getCWGroup(std::string rmx_no,std::string output);
+	int getEmptySlot(int cw_group_value);
+	int updateCWGroupValue(std::string rmx_no,std::string output,std::string input,std::string programNumber,long long int cw_group_value,long int cw_group,int addFlag);
 };	
 // This is the content of the .h file, which is where the declarations go
 

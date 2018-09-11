@@ -9,7 +9,7 @@ C_DEFINES =
 
 C_INCLUDES = -I/home/user/Videos/CONTROLLER_V4/pistache-master/include 
 
-CXX_FLAGS =  -std=c++11  
+CXX_FLAGS =  -std=c++11 -g  
 
 CXX_DEFINES = 
 
