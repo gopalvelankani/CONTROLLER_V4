@@ -49,9 +49,8 @@
 #define CMD_GET_STAT_PID		0x39
 #define CMD_SET_ASPECT_RATIO	0x3A
 #define CMD_FILT_PROG_STATE		0x40
-#define CMD_FILT_PROG_STATE		0x40
-#define CMD_ENCRYPT_PROG_STATE		0x45
-#define CMD_INIT_CSA		        0x46
+#define CMD_ENCRYPT_PROG_STATE	0x45
+#define CMD_INIT_CSA		    0x46
 #define CMD_SET_CSA		        0x47
 #define CMD_SET_PID		        0x48
 #define CMD_SET_FILT			0x41
@@ -73,6 +72,8 @@
 #define CMD_BL_ADDRESS			0x04
 #define CMD_BL_TRANSFER			0x05
 #define CMD_BL_RD_DDR			0x06
+#define CMD_INPUT_PID_FLTR		0x0A
+#define CMD_OUTPUT_PID_FLTR		0x0B
 
 #define MMSB_32_8(x)		(x&0xFF000000)>>24
 #define MLSB_32_8(x)		0xFF&((x&0x00FF0000)>>16)

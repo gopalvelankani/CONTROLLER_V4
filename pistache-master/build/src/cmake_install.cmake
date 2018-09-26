@@ -1,4 +1,4 @@
-# Install script for directory: /home/user/Videos/CONTROLLER_V4/pistache-master/src
+# Install script for directory: /home/user/Videos/CONTROLLER_V2_5/pistache-master/src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -33,10 +33,10 @@ if(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "/home/user/Videos/CONTROLLER_V4/pistache-master/build/src/libnet_static.a")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "/home/user/Videos/CONTROLLER_V2_5/pistache-master/build/src/libnet_static.a")
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES "/home/user/Videos/CONTROLLER_V4/pistache-master/build/src/CMakeFiles/CMakeRelink.dir/libnet.so")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES "/home/user/Videos/CONTROLLER_V2_5/pistache-master/build/src/CMakeFiles/CMakeRelink.dir/libnet.so")
 endif()
 

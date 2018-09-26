@@ -6,5 +6,5 @@ CXX_FLAGS =  -std=c++11 -g
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/user/Videos/CONTROLLER_V4/pistache-master/include -I/home/user/Videos/CONTROLLER_V4/pistache-master/src 
+CXX_INCLUDES = -I/home/user/Videos/CONTROLLER_V2_5/pistache-master/include -I/home/user/Videos/CONTROLLER_V2_5/pistache-master/src 
 

@@ -266,7 +266,7 @@ private:
         Routes::Post(router, "/getNITmode", Routes::bind(&StatsEndpoint::getNITmodes, this));      
         Routes::Post(router, "/getTSDetails", Routes::bind(&StatsEndpoint::getTSDetails, this));      
         Routes::Post(router, "/setTDT_TOT", Routes::bind(&StatsEndpoint::setTDT_TOT, this));
-        
+        Routes::Post(router, "/setInputPIDFilter", Routes::bind(&StatsEndpoint::setInputPIDFilter, this));
         //UDP IP STACK Commands
         Routes::Post(router, "/readWrite32bUdpCpu", Routes::bind(&StatsEndpoint::readWrite32bUdpCpu, this));
         Routes::Post(router, "/readWrite32bUdpI2C", Routes::bind(&StatsEndpoint::readWrite32bUdpI2C, this));
@@ -396,7 +396,10 @@ private:
         Routes::Post(router, "/reBootScript", Routes::bind(&StatsEndpoint::reBootScript, this));
         Routes::Post(router, "/getInputChannelTunerType", Routes::bind(&StatsEndpoint::getInputChannelTunerType, this));
         Routes::Post(router, "/setPrivateData", Routes::bind(&StatsEndpoint::setPrivateData, this));
+        Routes::Post(router, "/setSDTPrivateData", Routes::bind(&StatsEndpoint::setSDTPrivateData, this));
         Routes::Post(router, "/getPrivateData", Routes::bind(&StatsEndpoint::getPrivateData, this));
+        Routes::Post(router, "/setServiceType", Routes::bind(&StatsEndpoint::setServiceType, this));
+        Routes::Post(router, "/enableEIT", Routes::bind(&StatsEndpoint::enableEIT, this));
 
         //FPGA Version 
         Routes::Post(router, "/getFPGA1To3Version", Routes::bind(&StatsEndpoint::getFPGA1To3Version, this)); 
@@ -421,6 +424,8 @@ private:
         Routes::Post(router, "/getBlTransfer", Routes::bind(&StatsEndpoint::getBlTransfer, this));
         Routes::Post(router, "/updateRemuxFirmware", Routes::bind(&StatsEndpoint::updateRemuxFirmware, this));
         Routes::Get(router, "/setBootloaderMode/:rmx_no", Routes::bind(&StatsEndpoint::setBootloaderMode, this));
+        Routes::Post(router, "/setFPGAStaticIP", Routes::bind(&StatsEndpoint::setFPGAStaticIP, this));
+        Routes::Get(router, "/getFPGAStaticIP/:data_ip_id", Routes::bind(&StatsEndpoint::getFPGAStaticIP, this));
 
     }
     /*****************************************************************************/
@@ -518,11 +523,11 @@ private:
                         		inputChanged = true;
                         } 
 
-                        Json::Value fwJson = downloadMxlFW(mxl_id,rmx_no);
-                        if(fwJson["error"]==true){
-                            json["error"]= true;
-                            json["message"]= "Download FW failed!";
-                        }
+                        // Json::Value fwJson = downloadMxlFW(mxl_id,rmx_no);
+                        // if(fwJson["error"]==true){
+                        //     json["error"]= true;
+                        //     json["message"]= "Download FW failed!";
+                        // }
                         usleep(1000000);
                         if(lnb_id==0 || lnb_id==1){
                             json["allegro"] = confAllegro(8,lnb_id,voltage,mxl_id);
@@ -3634,12 +3639,14 @@ private:
                         band[i] = (((RxBuffer[8 + i * 4 + 2] & 0x7F) << 8) | RxBuffer[8 + i * 4 + 3]);
                         // uiShared[2 + i] = ((RxBuffer[8 + i * 4 + 2] & 0x80) >> 7);
                         uishared[i] = ((RxBuffer[8 + i * 4 + 2] & 0x80) >> 7);
-                        Json::Value prog_name =  callGetProgramOriginalName(std::to_string(pnumber),rmx_no,input);
+                        string strPnumber = std::to_string(pnumber);
+                        Json::Value prog_name =  callGetProgramOriginalName(strPnumber,rmx_no,input);
                         if(prog_name["error"] == false){
-                           ProgNames.append(prog_name["name"].asString());
-                       }else{
+                            ProgNames.append(prog_name["name"].asString());
+                        }else{
                            ProgNames.append("NoName");
-                       }
+                        }
+                        callGetProgramOriginalProviderName(strPnumber,rmx_no,input);
                         // db->addChannelList(input,ProgNum[i].asInt(),rmx_no);
                     }
                     // callGetServiceTypeAndStatus(std::to_string(rmx_no),std::to_string(input));
@@ -3961,7 +3968,7 @@ private:
                         db->updateServiceType(rmx_no,input,progNum,service_type,encrypted_flag);
                     }
                     std::cout<<"--------------"<<endl;
-                    cout<<progNum<<endl;
+                    // cout<<progNum<<endl;
                     json["progNums"] = progNum;
                     json["service_type"] = service_type;
                     json["encrypted_flag"] = encrypted_flag;
@@ -3980,7 +3987,7 @@ private:
 
     	Json::Value json_prog_list = db->removeServiceIdName(str_rmx_no,str_input);
         updateServiceIDs(str_rmx_no,str_input);
-        cout<<json_prog_list<<endl;
+        // cout<<json_prog_list<<endl;
         if(json_prog_list["service_name_list"].size()>0){
         	for (int i = 0; i < json_prog_list["service_name_list"].size(); ++i)
         	{
@@ -3997,7 +4004,7 @@ private:
         }
         
         db->removeServiceEncryption(str_rmx_no,str_input);
-        cout<<"undoLastInputChanges3"<<endl;
+        // cout<<"undoLastInputChanges3"<<endl;
         callFlushEncryptedServices(str_input,stoi(str_rmx_no));
         db->clearServicesFromDB(str_rmx_no,str_input);
         delete db;
@@ -4049,6 +4056,7 @@ private:
         Json::Value json,jsonInput,iojson;
         Json::Reader reader;
         Json::FastWriter fastWriter;
+        dbHandler *db = new dbHandler(DB_CONF_PATH);
         std::string para[] = {"rmx_no","input","output","progNumber"};
         int error[ sizeof(para) / sizeof(para[0])];
         bool all_para_valid=true;
@@ -4109,6 +4117,11 @@ private:
                     if(grog_info_json["error"]==false){
                         json["provider_name"] = grog_info_json["pName"];
                     }
+                    Json::Value json_service_type = db->getServiceType(progNumber,input,str_rmx_no);
+                    if(json_service_type["error"] == false)
+                        json["service_type"] = json_service_type["service_type"].asString();
+                    else
+                        json["service_type"] = 0;
                 }else{
                     json = iojson;
                 }
@@ -4117,6 +4130,7 @@ private:
             json["error"]= true;
             json["message"]= res;
         } 
+        delete db;
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
@@ -6814,6 +6828,84 @@ private:
     }
 
     /*****************************************************************************/
+    /*  Commande 0x10   function setInputPIDFilter                           */
+    /*****************************************************************************/
+    void  setInputPIDFilter(const Rest::Request& request, Net::Http::ResponseWriter response){
+        unsigned char RxBuffer[6]={0};
+        
+        int uLen;
+        Json::Value json;
+        Json::FastWriter fastWriter;        
+        dbHandler *db = new dbHandler(DB_CONF_PATH);
+        // std::string para[] = {"mode","output","rmx_no"};
+        // int error[ sizeof(para) / sizeof(para[0])];
+        // bool all_para_valid=true;
+        // addToLog("setInputPIDFilter",request.body());
+        // std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
+        // if(res=="0"){
+        //     std::string mode = getParameter(request.body(),"mode"); 
+        //     std::string output = getParameter(request.body(),"output");
+        //     std::string rmx_no =getParameter(request.body(),"rmx_no") ; 
+            
+        //     error[0] = verifyInteger(mode,1,1);
+        //     error[1] = verifyInteger(output,1,1,OUTPUT_COUNT);
+        //     error[2] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+        //     for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
+        //     {
+        //        if(error[i]!=0){
+        //             continue;
+        //         }
+        //         all_para_valid=false;
+        //         json["error"]= true;
+        //         json[para[i]]= (i==0)? "Require Integer between 1-6!" :(i==1) ? "Require Integer" : "Require Integer between 0 - "+std::to_string(INPUT_COUNT)+"!" ;
+        //     }
+        //     if(all_para_valid){
+        //         Json::Value iojson=callSetInputOutput("0",output,std::stoi(rmx_no));
+        //         if(iojson["error"]==false){
+        //             json=callSetNITmode(mode,output,std::stoi(rmx_no));
+        //             if(json["error"] == false)
+        //                 db->addNitMode(mode,output,std::stoi(rmx_no)); 
+        //         }else{
+        //             json["error"]= true;
+        //             json["message"]= "Error while selecting output!";     
+        //         }
+        //     }
+        // }else{
+        //     json["error"]= true;
+        //     json["message"]= res;
+        // }
+        json = callSetInputPIDFilter();
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
+    }
+    Json::Value callSetInputPIDFilter(){
+        unsigned char RxBuffer[6]={0};
+        int uLen;
+        Json::Value json,jsonMsg;
+        json["error"]= false;
+        uLen = c1.callCommand(108,RxBuffer,6,6,jsonMsg,1);
+                     
+        if (!uLen || RxBuffer[0] != STX || RxBuffer[3] != CMD_INPUT_PID_FLTR || uLen != 6 || RxBuffer[5] != ETX){
+            json["error"]= true;
+            json["message"]= "STATUS COMMAND ERROR!";
+        }            
+        else{
+            uLen = ((RxBuffer[1]<<8) | RxBuffer[2]);
+            if (uLen != 1 ) {
+                // json["error"]= true;
+                json["message"]= "STATUS COMMAND ERROR!";
+                addToLog("setNitMode","Error");
+            }else{
+                json["status"] = RxBuffer[4];
+                json["error"]= false;
+                json["message"]= "set Nit Mode!!";    
+                addToLog("setNitMode","Success");
+            }
+        }
+        return json;
+    }
+
+    /*****************************************************************************/
     /*  Commande 0x10   function setNITmodeToAllRmx                           */
     /*****************************************************************************/
     void  setNITmodeToAllRmx(const Rest::Request& request, Net::Http::ResponseWriter response){
@@ -7484,8 +7576,10 @@ private:
                         json["old_service_ids"] = old_service_ids;
                         json["new_service_ids"] = new_service_ids;
                         json = callSetServiceID(old_service_ids,new_service_ids,rmx_no_i);
-                        if(json["error"] == false)
+                        if(json["error"] == false){
                             db->addServiceId(oldpronum,newprognum,rmx_no,input,flag);
+                            json["SDT"] = updateSDTtable(oldpronum,input,rmx_no);
+                        }
                     }
                     else
                         json = iojson;
@@ -7963,7 +8057,8 @@ private:
                 if(all_para_valid){
                    json = callSetServiceName(NewName,progNumber,input,std::stoi(rmx_no),addFlag);
                    if(json["error"] == false) 
-                        db->addChannelname(progNumber,NewName,rmx_no,input,addFlag);  
+                        db->addChannelname(progNumber,NewName,rmx_no,input,addFlag); 
+                        json["SDT"] = updateSDTtable(progNumber,input,rmx_no); 
                 }
             }else{
                 json["error"]= true;
@@ -8050,8 +8145,10 @@ private:
                 }
                 if(all_para_valid){
                     json = callSetServiceProvider(providerName,serviceNumber,input,std::stoi(rmx_no),std::stoi(addFlag));
-                    if(json["error"] == false)
+                    if(json["error"] == false){
                         db->addNewProviderName(serviceNumber,providerName,rmx_no,input,addFlag);        
+                        json["SDT"] = updateSDTtable(serviceNumber,input,rmx_no); 
+                    }
                 }
             }else{
                 json["error"] = false;
@@ -9893,7 +9990,111 @@ private:
         std::string resp = fastWriter.write(json);
         response.send(Http::Code::Ok, resp);
     }
+    /*****************************************************************************/
+    /*  UDP Ip Stack Command 0x14   function getFPGAStaticIP                      */
+    /*****************************************************************************/
+    void getFPGAStaticIP(const Rest::Request& request, Net::Http::ResponseWriter response){
+        Json::Value json;
+        Json::FastWriter fastWriter;        
+        dbHandler *db = new dbHandler(DB_CONF_PATH);   
+        string str_data_ip_id = request.param(":data_ip_id").as<std::string>();
+        if(verifyInteger(str_data_ip_id,1,1,3,1)){
+            int data_ip_id = stoi(str_data_ip_id);
+            int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((data_ip_id-1)&0xF)<<1) | (0&0x1);
+            if(write32bCPU(0,0,target) != -1){
+                json["message"]= "successfully assigned IP OUT!";
+                json["static_ip"]= (read32bI2C(2,20)&0xFFFFFFFF);
+                json["error"]= false;
+            }else{
+                json["error"]= true;
+                json["message"]= "Error while connection!";     
+            }
+        }
+        delete db;
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
 
+    }
+    /*****************************************************************************/
+    /*  UDP Ip Stack Command 0x14   function setFPGAStaticIP                      */
+    /*****************************************************************************/
+    void  setFPGAStaticIP(const Rest::Request& request, Net::Http::ResponseWriter response){
+        unsigned char RxBuffer[20]={0};
+        
+        int uLen;
+        Json::Value json;
+        Json::FastWriter fastWriter;     
+        dbHandler *db = new dbHandler(DB_CONF_PATH);   
+        std::string para[] = {"ip_address","data_ip_id"};  
+        int error[ sizeof(para) / sizeof(para[0])];
+        bool all_para_valid=true;      
+        addToLog("setFPGAStaticIP",request.body());
+        std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
+        if(res=="0"){        
+            
+            std::string ip_address = getParameter(request.body(),"ip_address"); 
+            std::string str_data_ip_id = getParameter(request.body(),"data_ip_id");
+            error[0] = isValidIpAddress(ip_address.c_str());
+            error[1] = verifyInteger(str_data_ip_id,1,1,3,1);
+            for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
+            {
+               if(error[i]!=0){
+                    continue;
+                }
+                all_para_valid=false;
+                json["error"]= true;
+                json[para[i]]= (i == 0)? "Invalid IP address!" :"Required integer between 1 to 3";
+            }
+            if(all_para_valid){
+                int data_ip_id = std::stoi(str_data_ip_id);
+                std::string hex_ip_part1,hex_ip_part2,hex_ip_part3,hex_ip_part4,hex_ip; 
+                std::stringstream split_str(ip_address);
+                unsigned int ip_part1,ip_part2,ip_part3,ip_part4; //to store the 4 ints
+                unsigned char ch; //to temporarily store the '.'
+                split_str >> ip_part1 >> ch >> ip_part2 >> ch >> ip_part3 >> ch >> ip_part4;
+                hex_ip_part1 = getDecToHex(ip_part1);
+                hex_ip_part1 = (hex_ip_part1.length() ==2)? hex_ip_part1 : "0"+hex_ip_part1;
+                hex_ip_part2 = getDecToHex(ip_part2);
+                hex_ip_part2 = (hex_ip_part2.length() ==2)? hex_ip_part2 : "0"+hex_ip_part2;
+                hex_ip_part3 = getDecToHex(ip_part3);
+                hex_ip_part3 = (hex_ip_part3.length() ==2)? hex_ip_part3 : "0"+hex_ip_part3;
+                hex_ip_part4 = getDecToHex(ip_part4);
+                hex_ip_part4 = (hex_ip_part4.length() ==2)? hex_ip_part4 : "0"+hex_ip_part4;
+                hex_ip = hex_ip_part1 +""+hex_ip_part2+""+hex_ip_part3+""+hex_ip_part4;
+                unsigned long int ip_addr = getHexToLongDec(hex_ip);
+               
+                json = callSetFPGAStaticIP(ip_addr,data_ip_id);
+                if(json["error"] == false){
+                    db->addStaticIP(std::to_string(ip_addr),str_data_ip_id,1);
+                }
+            }
+        }else{
+            json["error"]= true;
+            json["message"]= res;
+        }
+        delete db;
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
+    }
+    Json::Value callSetFPGAStaticIP(unsigned long int ip_addr, int data_ip_id){
+        Json::Value json;
+        int target =((0&0x3)<<8) | ((0&0x7)<<5) | (((data_ip_id-1)&0xF)<<1) | (0&0x1);
+        if(write32bCPU(0,0,target) != -1){
+            json["message"]= "successfully assigned IP OUT!";
+            if (write32bI2C (2,20,ip_addr) == -1) {
+                json["error"]= true;
+                json["message"]= "STATUS COMMAND ERROR!";
+                addToLog("callSetFPGAStaticIP IP","Error");
+            }else{
+                json["error"]= false;
+                addToLog("callSetFPGAStaticIP","Success");
+            }
+        }else{
+            json["error"]= true;
+            json["message"]= "Error while connection!";     
+        }
+        return json;
+    }
     /*****************************************************************************/
     /*  UDP Ip Stack Command 0x24,0x28,0x2C,0x30   function setEthernetOut                      */
     /*****************************************************************************/
@@ -10166,6 +10367,7 @@ private:
         }
         return json;
     }
+
      /*****************************************************************************/
     /*  UDP Ip Stack Command    function setEthernetIn                      */
     /*****************************************************************************/
@@ -14598,12 +14800,13 @@ private:
             std::string str_output_list =getParameter(request.body(),"output_list");
             std::string table_type =getParameter(request.body(),"table_type");
             json["mod"] =(int) sPrivateData.length()%2;
-            if(verifyIsHex(sPrivateData)>0 && (sPrivateData.length()%2 == 0) && verifyInteger(addflag,1,1,1)  && verifyInteger(loop,1,1,1) && verifyInteger(table_type,1,1,1)){
+            if(verifyIsHex(sPrivateData)>0 && (sPrivateData.length()%2 == 0) && verifyInteger(addflag,1,1,1)  && verifyInteger(loop,1,1,1) && verifyInteger(table_type,1,1,2))
+            {
                 if((sPrivateData.substr(0,2) == "0x") && ((sPrivateData.substr(2,2) == "4a")||(sPrivateData.substr(2,2) == "4A") ) && (sPrivateData.length() > 20))
                 {
                     long pDataLen = getHexToLongDec(sPrivateData.substr(4,2));
                     if((sPrivateData.substr(6,sPrivateData.length())).length() == (pDataLen*2)){
-                    	if(std::stoi(loop) !=1 ){
+                    	if(std::stoi(loop) == 0 ){
 	                        if(db->addPrivateData(sPrivateData.substr(2,sPrivateData.length()),private_data_id,"0",outputs,table_type,std::stoi(addflag)) >0){
 	                            json["error"]= false;
 	                            json["message"]= "Private Data updated successfully!";   
@@ -14622,6 +14825,7 @@ private:
 				            }else{
 				            	// std::cout<<outputs<<endl;
 		                    	if(db->addPrivateData(sPrivateData.substr(2,sPrivateData.length()),private_data_id,"1",outputs["outputs"],table_type,std::stoi(addflag)) >0){
+                                   
 		                            json["error"]= false;
 		                            json["message"]= "Private Data updated successfully!";   
 		                        }else{
@@ -14644,6 +14848,197 @@ private:
                 json["message"]= "Private Data is not valid (Even length) HEX OR addFlag is not valide integer!"; 
             }
             
+        }else{
+            json["error"]= true;
+            json["message"]= res;
+        }
+        delete db;
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
+    }
+
+/*****************************************************************************/
+    /*  Command    function setPrivateData                          */
+    /*****************************************************************************/
+    void setSDTPrivateData(const Rest::Request& request, Net::Http::ResponseWriter response){
+        std::string sPrivateData;
+        Json::Value json,outputs;
+        Json::Reader reader;
+        Json::FastWriter fastWriter;
+        dbHandler *db = new dbHandler(DB_CONF_PATH);
+        std::string para[] = {"private_data_id","private_data","addFlag","ts_id","service_id"};
+        int error[ sizeof(para) / sizeof(para[0])];
+        bool all_para_valid=true;
+        addToLog("setPrivateData",request.body());
+        std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
+        if(res=="0"){
+            std::string private_data_id =getParameter(request.body(),"private_data_id");
+            sPrivateData =getParameter(request.body(),"private_data");
+            std::string addflag =getParameter(request.body(),"addFlag");
+            std::string ts_id =getParameter(request.body(),"ts_id");
+            std::string service_id =getParameter(request.body(),"service_id");
+            json["mod"] =(int) sPrivateData.length()%2;
+
+            error[0] = verifyInteger(private_data_id);
+            error[1] = 1;
+            error[2] = verifyInteger(addflag,1,1,1);
+            error[3] = verifyInteger(ts_id,1,1,47);
+            error[4] = verifyInteger(service_id);
+            for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
+            {
+               if(error[i]!=0){
+                    continue;
+                }
+                all_para_valid=false;
+                json["error"]= true;
+                json[para[i]]= "Please give valid input for "+para[i]+"!";
+            }
+            if(all_para_valid){
+                if(verifyIsHex(sPrivateData)>0 && (sPrivateData.length()%2 == 0))
+                {
+                    if(sPrivateData.substr(0,2) == "0x")
+                    {
+                        int iTs_id = stoi(ts_id);
+                        int rmx_no =floor(iTs_id/8)+1;
+                        int output =floor(iTs_id%8);
+                        
+                        long pDataLen = getHexToLongDec(sPrivateData.substr(4,2));
+                        if((sPrivateData.substr(6,sPrivateData.length())).length() == (pDataLen*2)){
+                            string str_rmx_no = std::to_string(rmx_no);
+                            string str_output = std::to_string(output);
+                            if(db->addSDTPrivateData(sPrivateData.substr(2,sPrivateData.length()),private_data_id,str_rmx_no,str_output,service_id,std::stoi(addflag)) >0){
+                                db->updateSDTtableCreationFlag(str_rmx_no,str_output,std::stoi(addflag));
+                                callInsertSDTtable(output,rmx_no);
+                                json["error"]= false;
+                                json["message"]= "Private Data updated successfully!";   
+                            }else{
+                                json["error"]= true;
+                                json["message"]= "Error while adding to database!";  
+                            }
+                        }else{
+                            json["error"]= true;
+                            json["message"]= "Is not valide private data(Length missmatch)!";  
+                        }
+                    }else{
+                        json["error"]= true;
+                        json["message"]= "Private Data is not valid!"; 
+                    }
+
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Private Data is not valid (Even length) HEX OR addFlag is not valide integer!"; 
+                }
+            }
+            
+        }else{
+            json["error"]= true;
+            json["message"]= res;
+        }
+        delete db;
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
+    }
+
+        /*****************************************************************************/
+    /*  Command    function setServiceType                          */
+    /*****************************************************************************/
+    void setServiceType(const Rest::Request& request, Net::Http::ResponseWriter response){
+        Json::Value json;
+        Json::Reader reader;
+        Json::FastWriter fastWriter;
+        dbHandler *db = new dbHandler(DB_CONF_PATH);
+        std::string para[] = {"service_type","program_no","input","rmx_no","addFlag"};
+        int error[ sizeof(para) / sizeof(para[0])];
+        bool all_para_valid=true,nit_insert_error = true;
+        addToLog("setServiceType",request.body());
+        std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
+        if(res=="0"){
+            std::string service_type =getParameter(request.body(),"service_type");
+            std::string addflag =getParameter(request.body(),"addFlag");
+            std::string program_no =getParameter(request.body(),"program_no");
+            std::string input =getParameter(request.body(),"input");
+            std::string rmx_no =getParameter(request.body(),"rmx_no");
+
+            error[0] = verifyInteger(service_type);
+            error[1] = verifyInteger(program_no);
+            error[2] = verifyInteger(input,1,1,INPUT_COUNT);
+            error[3] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[4] = verifyInteger(addflag,1,1,1,0);
+
+            for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
+            {
+               if(error[i]!=0){
+                    continue;
+                }
+                all_para_valid=false;
+                json["error"]= true;
+                json[para[i]]= "Please give valid input "+para[i]+"! Require Integer!";
+            }
+            if(all_para_valid){
+                if(db->addServiceType(program_no,service_type,input,rmx_no,addflag) >0){
+                    json["SDT"] = updateSDTtable(program_no,input,rmx_no); 
+                    json["error"]= false;
+                    json["message"]= "Private Data updated successfully!";   
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Error while adding to database!";  
+                }
+            }else{
+                json["error"]= true;
+                json["message"]= "Invalid Input!";  
+            }   
+        }else{
+            json["error"]= true;
+            json["message"]= res;
+        }
+        delete db;
+        std::string resp = fastWriter.write(json);
+        response.send(Http::Code::Ok, resp);
+    }
+        /*****************************************************************************/
+    /*  Command    function enableEIT                          */
+    /*****************************************************************************/
+    void enableEIT(const Rest::Request& request, Net::Http::ResponseWriter response){
+        Json::Value json;
+        Json::Reader reader;
+        Json::FastWriter fastWriter;
+        dbHandler *db = new dbHandler(DB_CONF_PATH);
+        std::string para[] = {"output","rmx_no","addFlag"};
+        int error[ sizeof(para) / sizeof(para[0])];
+        bool all_para_valid=true,nit_insert_error = true;
+        addToLog("enableEIT",request.body());
+        std::string res=validateRequiredParameter(request.body(),para, sizeof(para) / sizeof(para[0]));
+        if(res=="0"){
+            std::string str_output =getParameter(request.body(),"output");
+            std::string rmx_no =getParameter(request.body(),"rmx_no");
+            std::string addflag =getParameter(request.body(),"addFlag");
+
+            error[0] = verifyInteger(str_output,1,1,OUTPUT_COUNT);
+            error[1] = verifyInteger(rmx_no,1,1,RMX_COUNT,1);
+            error[2] = verifyInteger(addflag,1,1,1,0);
+
+            for (int i = 0; i < sizeof(error) / sizeof(error[0]); ++i)
+            {
+               if(error[i]!=0){
+                    continue;
+                }
+                all_para_valid=false;
+                json["error"]= true;
+                json[para[i]]= "Please give valid input "+para[i]+"! Require Integer!";
+            }
+            if(all_para_valid){
+                if(db->setEITpresentFlag(str_output,rmx_no,std::stoi(addflag)) >0){
+                    callInsertSDTtable(std::stoi(str_output),std::stoi(rmx_no));
+                    json["error"]= false;
+                    json["message"]= "EIT present flag updated successfully!";   
+                }else{
+                    json["error"]= true;
+                    json["message"]= "Error while adding to database!";  
+                }
+            }else{
+                json["error"]= true;
+                json["message"]= "Invalid Input!";  
+            }   
         }else{
             json["error"]= true;
             json["message"]= res;
@@ -14918,53 +15313,54 @@ private:
         return json; 
     }
 
-    Json::Value callInsertNITable(std::string str_network_id,std::string network_name){
-        Json::Value json;
-        dbHandler *db = new dbHandler(DB_CONF_PATH);
-        NIT_VER = (NIT_VER == 31)? 0 : NIT_VER+1;
-        unsigned char* ucNetworkName =(unsigned char*) network_name.c_str();
-        Json::Value NIT_Host_modes = db->getNITHostMode();
-        
-        bool nit_insert_error = true;
-        int pusSectionL=  getCountSections();
-        std::cout<<"\n-----------------------------LAST SECTION COUNT----------------------------\n"<<endl;
 
-        for (int rmx_no = 0; rmx_no < RMX_COUNT; ++rmx_no)
-        {
-            for (int output = 0; output < OUTPUT_COUNT; ++output)
-            {
-                callSetInputOutput("0",std::to_string(output),rmx_no+1);
-                unsigned short usNitLen[pusSectionL];
-                unsigned short *pucData = usNitLen; 
-                int nit_insert_resp = TS_GenNITSection(std::stoi(str_network_id),NIT_VER,ucNetworkName,pusSectionL,pucData);
-                if(nit_insert_resp == 1){
-                    usleep(100);
-                    int nit_sec_len_resp = c1.setTableSectionLen(usNitLen,pusSectionL+1,TABLE_NIT,TABLE_SET_LEN);
-                    usleep(100);
-                    if(nit_sec_len_resp == 1){
-                        int nit_activation_resp = c1.activateTable(TABLE_NIT,TABLE_ACTIVATE);
-                        if(nit_activation_resp == 1){
-                            nit_insert_error = false;
-                        }
-                    }
-                }else{
-                    json["error"]= true;
-                    json["message"]= "NIT insertion error!";
-                }
-                usleep(100);
-            }
-        }
-        if(nit_insert_error == false){
-            db->addNITDetails(NIT_VER,network_name,str_network_id);
-            json["error"]= false;
-            json["message"]= "NIT inserted!";
-        }else{
-            json["error"]= true;
-            json["message"]= "Connection error!";   
-        } 
-        delete db;
-        return json; 
-    }
+    // Json::Value callInsertNITable(std::string str_network_id,std::string network_name){
+    //     Json::Value json;
+    //     dbHandler *db = new dbHandler(DB_CONF_PATH);
+    //     NIT_VER = (NIT_VER == 31)? 0 : NIT_VER+1;
+    //     unsigned char* ucNetworkName =(unsigned char*) network_name.c_str();
+    //     Json::Value NIT_Host_modes = db->getNITHostMode();
+        
+    //     bool nit_insert_error = true;
+    //     int pusSectionL=  getCountSections();
+    //     std::cout<<"\n-----------------------------LAST SECTION COUNT----------------------------\n"<<endl;
+
+    //     for (int rmx_no = 0; rmx_no < RMX_COUNT; ++rmx_no)
+    //     {
+    //         for (int output = 0; output < OUTPUT_COUNT; ++output)
+    //         {
+    //             callSetInputOutput("0",std::to_string(output),rmx_no+1);
+    //             unsigned short usNitLen[pusSectionL];
+    //             unsigned short *pucData = usNitLen; 
+    //             int nit_insert_resp = TS_GenNITSection(std::stoi(str_network_id),NIT_VER,ucNetworkName,pusSectionL,pucData);
+    //             if(nit_insert_resp == 1){
+    //                 usleep(100);
+    //                 int nit_sec_len_resp = c1.setTableSectionLen(usNitLen,pusSectionL+1,TABLE_NIT,TABLE_SET_LEN);
+    //                 usleep(100);
+    //                 if(nit_sec_len_resp == 1){
+    //                     int nit_activation_resp = c1.activateTable(TABLE_NIT,TABLE_ACTIVATE);
+    //                     if(nit_activation_resp == 1){
+    //                         nit_insert_error = false;
+    //                     }
+    //                 }
+    //             }else{
+    //                 json["error"]= true;
+    //                 json["message"]= "NIT insertion error!";
+    //             }
+    //             usleep(100);
+    //         }
+    //     }
+    //     if(nit_insert_error == false){
+    //         db->addNITDetails(NIT_VER,network_name,str_network_id);
+    //         json["error"]= false;
+    //         json["message"]= "NIT inserted!";
+    //     }else{
+    //         json["error"]= true;
+    //         json["message"]= "Connection error!";   
+    //     } 
+    //     delete db;
+    //     return json; 
+    // }
 
     // callInsertNITable14_247 for firmware version 14.247
     Json::Value callInsertNITable14_247(std::string str_network_id,std::string network_name){
@@ -16318,12 +16714,18 @@ private:
 	   }
 	   return (unsigned short)length+2;
 	}
-    unsigned short setPrivateDataDescriptor(unsigned char *pucDescriptor) {
+
+    //First loop private data
+    unsigned short setPrivateDataDescriptor(unsigned char *pucDescriptor,int tableType = 0) {
        unsigned char *pucData = pucDescriptor;
        unsigned char *pucPrivateData;
        unsigned short usDataSize;
+       Json::Value json_private_data;
+       json_private_data["error"] = true;
        dbHandler *db = new dbHandler(DB_CONF_PATH);
-       Json::Value json_private_data = db->getPrivateData();
+        if(tableType == 0)
+            Json::Value json_private_data = db->getPrivateData();
+
        // std::cout<<json_private_data<<endl;
        unsigned short usPDataLength=0;
        std::string sPrivateData;
@@ -16346,6 +16748,30 @@ private:
        delete db;
        return usPDataLength;
     }
+    //First loop private data
+    unsigned short setSDTPrivateDataDescriptor(unsigned char *pucDescriptor,Json::Value json_private_data) {
+       unsigned char *pucData = pucDescriptor;
+       unsigned char *pucPrivateData;
+       unsigned short usDataSize;      
+       std::cout<<json_private_data<<endl;
+       unsigned short usPDataLength=0;
+       std::string sPrivateData;
+       usDataSize = json_private_data.size();
+       for (int i = 0; i < usDataSize; ++i)
+       {
+            sPrivateData = json_private_data[i]["private_data"].asString();
+            unsigned short length = sPrivateData.length();
+            if(length%2 == 0){
+                for (int i = 0; i < length ; i+=2)
+                 {
+                    *(pucData++) = getHexToLongDec(sPrivateData.substr(i,2)); 
+                    usPDataLength++;
+                }
+            }
+       }
+       return usPDataLength;
+    }
+
     int isPrivateDataPresentInCurrentOutputTS(string sOutputList,int output_ts){
     	Json::Reader reader;
     	Json::Value outputs;
@@ -16762,227 +17188,227 @@ int TS_GenNITSections(unsigned char usNitSections[16][1200],unsigned short *pusN
             return -1;
         }
     }
-int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigned char *pucNetworkName,int iSectionCount,unsigned short* totalTableLen) {	// 30300
-	   unsigned short *pucServiceId=NULL,*pucChannelNumber=NULL,*pucHdChannelNumber,*pucServiceType=NULL,*pucServiceLcnId=NULL;
-	   unsigned short usOriginalNetworkId,ucCurrentTsId;
-	   unsigned int uiNbServices,uiSymbol_rate;
-	   unsigned char pucNewSection[1500];     // 1 section allocated array
-	   unsigned char *pucData;                // byte pointer for NIT section composing
-	   unsigned char *pucSectionLength;       // 2 keep section length pointer
-	   unsigned char *pucDescriptorLength;    // 2 keep descriptor length pointer
-	   unsigned char *pucTSLength;
-	   unsigned char i = 0;                   // Current section increment
-	   unsigned char pucDescriptor[256];       // descriptor data
-	   unsigned short usFullDescriptorLength=0; // descriptor length
-	   unsigned short usFullTSLength=0;
-	   unsigned short usDescriptorLength;     // descriptor length
-	   unsigned short usFullSectionLength;
-	   unsigned long val_crc;
-	   unsigned short sec_len, sec_len_desc, list_desc_len;
-	   unsigned short NIT_TAG_SEC_LEN3 = 3,NIT_NID_VER_LASTSEC_DESC_LENB7 = 7,TS_SECTION_LENB2 = 2,CRC32B4=4;
-	   unsigned int ts_size=0,uiFrequency;
-	   unsigned char ucFec_Inner = 0,ucFec_Outer = 0,ucModulation;
-       int nit_insert_error = 0;
-	   // generate required sections according to descriptors.
-	   	int ts_cout=0;
-	   	int section_count=0;
-	   	dbHandler *db = new dbHandler(DB_CONF_PATH);
-	   	Json::Value json_network_details = db->getNetworkDetailsForNIT(); 
-	   	ts_size = json_network_details["list"].size();
-	      // std::cout<<json_network_details<<endl;
-	    if(json_network_details["error"]==false){
-	      	while(1) {
-	      		// printf("\n----Fisrt Section TS Start------------>%d\n ",ts_cout);
-	      		pucNewSection[1500] = {0};
-			    // point to the first byte of the allocated array
-			    pucData = pucNewSection;
-			    // first byte of the section
-			    *(pucData++) = 0x40;
-			    //skip section length and keep pointer to
-			    pucSectionLength = pucData;
-			    pucData+=2;
-			    // insert network id
-			    *(pucData++) =  (unsigned char)(usNetworkId>>8);
-			    *(pucData++) =  (unsigned char)(usNetworkId&0xFF);
-			    // insert version number
-			    *(pucData++) =  0xC1 | (ucVersion<<1);
-			    // Insert section number
-			    *(pucData++) = section_count;
-			    // Jump last section number (don't know yet)
-			    *(pucData++) = iSectionCount;
-			    // Save descriptor length pointer and jump it
-			    pucDescriptorLength = pucData;
-			    pucData += 2;
-			    // Add Network Name descriptor
-			    usDescriptorLength = setNetworkNameDescriptor(pucData, pucNetworkName);
-			    usFullDescriptorLength = usDescriptorLength;
-			    pucData += usDescriptorLength;
+// int TS_GenNITSection(unsigned short usNetworkId,unsigned char ucVersion, unsigned char *pucNetworkName,int iSectionCount,unsigned short* totalTableLen) {	// 30300
+// 	   unsigned short *pucServiceId=NULL,*pucChannelNumber=NULL,*pucHdChannelNumber,*pucServiceType=NULL,*pucServiceLcnId=NULL;
+// 	   unsigned short usOriginalNetworkId,ucCurrentTsId;
+// 	   unsigned int uiNbServices,uiSymbol_rate;
+// 	   unsigned char pucNewSection[1500];     // 1 section allocated array
+// 	   unsigned char *pucData;                // byte pointer for NIT section composing
+// 	   unsigned char *pucSectionLength;       // 2 keep section length pointer
+// 	   unsigned char *pucDescriptorLength;    // 2 keep descriptor length pointer
+// 	   unsigned char *pucTSLength;
+// 	   unsigned char i = 0;                   // Current section increment
+// 	   unsigned char pucDescriptor[256];       // descriptor data
+// 	   unsigned short usFullDescriptorLength=0; // descriptor length
+// 	   unsigned short usFullTSLength=0;
+// 	   unsigned short usDescriptorLength;     // descriptor length
+// 	   unsigned short usFullSectionLength;
+// 	   unsigned long val_crc;
+// 	   unsigned short sec_len, sec_len_desc, list_desc_len;
+// 	   unsigned short NIT_TAG_SEC_LEN3 = 3,NIT_NID_VER_LASTSEC_DESC_LENB7 = 7,TS_SECTION_LENB2 = 2,CRC32B4=4;
+// 	   unsigned int ts_size=0,uiFrequency;
+// 	   unsigned char ucFec_Inner = 0,ucFec_Outer = 0,ucModulation;
+//        int nit_insert_error = 0;
+// 	   // generate required sections according to descriptors.
+// 	   	int ts_cout=0;
+// 	   	int section_count=0;
+// 	   	dbHandler *db = new dbHandler(DB_CONF_PATH);
+// 	   	Json::Value json_network_details = db->getNetworkDetailsForNIT(); 
+// 	   	ts_size = json_network_details["list"].size();
+// 	      // std::cout<<json_network_details<<endl;
+// 	    if(json_network_details["error"]==false){
+// 	      	while(1) {
+// 	      		// printf("\n----Fisrt Section TS Start------------>%d\n ",ts_cout);
+// 	      		pucNewSection[1500] = {0};
+// 			    // point to the first byte of the allocated array
+// 			    pucData = pucNewSection;
+// 			    // first byte of the section
+// 			    *(pucData++) = 0x40;
+// 			    //skip section length and keep pointer to
+// 			    pucSectionLength = pucData;
+// 			    pucData+=2;
+// 			    // insert network id
+// 			    *(pucData++) =  (unsigned char)(usNetworkId>>8);
+// 			    *(pucData++) =  (unsigned char)(usNetworkId&0xFF);
+// 			    // insert version number
+// 			    *(pucData++) =  0xC1 | (ucVersion<<1);
+// 			    // Insert section number
+// 			    *(pucData++) = section_count;
+// 			    // Jump last section number (don't know yet)
+// 			    *(pucData++) = iSectionCount;
+// 			    // Save descriptor length pointer and jump it
+// 			    pucDescriptorLength = pucData;
+// 			    pucData += 2;
+// 			    // Add Network Name descriptor
+// 			    usDescriptorLength = setNetworkNameDescriptor(pucData, pucNetworkName);
+// 			    usFullDescriptorLength = usDescriptorLength;
+// 			    pucData += usDescriptorLength;
 
-			    //Add linkage descriptor here
-                usDescriptorLength = setPrivateDataDescriptor(pucData);
-                usFullDescriptorLength += usDescriptorLength;
-                pucData += usDescriptorLength;
-                // printf("\n----      setPrivateDataDescriptor   ------------>%d\n ",usDescriptorLength);
+// 			    //Add linkage descriptor here
+//                 usDescriptorLength = setPrivateDataDescriptor(pucData);
+//                 usFullDescriptorLength += usDescriptorLength;
+//                 pucData += usDescriptorLength;
+//                 // printf("\n----      setPrivateDataDescriptor   ------------>%d\n ",usDescriptorLength);
                 
-			    *(pucDescriptorLength++) =  0xF0 | (usFullDescriptorLength>>8);
-			    *(pucDescriptorLength++) =  (usFullDescriptorLength&0xFF);
+// 			    *(pucDescriptorLength++) =  0xF0 | (usFullDescriptorLength>>8);
+// 			    *(pucDescriptorLength++) =  (usFullDescriptorLength&0xFF);
 
-			    //to chech the length of full section
-			    usFullSectionLength = usFullDescriptorLength + NIT_NID_VER_LASTSEC_DESC_LENB7;
+// 			    //to chech the length of full section
+// 			    usFullSectionLength = usFullDescriptorLength + NIT_NID_VER_LASTSEC_DESC_LENB7;
 
-			    //TS steams loop start here
+// 			    //TS steams loop start here
 			      
-			    pucTSLength = pucData;
-			    pucData += 2;
-			    usFullTSLength = 0;
+// 			    pucTSLength = pucData;
+// 			    pucData += 2;
+// 			    usFullTSLength = 0;
 			   
-	            for (; ts_cout < json_network_details["list"].size(); ++ts_cout)
-	            {
+// 	            for (; ts_cout < json_network_details["list"].size(); ++ts_cout)
+// 	            {
 	            	
-	            	// std::cout<<"---------------------------TS_COUNT ---------------"<<json_network_details["list"][ts_cout]["ts_id"]<<endl;
-	            	std::string rmx_no = json_network_details["list"][ts_cout]["rmx_no"].asString();
-	            	std::string output = json_network_details["list"][ts_cout]["output"].asString();
+// 	            	// std::cout<<"---------------------------TS_COUNT ---------------"<<json_network_details["list"][ts_cout]["ts_id"]<<endl;
+// 	            	std::string rmx_no = json_network_details["list"][ts_cout]["rmx_no"].asString();
+// 	            	std::string output = json_network_details["list"][ts_cout]["output"].asString();
 
-	              	ucCurrentTsId = (unsigned short) std::stoi(json_network_details["list"][ts_cout]["ts_id"].asString());
-	              	usOriginalNetworkId = (unsigned short) std::stoi(json_network_details["list"][ts_cout]["original_netw_id"].asString());
-			      	//transport stream loop len
-			      	*(pucData++) = (ucCurrentTsId>>8);
-			      	*(pucData++) = (ucCurrentTsId&0xFF);
-			      	*(pucData++) = (usOriginalNetworkId>>8);
-			     	*(pucData++) = (usOriginalNetworkId&0xFF);
+// 	              	ucCurrentTsId = (unsigned short) std::stoi(json_network_details["list"][ts_cout]["ts_id"].asString());
+// 	              	usOriginalNetworkId = (unsigned short) std::stoi(json_network_details["list"][ts_cout]["original_netw_id"].asString());
+// 			      	//transport stream loop len
+// 			      	*(pucData++) = (ucCurrentTsId>>8);
+// 			      	*(pucData++) = (ucCurrentTsId&0xFF);
+// 			      	*(pucData++) = (usOriginalNetworkId>>8);
+// 			     	*(pucData++) = (usOriginalNetworkId&0xFF);
 
-			       	usFullDescriptorLength = 0;
-			       	pucDescriptorLength = pucData;
-			       	pucData += 2;
+// 			       	usFullDescriptorLength = 0;
+// 			       	pucDescriptorLength = pucData;
+// 			       	pucData += 2;
 
-			      	ucModulation = (unsigned char) std::stoi(json_network_details["list"][ts_cout]["modulation"].asString());
-			      	ucModulation+=1;
-	              	uiFrequency = (unsigned int) std::stoi(json_network_details["list"][ts_cout]["frequency"].asString());
-	              	uiSymbol_rate = ((unsigned int) std::stoi(json_network_details["list"][ts_cout]["symbol_rate"].asString()) / 1000);
-	              	uiSymbol_rate = uiSymbol_rate*100;
-	              	// printf("--------TS Start HERE--------> %d ----->> %d ----------------- >> %d \n", ts_cout,ucCurrentTsId,uiFrequency);
-			        //Add cable_delivery descriptor
-			      	usDescriptorLength = setCableDeliverySystemDescriptor(pucData,uiFrequency,ucFec_Outer,ucModulation,uiSymbol_rate,ucFec_Inner);
-			      	usFullDescriptorLength += usDescriptorLength;
-			      	pucData += usDescriptorLength;
-				      	//printf("-------CABLE DELE DESC LEN--------->%d\n", usDescriptorLength);
+// 			      	ucModulation = (unsigned char) std::stoi(json_network_details["list"][ts_cout]["modulation"].asString());
+// 			      	ucModulation+=1;
+// 	              	uiFrequency = (unsigned int) std::stoi(json_network_details["list"][ts_cout]["frequency"].asString());
+// 	              	uiSymbol_rate = ((unsigned int) std::stoi(json_network_details["list"][ts_cout]["symbol_rate"].asString()) / 1000);
+// 	              	uiSymbol_rate = uiSymbol_rate*100;
+// 	              	// printf("--------TS Start HERE--------> %d ----->> %d ----------------- >> %d \n", ts_cout,ucCurrentTsId,uiFrequency);
+// 			        //Add cable_delivery descriptor
+// 			      	usDescriptorLength = setCableDeliverySystemDescriptor(pucData,uiFrequency,ucFec_Outer,ucModulation,uiSymbol_rate,ucFec_Inner);
+// 			      	usFullDescriptorLength += usDescriptorLength;
+// 			      	pucData += usDescriptorLength;
+// 				      	//printf("-------CABLE DELE DESC LEN--------->%d\n", usDescriptorLength);
 
-				      	Json::Value json_active_progs = db->getActivePrograms(output,rmx_no);
-				      	// std::cout<<json_active_progs<<endl;
-				      	if(json_active_progs["error"]==false){
-				      		uiNbServices =(unsigned int) json_active_progs["list"].size();
-				      		int iServiceCount = 0;
-				      		pucServiceId =(short unsigned int*) new short[uiNbServices];
-				      		pucServiceType =(short unsigned int*) new short[uiNbServices];
-				      		for (int iServiceCount = 0; iServiceCount < uiNbServices; ++iServiceCount)
-				      		{  
-                                int service_id = std::stoi(json_active_progs["list"][iServiceCount]["service_id"].asString());
-                                int orig_service_id =std::stoi(json_active_progs["list"][iServiceCount]["orig_service_id"].asString());
-				      			pucServiceId[iServiceCount] = (unsigned short) (service_id != -1)? service_id : orig_service_id;	
-				      			pucServiceType[iServiceCount] = std::stoi(json_active_progs["list"][iServiceCount]["service_type"].asString());;//Get the service type from getProg INFO
-				      		}
-				      		//Add Service List Descriptor
-				      		usDescriptorLength = setServiceListDescriptor(pucData, uiNbServices, pucServiceId,pucServiceType);
-					      	usFullDescriptorLength += usDescriptorLength;
-					      	pucData += usDescriptorLength;
-				  		}
+// 				      	Json::Value json_active_progs = db->getActivePrograms(output,rmx_no);
+// 				      	// std::cout<<json_active_progs<<endl;
+// 				      	if(json_active_progs["error"]==false){
+// 				      		uiNbServices =(unsigned int) json_active_progs["list"].size();
+// 				      		int iServiceCount = 0;
+// 				      		pucServiceId =(short unsigned int*) new short[uiNbServices];
+// 				      		pucServiceType =(short unsigned int*) new short[uiNbServices];
+// 				      		for (int iServiceCount = 0; iServiceCount < uiNbServices; ++iServiceCount)
+// 				      		{  
+//                                 int service_id = std::stoi(json_active_progs["list"][iServiceCount]["service_id"].asString());
+//                                 int orig_service_id =std::stoi(json_active_progs["list"][iServiceCount]["orig_service_id"].asString());
+// 				      			pucServiceId[iServiceCount] = (unsigned short) (service_id != -1)? service_id : orig_service_id;	
+// 				      			pucServiceType[iServiceCount] = std::stoi(json_active_progs["list"][iServiceCount]["service_type"].asString());;//Get the service type from getProg INFO
+// 				      		}
+// 				      		//Add Service List Descriptor
+// 				      		usDescriptorLength = setServiceListDescriptor(pucData, uiNbServices, pucServiceId,pucServiceType);
+// 					      	usFullDescriptorLength += usDescriptorLength;
+// 					      	pucData += usDescriptorLength;
+// 				  		}
 
-				  		// // Add LCN Descriptor
-				  		Json::Value json_prog_lcn_ids = db->getLcnIds(output,rmx_no);
-				  		// std::cout<<json_prog_lcn_ids<<endl;
-				  		if(json_prog_lcn_ids["error"]==false){
-				  			uiNbServices =(unsigned int) json_prog_lcn_ids["list"].size();
-				      		int iLcnCount = 0;
-				      		pucServiceLcnId =(short unsigned int*) new short[uiNbServices];
-				      		pucChannelNumber =(short unsigned int*) new short[uiNbServices];
-					  		for (int iLcnCount = 0; iLcnCount < uiNbServices; ++iLcnCount)
-				      		{
-				      			pucServiceLcnId[iLcnCount] = (unsigned short)std::stoi(json_prog_lcn_ids["list"][iLcnCount]["service_id"].asString());	
-				      			pucChannelNumber[iLcnCount] = (unsigned short)std::stoi(json_prog_lcn_ids["list"][iLcnCount]["lcn_id"].asString());
-				      		}
-					      	usDescriptorLength = setLcnDescriptor(pucData, uiNbServices, pucServiceId, pucChannelNumber, pucHdChannelNumber);
-					      	usFullDescriptorLength += usDescriptorLength;
-					      	pucData += usDescriptorLength;
-				  		}
+// 				  		// // Add LCN Descriptor
+// 				  		Json::Value json_prog_lcn_ids = db->getLcnIds(output,rmx_no);
+// 				  		// std::cout<<json_prog_lcn_ids<<endl;
+// 				  		if(json_prog_lcn_ids["error"]==false){
+// 				  			uiNbServices =(unsigned int) json_prog_lcn_ids["list"].size();
+// 				      		int iLcnCount = 0;
+// 				      		pucServiceLcnId =(short unsigned int*) new short[uiNbServices];
+// 				      		pucChannelNumber =(short unsigned int*) new short[uiNbServices];
+// 					  		for (int iLcnCount = 0; iLcnCount < uiNbServices; ++iLcnCount)
+// 				      		{
+// 				      			pucServiceLcnId[iLcnCount] = (unsigned short)std::stoi(json_prog_lcn_ids["list"][iLcnCount]["service_id"].asString());	
+// 				      			pucChannelNumber[iLcnCount] = (unsigned short)std::stoi(json_prog_lcn_ids["list"][iLcnCount]["lcn_id"].asString());
+// 				      		}
+// 					      	usDescriptorLength = setLcnDescriptor(pucData, uiNbServices, pucServiceId, pucChannelNumber, pucHdChannelNumber);
+// 					      	usFullDescriptorLength += usDescriptorLength;
+// 					      	pucData += usDescriptorLength;
+// 				  		}
 
-				  		//END OF Descriptors
-				  		*(pucDescriptorLength++) =  0xF0 | (usFullDescriptorLength>>8);
-					    *(pucDescriptorLength++) =  (usFullDescriptorLength&0xFF);
+// 				  		//END OF Descriptors
+// 				  		*(pucDescriptorLength++) =  0xF0 | (usFullDescriptorLength>>8);
+// 					    *(pucDescriptorLength++) =  (usFullDescriptorLength&0xFF);
 			      
-			        // printf("--------usFullDescriptorLength-------->%d\n", usFullDescriptorLength+6);
+// 			        // printf("--------usFullDescriptorLength-------->%d\n", usFullDescriptorLength+6);
 
-			        usFullSectionLength += usFullDescriptorLength+6;
-			        if(usFullSectionLength>900){
-			        	// printf("%d---- SECTION Full------------>%d\n ", ts_cout,usFullSectionLength);
-			            pucData = pucData-(usFullDescriptorLength+6);
-			            usFullSectionLength = usFullSectionLength - (usFullDescriptorLength+6);
-			            // ts_cout = ts_cout-1;
-			            // printf("%d---- SECTION Full------------>%d\n ", ts_cout,usFullSectionLength);
-			            break;
-			        }
-			             //Full TS length
-			       		 usFullTSLength += usFullDescriptorLength+6;
-			       		 // printf("--------usFullDescriptorLength-------->%d\n", usFullDescriptorLength+6);
-			    }
-		        *(pucTSLength++) =  0xF0 | (usFullTSLength>>8);
-		        *(pucTSLength++) =  (usFullTSLength&0xFF);
+// 			        usFullSectionLength += usFullDescriptorLength+6;
+// 			        if(usFullSectionLength>900){
+// 			        	// printf("%d---- SECTION Full------------>%d\n ", ts_cout,usFullSectionLength);
+// 			            pucData = pucData-(usFullDescriptorLength+6);
+// 			            usFullSectionLength = usFullSectionLength - (usFullDescriptorLength+6);
+// 			            // ts_cout = ts_cout-1;
+// 			            // printf("%d---- SECTION Full------------>%d\n ", ts_cout,usFullSectionLength);
+// 			            break;
+// 			        }
+// 			             //Full TS length
+// 			       		 usFullTSLength += usFullDescriptorLength+6;
+// 			       		 // printf("--------usFullDescriptorLength-------->%d\n", usFullDescriptorLength+6);
+// 			    }
+// 		        *(pucTSLength++) =  0xF0 | (usFullTSLength>>8);
+// 		        *(pucTSLength++) =  (usFullTSLength&0xFF);
 
-		        //add section len size
-		        usFullSectionLength += TS_SECTION_LENB2;
-		        usFullSectionLength += CRC32B4;
+// 		        //add section len size
+// 		        usFullSectionLength += TS_SECTION_LENB2;
+// 		        usFullSectionLength += CRC32B4;
 
-		        *(pucSectionLength++) =  0xF0 | ((usFullSectionLength)>>8);
-		        *(pucSectionLength++) =  ((usFullSectionLength)&0xFF);
+// 		        *(pucSectionLength++) =  0xF0 | ((usFullSectionLength)>>8);
+// 		        *(pucSectionLength++) =  ((usFullSectionLength)&0xFF);
 		        
 
-			    //usFullSectionLength+= NIT_TAG_SEC_LEN3;
-			    int j = 0;
-			    val_crc = crc32 (pucData-(usFullSectionLength+NIT_TAG_SEC_LEN3-CRC32B4), usFullSectionLength-CRC32B4+NIT_TAG_SEC_LEN3);
-				*(pucData++) = val_crc>>24;
-				*(pucData++) = val_crc>>16;
-				*(pucData++) = val_crc>>8;
-				*(pucData) = val_crc;
-				usFullSectionLength +=NIT_TAG_SEC_LEN3;
-				printf("\n");
-                printf("----FULL SECTION LEN------------>%d\n", usFullSectionLength);
-			    unsigned char * ucSectionPayload = pucNewSection;
-			    // for(j = 0;j<usFullSectionLength;j++){
-			    //     // printf(" %d --> %x \t\t",j,pucNewSection[j]);
-			    //     printf("%x:",pucNewSection[j]);
-			    // }
-                *(totalTableLen++)=usFullSectionLength; 
-			    int k = 0;
-			    unsigned short usPointer=0;
-			    while(usFullSectionLength)
-			    {
-		        	int size_of_payload = (usFullSectionLength>256)? 256 : usFullSectionLength;
-		            int nit_resp = c1.insertTable(ucSectionPayload+=k,size_of_payload,usPointer,section_count,TABLE_NIT,TABLE_WRITE);
-		            usPointer += size_of_payload;
-		            usFullSectionLength -= size_of_payload;
-		            // printf(")) --> %d\n",nit_resp);
-		            k =size_of_payload;
-                    if(nit_resp != 1)
-                    {
-                        nit_insert_error = 1;
-                        break;
-                    }
-                    usleep(1000);
-		        }
-		        std::cout<<ts_cout<<"------NIT ------>>"<<ts_size<<endl;
-		        if(ts_cout==ts_size)
-					break;
-                if(nit_insert_error == 1)
-                    break;
-			    section_count++;
-		    }
+// 			    //usFullSectionLength+= NIT_TAG_SEC_LEN3;
+// 			    int j = 0;
+// 			    val_crc = crc32 (pucData-(usFullSectionLength+NIT_TAG_SEC_LEN3-CRC32B4), usFullSectionLength-CRC32B4+NIT_TAG_SEC_LEN3);
+// 				*(pucData++) = val_crc>>24;
+// 				*(pucData++) = val_crc>>16;
+// 				*(pucData++) = val_crc>>8;
+// 				*(pucData) = val_crc;
+// 				usFullSectionLength +=NIT_TAG_SEC_LEN3;
+// 				printf("\n");
+//                 printf("----FULL SECTION LEN------------>%d\n", usFullSectionLength);
+// 			    unsigned char * ucSectionPayload = pucNewSection;
+// 			    // for(j = 0;j<usFullSectionLength;j++){
+// 			    //     // printf(" %d --> %x \t\t",j,pucNewSection[j]);
+// 			    //     printf("%x:",pucNewSection[j]);
+// 			    // }
+//                 *(totalTableLen++)=usFullSectionLength; 
+// 			    int k = 0;
+// 			    unsigned short usPointer=0;
+// 			    while(usFullSectionLength)
+// 			    {
+// 		        	int size_of_payload = (usFullSectionLength>256)? 256 : usFullSectionLength;
+// 		            int nit_resp = c1.insertTable(ucSectionPayload+=k,size_of_payload,usPointer,section_count,TABLE_NIT,TABLE_WRITE);
+// 		            usPointer += size_of_payload;
+// 		            usFullSectionLength -= size_of_payload;
+// 		            // printf(")) --> %d\n",nit_resp);
+// 		            k =size_of_payload;
+//                     if(nit_resp != 1)
+//                     {
+//                         nit_insert_error = 1;
+//                         break;
+//                     }
+//                     usleep(1000);
+// 		        }
+// 		        std::cout<<ts_cout<<"------NIT ------>>"<<ts_size<<endl;
+// 		        if(ts_cout==ts_size)
+// 					break;
+//                 if(nit_insert_error == 1)
+//                     break;
+// 			    section_count++;
+// 		    }
 				
-		}
-		delete db;
-        if(nit_insert_error == 0)
-	       return 1;
-        else
-            return -1;
-	}
+// 		}
+// 		delete db;
+//         if(nit_insert_error == 0)
+// 	       return 1;
+//         else
+//             return -1;
+// 	}
 
     // TS_GenNITSection14_247 for firmware version 14.247 build
 
@@ -17376,6 +17802,245 @@ int TS_GenNITSection14_247(unsigned short usNetworkId,unsigned char ucVersion, u
             }
             delete db;
         return section_count;
+    }
+    int updateSDTtable(string service_number,string input,string rmx_no){
+        dbHandler *db = new dbHandler(DB_CONF_PATH);
+        Json::Value json_output_list;
+        int service_presence = 0;
+        json_output_list = db->getOuputListContainingService(service_number,input,rmx_no);
+        if(json_output_list["error"] == false){
+            service_presence = 1;
+            for (int i = 0; i < json_output_list["list"].size(); ++i)
+            {
+                if(db->isCustomSDTPresent(std::to_string(json_output_list["list"][i].asInt()),rmx_no))
+                    callInsertSDTtable(json_output_list["list"][i].asInt(),std::stoi(rmx_no));
+            }
+        }
+        delete db;
+        return service_presence;
+    }
+    int SDT_VER = 31;
+    Json::Value callInsertSDTtable(int output,int rmx_no){
+        Json::Value json;
+        SDT_VER = (SDT_VER == 31)? 0 : SDT_VER+1;
+        bool sdt_insert_error = true;
+        short sSDTLength;
+        unsigned char usNitSections[1200] = {0}; 
+        int originalnwid=0,ts_id=0;
+        dbHandler *db = new dbHandler(DB_CONF_PATH);
+        Json::Value json_ts_details = db->getNetworkId(std::to_string(rmx_no),std::to_string(output));
+        if(json_ts_details["error"] == false){
+            originalnwid = std::stoi(json_ts_details["original_netw_id"].asString());
+            ts_id = std::stoi(json_ts_details["ts_id"].asString());
+        }
+        sSDTLength = TS_GenSDTSections(usNitSections,SDT_VER,ts_id,originalnwid,output,rmx_no);
+        std::cout<<sSDTLength<<endl;
+        if(sSDTLength > 0){
+           
+            Json::Value iojson = callSetInputOutput("0",std::to_string(output),rmx_no);
+            if(iojson["error"] == false)
+            { 
+                   unsigned char * ucSectionPayload = usNitSections;
+                    unsigned short usFullSectionLength = sSDTLength;
+                    int k = 0;
+                    unsigned short usPointer=0;
+                    while(usFullSectionLength)
+                    {
+                        int size_of_payload = (usFullSectionLength>256)? 256 : usFullSectionLength;
+                        int nit_resp = c1.insertTable(ucSectionPayload+=k,size_of_payload,usPointer,0,TABLE_SDT,TABLE_WRITE);
+                        usPointer += size_of_payload;
+                        usFullSectionLength -= size_of_payload;
+                        // printf(")) --> %d\n",nit_resp);
+                        k =size_of_payload;
+                        if(nit_resp != 1)
+                        {
+                            break;
+                        }else
+                        {
+                            sdt_insert_error = false;
+                        }
+                    }
+                if(!sdt_insert_error){
+
+                    json["size"] = sSDTLength;
+                    if(!sdt_insert_error){
+                        unsigned short usSdtLen[0];
+                        usSdtLen[0] = sSDTLength;
+                        cout<<"\n------------------------"<<usSdtLen[0]<<"-------------------------"<<endl;
+                        int sdt_sec_len_resp = c1.setTableSectionLen(usSdtLen,1,TABLE_SDT,TABLE_SET_LEN);
+                        if(sdt_sec_len_resp == 1){
+                            int sdt_activation_resp = c1.activateTable(TABLE_SDT,TABLE_ACTIVATE);
+                            if(sdt_activation_resp != 1)
+                                std::cout<<"sdt_insert_error ---------------"<<sSDTLength<<endl;
+                            else
+                                std::cout<<"SDT ACTIVATED ---------------"<<sSDTLength<<endl;
+                            printf(")) --> %d\n",sdt_activation_resp);
+                            if(sdt_activation_resp != 1){
+                                sdt_insert_error = true;
+                            }
+                        }else{
+                            sdt_insert_error = true;
+                        }
+                    }  
+                }
+                std::cout<<"sdt_insert_error ---------------"<<sdt_insert_error<<endl;
+                usleep(100);
+            }else{
+                std::cout<<"------------------------------INPUT ERROR -------------------"<<output<<endl;
+                Json::Value json_output_err;
+                json_output_err["output:"+std::to_string(output)]= iojson;
+                json["Remux:"+std::to_string(rmx_no)].append(json_output_err);
+            }
+               
+            // db->addNITDetails(NIT_VER,network_name,str_network_id);
+            json["error"]= false;
+            json["message"]= "SDT inserted!";
+        }
+        else{
+            json["error"]= true;
+            json["message"]= "No services output present!"; 
+            json["len"] = sSDTLength;
+        }
+        delete db;
+        return json; 
+    }
+    // TS_GenNITSection section
+short TS_GenSDTSections(unsigned char usSDTSections[1200],unsigned char ucVersion,int ts_id,int originalnwid,int iOutput,int iRmx_no) {   // 30300
+       unsigned short *pucServiceId=NULL,*pucChannelNumber=NULL,*pucHdChannelNumber,*pucServiceType=NULL,*pucServiceLcnId=NULL;
+       unsigned short usOriginalNetworkId,ucCurrentTsId;
+       unsigned int uiNbServices,uiSymbol_rate;
+       unsigned char *pucSectionLength;       // 2 keep section length pointer
+       unsigned char *pucDescriptorLength;    // 2 keep descriptor length pointer
+       unsigned char *pucTSLength;
+       unsigned char pucDescriptor[256];       // descriptor data
+       unsigned short usFullDescriptorLength=0;
+       unsigned char *pucServiceDescLength =0,*pucServiceLength =0; // descriptor length
+       unsigned short usFullTSLength=0;
+       unsigned short usDescriptorLength;     // descriptor length
+       short usFullSectionLength;
+       unsigned long val_crc;
+       unsigned short SDT_TAG_SEC_LEN3 = 3,NIT_NID_VER_LASTSEC_DESC_LENB7 = 7,TS_SECTION_LENB2 = 2,CRC32B4=4;
+       unsigned int ts_size=0,uiFrequency;
+       unsigned char ucFec_Inner = 0,ucFec_Outer = 0,ucModulation;
+       // generate required sections according to descriptors.
+        int ts_cout=0;
+        int section_count=0;
+        dbHandler *db = new dbHandler(DB_CONF_PATH);
+        while(1) {
+            printf("\n----Fisrt Section TS Start------------>%d\n ",section_count);
+            usFullSectionLength = 0;
+            // point to the first byte of the allocated array
+            unsigned char *pucData; 
+            pucData = usSDTSections;
+            // first byte of the section
+            *(pucData++) = 0x42;
+            //skip section length and keep pointer to
+            pucSectionLength = pucData;
+            pucData+=2;
+            // insert network id
+            *(pucData++) =  (unsigned char)(ts_id>>8);
+            *(pucData++) =  (unsigned char)(ts_id&0xFF);
+            // insert version number
+            *(pucData++) =  0xC1 | (ucVersion<<1);
+            // Insert section number
+            *(pucData++) = section_count;
+            // Jump last section number (don't know yet)
+            *(pucData++) = 0x00;
+
+             *(pucData++) =  (unsigned char)(originalnwid>>8);
+            *(pucData++) =  (unsigned char)(originalnwid&0xFF);
+            // Reserved for future use
+            *(pucData++) = 0xFF;
+
+             //to chech the length of full section
+            Json::Value json_servuce_list = db->getActiveServiceListToSDT(iOutput,iRmx_no);
+            int eit_present = json_servuce_list["EIT_present"].asInt();
+            for (int i=0; i < json_servuce_list["list"].size(); ++i)
+            {
+                // std::cout<<"---------------------------TS_COUNT ---------------"<<json_network_details["list"][ts_cout]["ts_id"]<<endl;
+                int service_id = std::stoi(json_servuce_list["list"][i]["service_id"].asString());
+                std::string service_name = json_servuce_list["list"][i]["service_name"].asString();
+                std::string service_provider = json_servuce_list["list"][i]["service_provider"].asString();
+                int service_type = std::stoi(json_servuce_list["list"][i]["service_type"].asString());
+                unsigned char* ucServiceName =(unsigned char*) service_name.c_str();  
+                unsigned char* ucServiceProvider =(unsigned char*) service_provider.c_str();  
+                cout<<ucServiceName<<" -- "<<service_type<<endl;
+                *(pucData++) =(unsigned char) (service_id>>8);
+                *(pucData++) =(unsigned char) (service_id&0xFF);
+                //EIT_schedule_flag presently zero
+                cout<<"EIT PRESENT "<<eit_present<<endl;
+                if(eit_present) //EIT_present_following_flag
+                    *(pucData++) = 0xFD;
+                else
+                    *(pucData++) = 0xFC;
+
+                pucServiceLength = pucData;
+                pucData += 2;
+
+                //Service Descriptor 
+                unsigned short usSerDescLen;
+                *(pucData++) = 0x48;
+                pucServiceDescLength=pucData;
+                pucData ++;
+                *(pucData++) =(unsigned char) (service_type);
+                //Service provide 
+                *(pucData++) = (unsigned char) strlen((char*)ucServiceProvider); 
+                usSerDescLen = 3;
+                while(*ucServiceProvider) {
+                    *(pucData++) = *(ucServiceProvider++);
+                    usSerDescLen++;
+                }
+                cout<<"strlen((char*)ucServiceProvider) ------------> "<<strlen((char*)ucServiceName)<<ucServiceName<<endl;
+                //service name 
+                *(pucData++) =(unsigned char) strlen((char*)ucServiceName); 
+                usSerDescLen++;
+                while(*ucServiceName) {
+                    *(pucData++) = *(ucServiceName++);
+                    usSerDescLen++;
+                }
+                *(pucServiceDescLength++) =  ((usSerDescLen-1)&0xFF);
+
+                usFullDescriptorLength =usSerDescLen+1;
+
+                //Add linkage descriptor here
+                Json::Value json_sdt_pd =  db->getSDTPrivateDescripter(std::to_string(service_id),std::to_string(iOutput),std::to_string(iRmx_no));
+                if(json_sdt_pd["error"] == false){
+                    usDescriptorLength = setSDTPrivateDataDescriptor(pucData,json_sdt_pd["list"]);
+                    usFullDescriptorLength += usDescriptorLength;
+                    pucData += usDescriptorLength;
+                }
+
+                //END OF Descriptors
+                *(pucServiceLength++) =  0x80 | (usFullDescriptorLength>>8);
+                *(pucServiceLength++) =  (usFullDescriptorLength&0xFF);
+
+                 //Full TS length
+                 usFullSectionLength += usFullDescriptorLength+5;
+                     // printf("--------usFullDescriptorLength-------->%d\n", usFullDescriptorLength+6);
+            }
+            usFullSectionLength +=8;
+            usFullSectionLength += CRC32B4;
+
+            *(pucSectionLength++) =  0xB0 | ((usFullSectionLength)>>8);
+            *(pucSectionLength++) =  ((usFullSectionLength)&0xFF);
+            
+            usFullSectionLength += SDT_TAG_SEC_LEN3;
+            int j = 0;
+            val_crc = crc32 (pucData-(usFullSectionLength-CRC32B4), usFullSectionLength-CRC32B4);
+            cout<<"SECTION CRC BEFORE "<<val_crc<<endl;
+            *(pucData++) = val_crc>>24;
+            *(pucData++) = val_crc>>16;
+            *(pucData++) = val_crc>>8;
+            *(pucData) = val_crc;
+            printf("\n----FULL SECTION LEN------------>%d\n", usFullSectionLength);
+            for(j = 0;j<usFullSectionLength;j++){
+                printf("%x:",usSDTSections[j]);
+            }
+            break;
+        }
+        std::cout<<"------Section Count ------>>"<<section_count<<endl;  
+        delete db;
+        return usFullSectionLength;            
     }
 	/*****************************************************************************/
     /*  Command    function insertNITable                          */
@@ -18149,7 +18814,7 @@ void setBootloaderMode(const Rest::Request& request, Net::Http::ResponseWriter r
     	dbHandler *db = new dbHandler(DB_CONF_PATH);
         if(write32bCPU(0,0,0) != -1)
         {
-            Json::Value json,NewService_names,network_details,lcn_json,high_prior_ser,pmt_alarm_json,active_progs,locked_progs,freeca_progs,input_mode_json,fifo_flags,table_ver_json,table_timeout_json,dvb_output_json,psisi_interval,serv_provider_json,nit_mode;
+            Json::Value json,NewService_names,network_details,lcn_json,high_prior_ser,pmt_alarm_json,active_progs,locked_progs,freeca_progs,input_mode_json,fifo_flags,table_ver_json,table_timeout_json,dvb_output_json,psisi_interval,serv_provider_json,nit_mode,json_static_ips;
 
             printf("\n\n Downloding Mxl 1 \n");
             downloadMxlFW(1,0);
@@ -18171,6 +18836,17 @@ void setBootloaderMode(const Rest::Request& request, Net::Http::ResponseWriter r
             printf("\n\n MXL Downlod Completed! \n\n");
             usleep(100);
 
+            json_static_ips = db->getStaticIPs();
+            if(json_static_ips["error"] == false)
+            {
+                for (int i = 0; i < json_static_ips["list"].size(); ++i)
+                {
+                    Json::Value json_resp = callSetFPGAStaticIP(std::stoul(json_static_ips["list"][i]["ip_addr"].asString()),json_static_ips["list"][i]["mux_id"].asInt());
+                    if(json_resp["error"] == true)
+                        cout<<"Failed to set static IP "<<endl;
+                }
+                cout<<"-------------Completed static IP configuration ------------------- "<<endl;
+            }
             //Intialize the RMX_FPGA's
             int remx_bit[]= {0,4,1,5,2,6};
             for (int rmx_no = 0; rmx_no < RMX_COUNT; ++rmx_no)
@@ -18734,6 +19410,18 @@ void setBootloaderMode(const Rest::Request& request, Net::Http::ResponseWriter r
                 }
 
             }
+            //SDT custom insert
+            for (int rmx_no = 1; rmx_no <= RMX_COUNT; ++rmx_no)
+            {
+                for (int output = 0; output <= OUTPUT_COUNT; ++output)
+                {
+                    if(db->isCustomSDTPresent(std::to_string(output),std::to_string(rmx_no)))
+                        callInsertSDTtable(output,rmx_no);        
+                }
+                cout<<"---------------------- Custom SDT completed ------------------------"<<endl;
+            }
+            
+
 
             usleep(100);
             //Insert NIT insertion 
@@ -18744,7 +19432,7 @@ void setBootloaderMode(const Rest::Request& request, Net::Http::ResponseWriter r
         			std::string networkName =json_nit["network_name"].asString();
                     NIT_VER = std::stoi(json_nit["nit_version"].asString());
 
-                    Json::Value json_nit =  callInsertNITable(networkid,networkName);
+                    Json::Value json_nit =  callInsertNITables(networkid,networkName);
                     if(json_nit["error"] == false)
                         std::cout<<"-----------------------NIT Updated successfully!----------------------------";
                     else

@@ -234,20 +234,45 @@ using namespace std;
 	}
 	int dbHandler :: addServiceId(std::string orig_service_id,std::string service_id,std::string rmx_no,std::string input, int addFlag)
 	{
+		int updated= 0;
 		string query="";
 		if(addFlag){
+
+			query = "UPDATE bouquet_service_list b SET b.service_id = '"+service_id+"' WHERE b.input = '"+input+"' AND b.rmx_id = '"+rmx_no+"' AND b.service_id = (SELECT CASE WHEN service_id !=-1 THEN service_id ELSE channel_number END AS service_id FROM channel_list WHERE input_channel = '"+input+"' AND rmx_id = '"+rmx_no+"' AND channel_number = '"+orig_service_id+"')";
+			if(mysql_query (connect,query.c_str())){
+				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+			    return -1;
+			}
+			query = "UPDATE sdt_private_data s, (SELECT DISTINCT CASE WHEN c.service_id !=-1 THEN c.service_id ELSE c.channel_number END AS service_id,c.rmx_id,a.out_channel,c.input_channel FROM channel_list c,active_service_list a WHERE c.input_channel = '"+input+"' AND c.rmx_id = '"+rmx_no+"' AND c.input_channel = a.in_channel AND c.rmx_id = a.rmx_id AND c.channel_number = '4401' AND a.in_channel = '"+input+"' AND a.rmx_id = '"+rmx_no+"' AND c.channel_number = a.channel_num) AS channel SET s.service_id = '"+service_id+"' WHERE s.service_id = channel.service_id";
+			if(mysql_query (connect,query.c_str())){
+				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+			    return -1;
+			}
+
 			query = "UPDATE channel_list SET service_id = '"+service_id+"' WHERE channel_number = '"+orig_service_id+"' AND rmx_id = '"+rmx_no+"' AND input_channel = '"+input+"';";  
 		}else{
+			query = "UPDATE bouquet_service_list b SET b.service_id = '"+orig_service_id+"' WHERE b.input = '"+input+"' AND b.rmx_id = '"+rmx_no+"' AND b.service_id = (SELECT CASE WHEN service_id !=-1 THEN service_id ELSE channel_number END AS service_id FROM channel_list WHERE input_channel = '"+input+"' AND rmx_id = '"+rmx_no+"' AND channel_number = '"+orig_service_id+"')";
+			if(mysql_query (connect,query.c_str())){
+				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+			    return -1;
+			}
+
+			query = "UPDATE sdt_private_data s, (SELECT DISTINCT CASE WHEN c.service_id !=-1 THEN c.service_id ELSE c.channel_number END AS service_id,c.rmx_id,a.out_channel,c.input_channel FROM channel_list c,active_service_list a WHERE c.input_channel = '"+input+"' AND c.rmx_id = '"+rmx_no+"' AND c.input_channel = a.in_channel AND c.rmx_id = a.rmx_id AND c.channel_number = '4401' AND a.in_channel = '"+input+"' AND a.rmx_id = '"+rmx_no+"' AND c.channel_number = a.channel_num) AS channel SET s.service_id = '"+orig_service_id+"' WHERE s.service_id = channel.service_id";
+			if(mysql_query (connect,query.c_str())){
+				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+			    return -1;
+			}
+
 			query = "UPDATE channel_list SET service_id = '-1' WHERE channel_number = '"+orig_service_id+"' AND rmx_id = '"+rmx_no+"' AND input_channel = '"+input+"';";   
 		}
-		std::cout<<query<<endl;
+		// std::cout<<query<<endl;
 		//addToSQLLog("addServiceId",query);
 		if(mysql_query (connect,query.c_str())){
 				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
 			    return -1;
 			}
 		if(mysql_affected_rows(connect)){
-			return 1;
+			 updated = 1;
 		}else{
 			string query = "select service_id FROM channel_list WHERE channel_number = '"+orig_service_id+"' AND rmx_id = '"+rmx_no+"' AND input_channel = '"+input+"';"; 
 			if(mysql_query (connect,query.c_str())){
@@ -258,10 +283,18 @@ using namespace std;
 			res_set = mysql_store_result(connect);
 			if(row= mysql_fetch_row(res_set))
 			{
-			 	return atoi(row[0]);
+			 	updated =  atoi(row[0]);
 		 	}else{
-		 		return -1;
+		 		updated = -1;
 		 	}
+		}
+		if(updated){
+			query = "UPDATE bouquet_service_list b,channel_list c SET b.service_id= '"+service_id+"'  WHERE b.input = '"+input+"' AND b.rmx_id = '"+rmx_no+"' AND b.rmx_id = c.rmx_id AND b.input = c.input_channel AND b.service_id = c.service_id";
+			// cout<<query<<endl;
+			if(mysql_query (connect,query.c_str())){
+				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+			    return 0;
+			}
 		}
 	}
 	int dbHandler :: removeServiceIdName(std::string channel_number,std::string rmx_no,std::string input)
@@ -638,7 +671,7 @@ using namespace std;
 	}
 	 int dbHandler ::addSPTSIPInputChannels(std::string mux_id, std::string input_channel, std::string ip_address,std::string port,std::string type){
 		string query = "UPDATE mux_15_1 SET is_enable = 1 WHERE mux_id = '"+mux_id+"';";  
-		std::cout<<query<<std::endl;
+		// std::cout<<query<<std::endl;
 		if(mysql_query (connect,query.c_str())){
 				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
 			    return 0;
@@ -758,7 +791,7 @@ using namespace std;
 	int dbHandler :: addCustomPid(std::string rmx_no, std::string output,std::string pid,std::string auth_output, int addFlag){
 		string query = "";
 		if(addFlag){
-			query = "INSERT INTO `custom_pids` ( `rmx_no`, `output_channel`, `pid`,`output_auth`) VALUES ('"+rmx_no+"', '"+output+"', '"+pid+"', '"+auth_output+"');";
+			query = "INSERT INTO `custom_pids` ( `rmx_no`, `output_channel`, `pid`,`output_auth`) VALUES ('"+rmx_no+"', '"+output+"', '"+pid+"', '"+auth_output+"') ON DUPLICATE KEY UPDATE output_auth = '"+auth_output+"';";
 		}else{
 			query = "DELETE FROM custom_pids WHERE pid = '"+pid+"'AND rmx_no = '"+rmx_no+"' AND output_channel = '"+output+"';";  
 		}
@@ -935,7 +968,7 @@ using namespace std;
 		else{
 			query = "DELETE FROM ecm_descriptor WHERE channel_id = '"+channel_id+"' AND stream_id = '"+stream_id+"' AND service_no = '"+programNumber+"' AND rmx_id = '"+rmx_no+"' AND output = '"+output+"' AND input = '"+input+"';";  
 		}
-		std::cout<<query<<std::endl;
+		// std::cout<<query<<std::endl;
 		addToSQLLog("dbHandler",query);
 		if(mysql_query (connect,query.c_str())){
 				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
@@ -953,7 +986,7 @@ using namespace std;
 		long long int cw_group_value;
 
 		query="SELECT cw_group_value FROM output WHERE rmx_id = '"+rmx_no+"' AND output_channel = '"+output+"';";
-		std::cout<<query<<std::endl;
+		// std::cout<<query<<std::endl;
 		if(mysql_query (connect,query.c_str())){
 				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
 			    return 0;
@@ -992,7 +1025,7 @@ using namespace std;
     	if(addFlag){
 			cw_group_value = setIndexSetUnset(cw_group,cw_group_value,addFlag);
 			query = "UPDATE output SET cw_group_value = '"+std::to_string(cw_group_value)+"' WHERE rmx_id = '"+rmx_no+"' AND output_channel = '"+output+"';";  
-			std::cout<<query<<std::endl;
+			// std::cout<<query<<std::endl;
 			//addToSQLLog("dbHandler",query);
 			if(mysql_query (connect,query.c_str())){
 				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
@@ -1013,7 +1046,7 @@ using namespace std;
 			 	if(atol(row[0]) == 0){
 			 		cw_group_value = setIndexSetUnset(cw_group,cw_group_value,addFlag);
 					query = "UPDATE output SET cw_group_value = '"+std::to_string(cw_group_value)+"' WHERE rmx_id = '"+rmx_no+"' AND output_channel = '"+output+"';";  
-					std::cout<<query<<std::endl;
+					// std::cout<<query<<std::endl;
 					//addToSQLLog("dbHandler",query);
 					if(mysql_query (connect,query.c_str())){
 							std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
@@ -1682,6 +1715,57 @@ using namespace std;
 		}
 	 	return jsonArray;
 	}
+	Json::Value dbHandler :: getActiveServiceListToSDT(int output ,int rmx_no){
+		MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+		std::string query;
+
+		query="SELECT CASE WHEN c.service_id != -1 THEN c.service_id ELSE c.channel_number END AS service_id,CASE WHEN c.service_name != -1 THEN c.service_name ELSE c.original_service_name END AS service_name,CASE WHEN c.provider_name != NULL THEN c.provider_name ELSE c.original_provider_name END AS service_provider,CASE WHEN c.new_service_type != -1 THEN c.new_service_type ELSE c.service_type END AS service_type FROM channel_list c, (SELECT `in_channel`,`channel_num` FROM `active_service_list` WHERE `out_channel` = '"+std::to_string(output)+"' AND `rmx_id` = '"+std::to_string(rmx_no)+"') al WHERE c.input_channel = al.in_channel AND al.channel_num = c.channel_number AND c.rmx_id =  '"+std::to_string(rmx_no)+"'";
+		// std::cout<<query<<endl;
+		if(mysql_query (connect,query.c_str())){
+			std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+		    jsonList["error"] = true;
+		    return jsonList;
+		}
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		if(res_set){
+			unsigned int numrows = mysql_num_rows(res_set);
+			if(numrows>0)
+			{
+				jsonArray["error"] = false;
+				while (((row= mysql_fetch_row(res_set)) !=NULL ))
+				{ 
+					Json::Value jsonObj;
+					jsonObj["service_id"]=row[i];
+					jsonObj["service_name"]=row[i+1];
+					jsonObj["service_provider"]=row[i+2];
+					jsonObj["service_type"]=row[i+3];
+					jsonList.append(jsonObj);
+				}
+			}else{	
+				jsonArray["error"] = true;
+			}
+			jsonArray["list"]=jsonList;
+		}else{ 		
+			jsonArray["error"] = true;
+		}
+		query="SELECT EIT_present FROM output WHERE rmx_id = '"+std::to_string(rmx_no)+"' AND output_channel = '"+std::to_string(output)+"' AND EIT_present != 0;";
+		// std::cout<<query<<endl;
+		if(mysql_query (connect,query.c_str())){
+			std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+		    return jsonArray;
+		}
+		jsonArray["EIT_present"] = 0;
+		if(mysql_store_result(connect)){
+			if(mysql_num_rows(res_set)>0)
+			{
+				jsonArray["EIT_present"] = 1;
+			}
+		}
+	 	return jsonArray;
+	}
 	int dbHandler :: getLCNNumber(std::string input ,std::string rmx_no ,std::string service_id){
 		MYSQL_RES *res_set;
 		MYSQL_ROW row;
@@ -1832,7 +1916,7 @@ using namespace std;
 			    jsonList["error"] = true;
 			    return jsonList;
 			}
-			cout<<query<<endl;
+			// cout<<query<<endl;
 //addToSQLLog("dbHandler",query);
 		unsigned int i =0;
 		res_set = mysql_store_result(connect);
@@ -3101,7 +3185,7 @@ Json::Value dbHandler :: getIPTunerDetails(){
 		    jsonList["error"] = true;
 		    return jsonList;
 		}
-		std::cout<<query<<endl;
+		// std::cout<<query<<endl;
 		jsonArray["error"] = false;
 //addToSQLLog("dbHandler",query);
 		unsigned int i =0;
@@ -3260,7 +3344,7 @@ Json::Value dbHandler :: getIPTunerDetails(){
 		std::string port;
 
 		query="SELECT port FROM emmg WHERE channel_id = '"+channel_id+"'";;
-		std::cout<<query<<std::endl;
+		// std::cout<<query<<std::endl;
 		if(mysql_query (connect,query.c_str())){
 				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
 			    return 0;
@@ -3369,7 +3453,7 @@ addToSQLLog("dbHandler",query);
 			std::string query="";
 			Json::Value json_list,jsonArray;
 			query = "SELECT out_channel,SUM(key_index) FROM encrypted_service_list WHERE in_channel = '"+ input+"' AND rmx_id = '"+rmx_no+"' GROUP BY out_channel;";  
-			std::cout<<query<<endl;	
+			// std::cout<<query<<endl;	
 			if(mysql_query (connect,query.c_str())){
 				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
 			   return 0;
@@ -3396,7 +3480,7 @@ addToSQLLog("dbHandler",query);
 					int indx_value = 0;
 					string output = json_list[i]["output"].asString();
 					query="SELECT indexValue FROM output WHERE rmx_id = '"+rmx_no+"' AND output_channel = '"+output+"';";
-					std::cout<<query<<endl;
+					// std::cout<<query<<endl;
 					if(mysql_query (connect,query.c_str())){
 						std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
 					   	return 0;
@@ -3411,12 +3495,12 @@ addToSQLLog("dbHandler",query);
 							}
 						}
 					} 
-					std::cout<<"---------------indx_value -------------"<<json_list[i]["index"].asString()<<endl;
+					// std::cout<<"---------------indx_value -------------"<<json_list[i]["index"].asString()<<endl;
 					indx_value = stoi(json_list[i]["index"].asString()) - indx_value; 
 
 					indx_value = (indx_value >= 0)?indx_value : 0;
 					query="UPDATE output SET indexValue = '"+std::to_string(indx_value)+"' WHERE rmx_id = '"+rmx_no+"' AND output_channel = '"+output+"';";
-					std::cout<<query<<endl;
+					// std::cout<<query<<endl;
 
 					if(mysql_query (connect,query.c_str())){
 						std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
@@ -3427,7 +3511,7 @@ addToSQLLog("dbHandler",query);
 			query = "DELETE FROM encrypted_service_list WHERE in_channel = '"+input+"' AND rmx_id = '"+rmx_no+"';";  
 			
 			// std::cout<<"addActivatedPrograms--------------------------\n"<<query;
-			std::cout<<query<<endl;
+			// std::cout<<query<<endl;
 			if(mysql_query (connect,query.c_str())){
 				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
 			   return 0;
@@ -3982,18 +4066,50 @@ Json::Value dbHandler :: getPrivateData(int withId){
 		}
 	 	return jsonArray;
 	}
+Json::Value dbHandler :: getSDTPrivateDescripter(string service_id,string output,string str_rmx_no){
+	MYSQL_RES *res_set;
+		MYSQL_ROW row;
+		Json::Value jsonList;
+		std::string query;
+		std::string indexValue;
 
+		query="SELECT id,private_data FROM sdt_private_data WHERE rmx_id ='"+str_rmx_no+"' AND output='"+output+"' AND service_id ='"+service_id+"'";
+		std::cout<<query<<std::endl;
+		if(mysql_query (connect,query.c_str())){
+				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+			    jsonList["error"] = true;
+			    return jsonList;
+			}
+//addToSQLLog("dbHandler",query);
+		unsigned int i =0;
+		res_set = mysql_store_result(connect);
+		if(res_set){
+			unsigned int numrows = mysql_num_rows(res_set);
+			if(numrows>0)
+			{
+				jsonArray["error"] = false;
+				while (((row= mysql_fetch_row(res_set)) !=NULL ))
+				{ 
+					Json::Value jsonObj;
+					jsonObj["private_data_id"]=row[i];
+					jsonObj["private_data"]=row[i+1];
+					jsonList.append(jsonObj);
+				}
+			}else{	
+				jsonArray["error"] = true;
+			}
+			jsonArray["list"]=jsonList;
+		}else{ 		
+			jsonArray["error"] = true;
+		}
+	 	return jsonArray;
+}
 int dbHandler :: addPrivateData(std::string sPrivateData,std::string private_data_id,string loop,Json::Value outputs,string table_type, int addFlag){
 	string query ="";
 	if(addFlag){
 		if(std::stoi(loop) == 1){
 			Json::FastWriter fastWriter;
 			string output_list = fastWriter.write(outputs);
-			// for (int i = 0; i < outputs.size(); ++i)
-			// {
-			// 	output_list +=outputs[i].asString() + ",";
-			// }
-			// output_list = output_list.substr(0,(output_list.length() -1));
 			query = "Insert into private_data (id,data,loop_no,output_list,table_type) VALUES ('"+private_data_id+"','"+sPrivateData+"','"+loop+"','"+output_list+"','"+table_type+"')  ON DUPLICATE KEY UPDATE data = '"+sPrivateData+"',loop_no = '"+loop+"', output_list = '"+output_list+"',table_type = '"+table_type+"';";
 		}
 		else
@@ -4012,6 +4128,39 @@ int dbHandler :: addPrivateData(std::string sPrivateData,std::string private_dat
 		return 1;
 	}else{
 		query = "SELECT COUNT(*) FROM private_data WHERE id = '"+private_data_id+"';";
+		if(mysql_query (connect,query.c_str())){
+				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+			    return 0;
+			}
+//addToSQLLog("dbHandler",query);
+		res_set = mysql_store_result(connect);
+		if(mysql_num_rows(res_set))
+		{
+			row= mysql_fetch_row(res_set);
+		 	return atoi(row[0]);
+	 	}else{
+	 		return 0;
+	 	}
+	}		
+}
+int dbHandler :: addSDTPrivateData(std::string sPrivateData,std::string private_data_id,string rmx_no,string output,string service_id, int addFlag){
+	string query ="";
+	if(addFlag){
+		query = "Insert into sdt_private_data (id,private_data,rmx_id,output,service_id) VALUES ('"+private_data_id+"','"+sPrivateData+"','"+rmx_no+"','"+output+"','"+service_id+"')  ON DUPLICATE KEY UPDATE private_data = '"+sPrivateData+"',rmx_id = '"+rmx_no+"', output = '"+output+"',service_id = '"+service_id+"';";
+	}
+	else
+		query = "DELETE FROM sdt_private_data WHERE id = '"+private_data_id+"';";
+	std::cout<<query<<std::endl;
+	// std::cout<<outputs<<std::endl;
+	if(mysql_query (connect,query.c_str())){
+		std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+	    return 0;
+	}
+	addToSQLLog("dbHandler",query);
+	if(mysql_affected_rows(connect)){
+		return 1;
+	}else{
+		query = "SELECT COUNT(*) FROM sdt_private_data WHERE id = '"+private_data_id+"';";
 		if(mysql_query (connect,query.c_str())){
 				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
 			    return 0;
@@ -4383,7 +4532,7 @@ int dbHandler :: deleteBouquet(std::string bouquet_id){
 		{
 			isDeleted = 1;
 	 	}
-	 	std::cout<<query<<endl;
+	 	// std::cout<<query<<endl;
 	 	return isDeleted;
 	}
 int dbHandler :: flushOldServices(std::string rmx_no,int input){
@@ -4393,7 +4542,7 @@ int dbHandler :: flushOldServices(std::string rmx_no,int input){
 		std::string query;
 		int isDeleted=0;
 		query="DELETE FROM channel_list WHERE rmx_id = '"+rmx_no+"' AND input_channel = '"+std::to_string(input)+"';";
-		std::cout<<query<<endl;
+		// std::cout<<query<<endl;
 		if(mysql_query (connect,query.c_str())){
 				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
 			    return 0;
@@ -4746,6 +4895,264 @@ int dbHandler :: updateInputTable(string rmx_no,string input,int val)
 		return 1;
 	}
 
+Json::Value dbHandler :: getOuputListContainingService(std::string service_number,std::string input,std::string rmx_no){
+	MYSQL_RES *res_set;
+	MYSQL_ROW row;
+	Json::Value jsonOriginalServiceName,jsonOriginalServiceId,jsonServiceId,jsonServiceName,jsonLcn,jsonBw,jsonServiceType,jsonEncryption;
+	Json::Value output_list;
+	std::string query;
+	std::string indexValue;
+
+	query="SELECT DISTINCT a.out_channel FROM channel_list c,active_service_list a WHERE c.input_channel = '"+input+"' AND c.input_channel = a.in_channel AND c.rmx_id = '"+rmx_no+"' AND c.rmx_id = a.rmx_id AND a.rmx_id = '"+rmx_no+"' AND a.in_channel = '"+input+"' AND c.channel_number = '"+service_number+"' AND a.channel_num = '"+service_number+"'" ;
+	// std::cout<<query<<std::endl;
+	mysql_query (connect,query.c_str());
+//addToSQLLog("dbHandler",query);
+	unsigned int i =0;
+	res_set = mysql_store_result(connect);
+	if(res_set){
+		unsigned int numrows = mysql_num_rows(res_set);
+		if(numrows>0)
+		{
+			jsonArray["error"] = false;
+			while (((row= mysql_fetch_row(res_set)) !=NULL ))
+			{
+				output_list.append(std::atoi(row[i]));
+			}
+
+		}else{	
+			jsonArray["error"] = true;
+		}
+		jsonArray["list"]=output_list;
+	}else{ 		
+		jsonArray["error"] = true;
+	}
+ 	return jsonArray;
+}
+
+int dbHandler :: addServiceType(std::string program_no,std::string service_type,std::string input,std::string rmx_no,std::string addFlag){
+	MYSQL_RES *res_set;
+	MYSQL_ROW row;
+	string query ="";
+	Json::Value json_output_list = this->getOuputListContainingService(program_no,input,rmx_no);
+	if(std::stoi(addFlag) == 1){
+		query = "UPDATE channel_list SET new_service_type = '"+service_type+"' WHERE rmx_id = '"+rmx_no+"' AND input_channel = '"+input+"' AND channel_number = '"+program_no+"';";
+		if(mysql_query (connect,query.c_str())){
+			std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+		    return 0;
+		}
+		
+		if(json_output_list["error"] == false)
+		{
+			for (int i = 0; i < json_output_list["list"].size(); ++i)
+			{
+				query = "UPDATE output SET custom_sdt = '1' WHERE rmx_id = '"+rmx_no+"' AND output_channel = '"+std::to_string(json_output_list["list"][i].asInt())+"';";
+				if(mysql_query (connect,query.c_str())){
+					std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+				    return 0;
+				}
+			}
+		}
+	}else{
+		query = "UPDATE channel_list SET new_service_type = '-1' WHERE rmx_id = '"+rmx_no+"' AND input_channel = '"+input+"' AND channel_number = '"+program_no+"';";
+		if(mysql_query (connect,query.c_str())){
+			std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+		    return 0;
+		}
+		if(json_output_list["error"] == false)
+		{
+			for (int i = 0; i < json_output_list["list"].size(); ++i)
+			{
+				std::string output = std::to_string(json_output_list["list"][i].asInt());
+				query="SELECT DISTINCT a.out_channel FROM channel_list c,active_service_list a WHERE c.input_channel = '"+input+"' AND c.input_channel = a.in_channel AND c.rmx_id = '"+rmx_no+"' AND c.rmx_id = a.rmx_id AND a.rmx_id = '"+rmx_no+"' AND a.in_channel = '"+input+"' AND new_service_type !=  '-1' AND a.out_channel = '"+output+"'";
+				if(mysql_query (connect,query.c_str())){
+					std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+				    return 0;
+				}
+				res_set = mysql_store_result(connect);
+				if(mysql_num_rows(res_set) == 0){
+					// int ts_number = ((std::stoi(rmx_no) -1) * 8)+std::stoi(output);
+					if(!this->isSDTPrivateDataExistForTS(rmx_no,output)){
+						query = "UPDATE output SET custom_sdt = '-1' WHERE rmx_id = '"+rmx_no+"' AND output_channel = '"+output+"';";
+						if(mysql_query (connect,query.c_str())){
+							std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+						    return 0;
+						}
+					}
+				}
+				
+			}
+		}
+
+	}	
+	
+	return 1;
+}
+bool dbHandler :: isSDTPrivateDataExistForTS(string rmx_no,string output){
+	Json::Reader reader;
+	Json::Value outputList;
+	bool output_index_found =false;
+	string query = "SELECT id FROM sdt_private_data WHERE rmx_id = '"+rmx_no+"' AND  output = '"+output+"';";
+	if(mysql_query (connect,query.c_str())){
+		std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+	    return false;
+	}
+	unsigned int i=0;
+	res_set = mysql_store_result(connect);
+	if(mysql_num_rows(res_set) > 0){
+		output_index_found = true;
+	}
+	return output_index_found;	
+}
+int dbHandler :: updateSDTtableCreationFlag(string rmx_no,string output,int addFlag){
+	string query ="";
+		
+	if(addFlag){
+		query = "UPDATE output SET custom_sdt = '1' WHERE rmx_id = '"+rmx_no+"' AND output_channel = '"+output+"';";
+		if(mysql_query (connect,query.c_str())){
+			std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+		    return 0;
+		}
+	}else{
+		if(!isSDTPrivateDataExistForTS(rmx_no,output)){
+			query="SELECT * FROM channel_list c,active_service_list a WHERE a.out_channel = '"+output+"' AND a.rmx_id = '"+rmx_no+"' AND c.input_channel = a.in_channel  AND c.rmx_id = a.rmx_id AND c.rmx_id = '"+rmx_no+"' AND c.new_service_type != '-1' AND c.channel_number = a.channel_num" ;
+			if(mysql_query (connect,query.c_str())){
+				std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+			    return 0;
+			}
+			res_set = mysql_store_result(connect);
+			if(mysql_num_rows(res_set) == 0){
+				query = "UPDATE output SET custom_sdt = '-1' WHERE rmx_id = '"+rmx_no+"' AND output_channel = '"+output+"';";
+				if(mysql_query (connect,query.c_str())){
+					std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+				    return 0;
+				}
+			}
+
+		}
+	}
+	return 1;
+	
+}
+int dbHandler :: addStaticIP(string ip_addr,string data_ip_id,int addFlag){
+	string query ="";
+
+	if(addFlag){
+		query = "UPDATE mux_15_1 SET static_ip = '"+ip_addr+"' WHERE mux_id = '"+data_ip_id+"';";
+	}else{
+		query = "UPDATE mux_15_1 SET static_ip = '0' WHERE mux_id = '"+data_ip_id+"';";
+	}
+	if(mysql_query (connect,query.c_str())){
+		std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+	    return 0;
+	}
+	return 1;
+}
+Json::Value dbHandler :: getStaticIPs(){
+	MYSQL_RES *res_set;
+	MYSQL_ROW row;
+	std::string query;
+	Json::Value jsonArray,jsonMux;
+
+	query="SELECT mux_id,static_ip FROM mux_15_1 WHERE static_ip != '0'";
+	// std::cout<<query<<std::endl;
+	mysql_query (connect,query.c_str());
+	unsigned int i =0;
+	res_set = mysql_store_result(connect);
+	if(res_set){
+		if(mysql_num_rows(res_set)>0)
+		{
+			jsonArray["error"] = false;
+			while (((row= mysql_fetch_row(res_set)) !=NULL ))
+			{
+				Json::Value json_obj;
+				json_obj["mux_id"] = atoi(row[i]);
+				json_obj["ip_addr"] = row[i+1];
+				jsonMux.append(json_obj);
+			}
+
+		}else{	
+			jsonArray["error"] = true;
+		}
+		jsonArray["list"]=jsonMux;
+	}else{ 		
+		jsonArray["error"] = true;
+	}
+ 	return jsonArray;
+}
+string dbHandler :: getStaticIP(string data_ip_id){
+	string static_ip= "-1",query;
+	MYSQL_RES *res_set;
+	MYSQL_ROW row;
+
+	query="SELECT static_ip FROM mux_15_1 WHERE mux_id != '"+data_ip_id+"'";
+	// std::cout<<query<<std::endl;
+	mysql_query (connect,query.c_str());
+	if(res_set = mysql_store_result(connect)){
+		if(mysql_num_rows(res_set)>0)
+		{
+			jsonArray["error"] = false;
+			while (((row= mysql_fetch_row(res_set)) !=NULL ))
+			{
+				static_ip = row[0];
+			}
+		}
+	}
+ 	return static_ip;
+}
+int dbHandler :: setEITpresentFlag(string str_output,string rmx_no,int addFlag){
+	string query ="";
+
+	if(addFlag){
+		query = "UPDATE output SET EIT_present = '1' WHERE output_channel = '"+str_output+"' AND rmx_id = '"+rmx_no+"';";
+	}else{
+		query = "UPDATE output SET EIT_present = '0' WHERE output_channel = '"+str_output+"' AND rmx_id = '"+rmx_no+"';";
+	}
+	if(mysql_query (connect,query.c_str())){
+		std::cout<<"MySQL query error : \n"<< mysql_error(connect)<<std::endl;
+	    return 0;
+	}
+	return 1;
+}
+int dbHandler :: isCustomSDTPresent(string str_output,string rmx_no){
+	string query;
+	int custom_sdt= 0;
+	MYSQL_RES *res_set;
+	MYSQL_ROW row;
+
+	query="SELECT custom_sdt FROM output WHERE output_channel ='"+str_output+"' AND rmx_id = '"+rmx_no+"' AND custom_sdt != '0'";
+	// std::cout<<query<<std::endl;
+	mysql_query (connect,query.c_str());
+	if(res_set = mysql_store_result(connect)){
+		if(mysql_num_rows(res_set)>0)
+		{
+			custom_sdt = 1;
+		}
+	}
+	return custom_sdt;
+}
+Json::Value dbHandler :: getServiceType(string progNumber,string input,string str_rmx_no){
+	string query;
+	int custom_sdt= 0;
+	MYSQL_RES *res_set;
+	MYSQL_ROW row;
+	Json::Value jsonArray;
+	jsonArray["error"] = true;
+	query="SELECT CASE WHEN new_service_type != -1 THEN new_service_type ELSE service_type END AS service_type FROM channel_list WHERE input_channel ='"+input+"' AND rmx_id = '"+str_rmx_no+"' AND channel_number = '"+progNumber+"'";
+	// std::cout<<query<<std::endl;
+	mysql_query (connect,query.c_str());
+	if(res_set = mysql_store_result(connect)){
+		if(mysql_num_rows(res_set)>0)
+		{
+			jsonArray["error"] = false;
+			while (((row= mysql_fetch_row(res_set)) !=NULL ))
+			{
+				jsonArray["service_type"] =row[0];
+				// cout<<"SERVICE TYPE "<<atoi(row[0])<<endl;
+			}
+		}
+	}
+	return jsonArray;
+}
 // int rmx_no = 6;
 // 		int frequency = 462;
 // 		for (int i = 0; i < 8; ++i)

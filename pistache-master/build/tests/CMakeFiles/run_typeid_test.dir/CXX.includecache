@@ -248,9 +248,9 @@ acxx_demangle.h
 
 ../include/typeid.h
 
-/home/user/Videos/CONTROLLER_V4/pistache-master/tests/typeid_test.cc
+/home/user/Videos/CONTROLLER_V2_5/pistache-master/tests/typeid_test.cc
 gtest/gtest.h
-/home/user/Videos/CONTROLLER_V4/pistache-master/tests/gtest/gtest.h
+/home/user/Videos/CONTROLLER_V2_5/pistache-master/tests/gtest/gtest.h
 typeid.h
-/home/user/Videos/CONTROLLER_V4/pistache-master/tests/typeid.h
+/home/user/Videos/CONTROLLER_V2_5/pistache-master/tests/typeid.h
 

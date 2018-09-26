@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string> 
 #include "config.h"
+#include <math.h>
 using namespace std;
 
 class dbHandler
@@ -28,6 +29,7 @@ public:
 	int addActivatedPrograms(std::string input,std::string output,Json::Value program_number,int rmx_no,int incFlag,std::string prog_list_str);
 	int addEncryptedPrograms(std::string input,std::string output,Json::Value program_number,int rmx_no,int incFlag,std::string prog_list_str,Json::Value keyIndex);
 	Json::Value getActivePrograms(int input,int output);
+	Json::Value getActiveServiceListToSDT(int output ,int rmx_no);
 	Json::Value getEncryptedPrograms(std::string program_number,std::string input ,std::string rmx_no);
 	Json::Value getEncryptedPrograms(std::string input ,std::string rmx_no);
 	int addLcnNumbers(std::string program_number,std::string channel_number,std::string input,int rmx_no,int addFlag);
@@ -202,6 +204,18 @@ public:
 	long long int getCWGroup(std::string rmx_no,std::string output);
 	int getEmptySlot(int cw_group_value);
 	int updateCWGroupValue(std::string rmx_no,std::string output,std::string input,std::string programNumber,long long int cw_group_value,long int cw_group,int addFlag);
+	Json::Value getOuputListContainingService(std::string service_number,std::string input,std::string rmx_no);
+	int addServiceType(std::string program_no,std::string service_type,std::string input,std::string rmx_no,std::string addFlag);
+	bool isSDTPrivateDataExistForTS(string rmx_no,string output);
+	int updateSDTtableCreationFlag(string rmx_no,string output,int addFlag);
+	int addStaticIP(string ip_addr,string data_ip_id,int addFlag);
+	Json::Value getStaticIPs();
+	string getStaticIP(string data_ip_id);
+	int setEITpresentFlag(string str_output,string rmx_no,int addflag);
+	int isCustomSDTPresent(string str_output,string rmx_no);
+	Json::Value getServiceType(string progNumber,string input,string str_rmx_no);
+	int addSDTPrivateData(std::string sPrivateData,std::string private_data_id,string rmx_no,string output,string service_id, int addFlag);
+	Json::Value getSDTPrivateDescripter(string service_id,string output,string str_rmx_no);
 };	
 // This is the content of the .h file, which is where the declarations go
 

@@ -1,4 +1,4 @@
-# Install script for directory: /home/user/Videos/CONTROLLER_V4/pistache-master/tests
+# Install script for directory: /home/user/Videos/CONTROLLER_V2_5/pistache-master/tests
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

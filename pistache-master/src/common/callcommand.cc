@@ -1137,6 +1137,21 @@
 			        msgBuf[3]  = CMD_BL_TRANSFER;
 			        msgBuf[len+4] = ETX;
 			        break;
+			case 108:
+	    		if(readWriteMode==0){
+		    		msgBuf[3] = CMD_INPUT_PID_FLTR;
+	    			msgBuf[4] = ETX;
+				}else{
+					len = 2;
+					int pid = 18;
+					msgBuf[1] = (unsigned char) (len>>8);
+					msgBuf[2] = (unsigned char) len;
+					msgBuf[3] = 0x0A;
+					msgBuf[4]= (unsigned char) (pid>>8);
+					msgBuf[5]= (unsigned char) pid;
+					msgBuf[6] = ETX;
+				}
+	    		break;
 	    }
 		len += 5; 
 		int count;
